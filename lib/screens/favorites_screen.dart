@@ -6,13 +6,20 @@ import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import 'wallpaper_preview_sheet.dart';
 
-class FavoritesScreen extends StatelessWidget {
+class FavoritesScreen extends StatefulWidget {
   final VoidCallback onBrowseWallpapers;
 
   const FavoritesScreen({
     super.key,
     required this.onBrowseWallpapers,
   });
+
+  @override
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
+}
+
+class _FavoritesScreenState extends State<FavoritesScreen> {
+  String _filter = 'All';
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +90,7 @@ class FavoritesScreen extends StatelessWidget {
                         ElevatedButton.icon(
                           onPressed: () {
                             HapticFeedback.selectionClick();
-                            onBrowseWallpapers();
+                            widget.onBrowseWallpapers();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFFF1744),
@@ -103,18 +110,55 @@ class FavoritesScreen extends StatelessWidget {
                     ),
                   ),
                 )
-              : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.65,
+              : Column(
+                  children: [
+                    // Filter Chips Row
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        children: [
+                          _buildFilterChip('All', favorites.length),
+                          const SizedBox(width: 8),
+                          _buildFilterChip('Live', favorites.where((s) => s.isLive).length),
+                          const SizedBox(width: 8),
+                          _buildFilterChip('Static', favorites.where((s) => !s.isLive).length),
+                        ],
+                      ),
                     ),
-                    itemCount: favorites.length,
-                    itemBuilder: (context, index) {
-                      final item = favorites[index];
+                    Expanded(
+                      child: (_filter == 'Live'
+                                  ? favorites.where((s) => s.isLive).toList()
+                                  : _filter == 'Static'
+                                      ? favorites.where((s) => !s.isLive).toList()
+                                      : favorites)
+                              .isEmpty
+                          ? Center(
+                              child: Text(
+                                'No $_filter favorites found.',
+                                style: const TextStyle(color: Colors.white38, fontSize: 13),
+                              ),
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: GridView.builder(
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                  childAspectRatio: 0.65,
+                                ),
+                                itemCount: (_filter == 'Live'
+                                        ? favorites.where((s) => s.isLive).toList()
+                                        : _filter == 'Static'
+                                            ? favorites.where((s) => !s.isLive).toList()
+                                            : favorites)
+                                    .length,
+                                itemBuilder: (context, index) {
+                                  final item = (_filter == 'Live'
+                                      ? favorites.where((s) => s.isLive).toList()
+                                      : _filter == 'Static'
+                                          ? favorites.where((s) => !s.isLive).toList()
+                                          : favorites)[index];
                       return GestureDetector(
                         onTap: () {
                           WallpaperPreviewSheet.show(context, item);
@@ -229,8 +273,39 @@ class FavoritesScreen extends StatelessWidget {
                     },
                   ),
                 ),
+              ),
+            ],
+          ),
         );
       },
+    );
+  }
+
+  Widget _buildFilterChip(String filterName, int count) {
+    final isSelected = _filter == filterName;
+    return ChoiceChip(
+      label: Text('$filterName ($count)'),
+      selected: isSelected,
+      onSelected: (selected) {
+        if (selected) {
+          HapticFeedback.selectionClick();
+          setState(() => _filter = filterName);
+        }
+      },
+      backgroundColor: const Color(0xFF16161A),
+      selectedColor: const Color(0xFFFF1744),
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.white : Colors.white70,
+        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+        fontSize: 12,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: isSelected ? const Color(0xFFFF1744) : Colors.white12,
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
     );
   }
 }

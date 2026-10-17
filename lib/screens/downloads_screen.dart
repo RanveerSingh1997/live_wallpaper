@@ -6,13 +6,20 @@ import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import 'wallpaper_preview_sheet.dart';
 
-class DownloadsScreen extends StatelessWidget {
+class DownloadsScreen extends StatefulWidget {
   final VoidCallback onBrowseWallpapers;
 
   const DownloadsScreen({
     super.key,
     required this.onBrowseWallpapers,
   });
+
+  @override
+  State<DownloadsScreen> createState() => _DownloadsScreenState();
+}
+
+class _DownloadsScreenState extends State<DownloadsScreen> {
+  String _filter = 'All';
 
   void _confirmClearAll(BuildContext context) {
     showDialog(
@@ -129,7 +136,7 @@ class DownloadsScreen extends StatelessWidget {
                         ElevatedButton.icon(
                           onPressed: () {
                             HapticFeedback.selectionClick();
-                            onBrowseWallpapers();
+                            widget.onBrowseWallpapers();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF00E676),
@@ -222,10 +229,44 @@ class DownloadsScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
+
+                    // Filter Chips Row
+                    Row(
+                      children: [
+                        _buildFilterChip('All', downloads.length),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Live', downloads.where((s) => s.isLive).length),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Static', downloads.where((s) => !s.isLive).length),
+                      ],
+                    ),
+
+                    const SizedBox(height: 14),
 
                     // Downloaded Wallpapers List
-                    ...downloads.map((item) {
+                    if ((_filter == 'Live'
+                            ? downloads.where((s) => s.isLive).toList()
+                            : _filter == 'Static'
+                                ? downloads.where((s) => !s.isLive).toList()
+                                : downloads)
+                        .isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Center(
+                          child: Text(
+                            'No $_filter downloads found.',
+                            style: const TextStyle(color: Colors.white38, fontSize: 13),
+                          ),
+                        ),
+                      )
+                    else
+                      ...(_filter == 'Live'
+                              ? downloads.where((s) => s.isLive).toList()
+                              : _filter == 'Static'
+                                  ? downloads.where((s) => !s.isLive).toList()
+                                  : downloads)
+                          .map((item) {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
@@ -302,6 +343,34 @@ class DownloadsScreen extends StatelessWidget {
                 ),
         );
       },
+    );
+  }
+
+  Widget _buildFilterChip(String filterName, int count) {
+    final isSelected = _filter == filterName;
+    return ChoiceChip(
+      label: Text('$filterName ($count)'),
+      selected: isSelected,
+      onSelected: (selected) {
+        if (selected) {
+          HapticFeedback.selectionClick();
+          setState(() => _filter = filterName);
+        }
+      },
+      backgroundColor: const Color(0xFF16161A),
+      selectedColor: const Color(0xFF00E676),
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.black : Colors.white70,
+        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+        fontSize: 12,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: isSelected ? const Color(0xFF00E676) : Colors.white12,
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
     );
   }
 }

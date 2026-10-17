@@ -473,5 +473,91 @@ void main() {
       expect(find.text('5.0 MB'), findsOneWidget);
       expect(find.text('Replay Onboarding Tour'), findsOneWidget);
     });
+
+    testWidgets('DownloadsScreen displays offline filter chips and switches segments',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          downloadedIds: const {'ippo_hard_work', 'static_amoled_nebula'},
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: DownloadsScreen(onBrowseWallpapers: () {}),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      expect(find.widgetWithText(ChoiceChip, 'All (2)'), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, 'Live (1)'), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, 'Static (1)'), findsOneWidget);
+
+      // Switch to Live segment
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Live (1)'));
+      await tester.pump();
+
+      expect(find.text('Hajime no Ippo: Makunouchi Creed'), findsOneWidget);
+    });
+
+    testWidgets('FavoritesScreen displays filter chips and filters live and static favorites',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          favoriteIds: const {'ippo_hard_work', 'static_nature_solitude'},
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: FavoritesScreen(onBrowseWallpapers: () {}),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      expect(find.widgetWithText(ChoiceChip, 'All (2)'), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, 'Live (1)'), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, 'Static (1)'), findsOneWidget);
+
+      // Switch to Static segment
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Static (1)'));
+      await tester.pump();
+
+      expect(find.text('Alpine Solitude & Misty Ridge'), findsOneWidget);
+    });
   });
 }
