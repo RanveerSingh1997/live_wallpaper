@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
+import '../models/wallpaper_effect_config.dart';
 
 abstract class WallpaperIntent extends Equatable {
   const WallpaperIntent();
@@ -290,4 +291,29 @@ class ToggleWallpaperInCollectionIntent extends WallpaperIntent {
 class ToggleAmoledSaverModeIntent extends WallpaperIntent {
   const ToggleAmoledSaverModeIntent();
 }
+
+/// Intent to update visual effects (blur, vignette, contrast, filters) for a given wallpaper.
+class UpdateWallpaperEffectIntent extends WallpaperIntent {
+  final String wallpaperId;
+  final WallpaperEffectConfig effectConfig;
+
+  const UpdateWallpaperEffectIntent({
+    required this.wallpaperId,
+    required this.effectConfig,
+  });
+
+  @override
+  List<Object?> get props => [wallpaperId, effectConfig];
+}
+
+/// Intent to reset visual effects for a given wallpaper to default.
+class ResetWallpaperEffectIntent extends WallpaperIntent {
+  final String wallpaperId;
+
+  const ResetWallpaperEffectIntent(this.wallpaperId);
+
+  @override
+  List<Object?> get props => [wallpaperId];
+}
+
 

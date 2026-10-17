@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
+import '../models/wallpaper_effect_config.dart';
 
 enum WallpaperActionStatus {
   idle,
@@ -24,6 +25,7 @@ class WallpaperState extends Equatable {
   final List<String> recentlyViewedIds;
   final Set<String> reportedIds;
   final Map<String, String> customizedQuotes;
+  final Map<String, WallpaperEffectConfig> customEffects;
   final bool isFeedMuted;
   final bool isLiveWallpaperActiveOnDevice;
   final String? activeWallpaperId;
@@ -54,6 +56,7 @@ class WallpaperState extends Equatable {
     this.recentlyViewedIds = const [],
     this.reportedIds = const {},
     this.customizedQuotes = const {},
+    this.customEffects = const {},
     this.isFeedMuted = true,
     this.isLiveWallpaperActiveOnDevice = false,
     this.activeWallpaperId,
@@ -85,6 +88,11 @@ class WallpaperState extends Equatable {
   /// Get the effective quote for any short (either user customized or default).
   String getEffectiveQuote(MotivationalShort short) {
     return customizedQuotes[short.id] ?? short.quote;
+  }
+
+  /// Get the effective visual effects for any short (either user customized or default).
+  WallpaperEffectConfig getEffectiveEffects(String wallpaperId) {
+    return customEffects[wallpaperId] ?? WallpaperEffectConfig.defaultPreset;
   }
 
   /// True if current short is marked as a favorite.
@@ -188,6 +196,7 @@ class WallpaperState extends Equatable {
     List<String>? recentlyViewedIds,
     Set<String>? reportedIds,
     Map<String, String>? customizedQuotes,
+    Map<String, WallpaperEffectConfig>? customEffects,
     bool? isFeedMuted,
     bool? isLiveWallpaperActiveOnDevice,
     String? activeWallpaperId,
@@ -218,6 +227,7 @@ class WallpaperState extends Equatable {
       recentlyViewedIds: recentlyViewedIds ?? this.recentlyViewedIds,
       reportedIds: reportedIds ?? this.reportedIds,
       customizedQuotes: customizedQuotes ?? this.customizedQuotes,
+      customEffects: customEffects ?? this.customEffects,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
       isLiveWallpaperActiveOnDevice:
           isLiveWallpaperActiveOnDevice ?? this.isLiveWallpaperActiveOnDevice,
@@ -254,6 +264,7 @@ class WallpaperState extends Equatable {
         recentlyViewedIds,
         reportedIds,
         customizedQuotes,
+        customEffects,
         isFeedMuted,
         isLiveWallpaperActiveOnDevice,
         activeWallpaperId,

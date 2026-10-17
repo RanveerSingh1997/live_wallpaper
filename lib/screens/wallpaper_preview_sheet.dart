@@ -11,6 +11,8 @@ import 'add_to_collection_sheet.dart';
 import 'fullscreen_wallpaper_viewer.dart';
 import 'ipad_wallpaper_dialog.dart';
 import 'quote_studio_sheet.dart';
+import 'wallpaper_effects_sheet.dart';
+import 'wallpaper_export_sheet.dart';
 
 class WallpaperPreviewSheet extends StatelessWidget {
   final MotivationalShort wallpaper;
@@ -40,6 +42,32 @@ class WallpaperPreviewSheet extends StatelessWidget {
             state.isLiveWallpaperActiveOnDevice;
         final effectiveQuote = state.getEffectiveQuote(wallpaper);
         final isCustomized = state.customizedQuotes.containsKey(wallpaper.id);
+        final effectiveEffects = state.getEffectiveEffects(wallpaper.id);
+
+        ColorFilter? colorFilter;
+        switch (effectiveEffects.colorFilterPreset) {
+          case 'noir':
+            colorFilter = const ColorFilter.mode(Colors.black, BlendMode.saturation);
+            break;
+          case 'cyber_cyan':
+            colorFilter = ColorFilter.mode(
+                const Color(0xFF00E5FF).withValues(alpha: 0.35), BlendMode.color);
+            break;
+          case 'sunset_amber':
+            colorFilter = ColorFilter.mode(
+                const Color(0xFFFF5722).withValues(alpha: 0.35), BlendMode.color);
+            break;
+          case 'matrix_emerald':
+            colorFilter = ColorFilter.mode(
+                const Color(0xFF00E676).withValues(alpha: 0.35), BlendMode.color);
+            break;
+          case 'aurora_violet':
+            colorFilter = ColorFilter.mode(
+                const Color(0xFFD500F9).withValues(alpha: 0.35), BlendMode.color);
+            break;
+          default:
+            colorFilter = null;
+        }
 
         final related = state.allShorts
             .where((s) => s.id != wallpaper.id && s.category == wallpaper.category)
@@ -96,24 +124,29 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                 },
                               )
                             else
-                              Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: wallpaper.gradientColors.isNotEmpty
-                                        ? wallpaper.gradientColors
-                                        : [
-                                            wallpaper.accentColor.withValues(alpha: 0.4),
-                                            Colors.black,
-                                          ],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
+                              ColorFiltered(
+                                colorFilter: colorFilter ??
+                                    const ColorFilter.mode(
+                                        Colors.transparent, BlendMode.dst),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: wallpaper.gradientColors.isNotEmpty
+                                          ? wallpaper.gradientColors
+                                          : [
+                                              wallpaper.accentColor.withValues(alpha: 0.4),
+                                              Colors.black,
+                                            ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
                                   ),
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.wallpaper_rounded,
-                                    size: 64,
-                                    color: wallpaper.accentColor.withValues(alpha: 0.6),
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.wallpaper_rounded,
+                                      size: 64,
+                                      color: wallpaper.accentColor.withValues(alpha: 0.6),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -125,9 +158,9 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                   colors: [
-                                    Colors.black.withValues(alpha: 0.4),
+                                    Colors.black.withValues(alpha: (0.4 + (effectiveEffects.vignetteStrength * 0.4)).clamp(0.0, 0.95)),
                                     Colors.transparent,
-                                    Colors.black.withValues(alpha: 0.8),
+                                    Colors.black.withValues(alpha: (0.8 + (effectiveEffects.vignetteStrength * 0.18)).clamp(0.0, 0.98)),
                                   ],
                                   stops: const [0.0, 0.5, 1.0],
                                 ),
@@ -178,6 +211,14 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                   ),
                                   Row(
                                     children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.tune_rounded, color: Colors.white),
+                                        tooltip: 'Visual Effects Studio',
+                                        onPressed: () {
+                                          HapticFeedback.mediumImpact();
+                                          WallpaperEffectsSheet.show(context, wallpaper);
+                                        },
+                                      ),
                                       IconButton(
                                         icon: const Icon(Icons.fullscreen_rounded, color: Colors.white),
                                         tooltip: 'Interactive Screen Simulator',
@@ -310,6 +351,128 @@ class WallpaperPreviewSheet extends StatelessWidget {
                           ],
                         ),
                       ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Visual Effects & Story Export Quick Cards
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              HapticFeedback.mediumImpact();
+                              WallpaperEffectsSheet.show(context, wallpaper);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF18181E),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: Colors.white12),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(Icons.tune_rounded, color: Color(0xFF00E5FF), size: 16),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Effects Studio',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 11,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          'Filters & Vignette',
+                                          style: TextStyle(
+                                            color: Colors.white54,
+                                            fontSize: 9,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              HapticFeedback.mediumImpact();
+                              WallpaperExportSheet.show(context, wallpaper);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF18181E),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: Colors.white12),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFF5722).withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(Icons.ios_share_rounded, color: Color(0xFFFF5722), size: 16),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Story Poster',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 11,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          '9:16 Social Export',
+                                          style: TextStyle(
+                                            color: Colors.white54,
+                                            fontSize: 9,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 

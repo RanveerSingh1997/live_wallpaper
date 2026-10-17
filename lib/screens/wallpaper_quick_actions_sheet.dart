@@ -10,6 +10,8 @@ import 'add_to_collection_sheet.dart';
 import 'fullscreen_wallpaper_viewer.dart';
 import 'ipad_wallpaper_dialog.dart';
 import 'quote_studio_sheet.dart';
+import 'wallpaper_effects_sheet.dart';
+import 'wallpaper_export_sheet.dart';
 
 class WallpaperQuickActionsSheet extends StatelessWidget {
   final MotivationalShort wallpaper;
@@ -157,10 +159,11 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
           ),
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 36),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Drag Handle
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Drag Handle
               Container(
                 width: 44,
                 height: 4,
@@ -303,16 +306,50 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
                     Navigator.of(context).pop();
                   }
                   FullScreenWallpaperViewer.open(
-                    context,
-                    wallpaper: wallpaper,
-                    playlist: state.allShorts,
-                  );
+                     context,
+                     wallpaper: wallpaper,
+                     playlist: state.allShorts,
+                   );
+                 },
+               ),
+
+               const SizedBox(height: 8),
+
+              // Action 3: Canvas Effects & Filters Studio
+              _buildActionTile(
+                context: context,
+                icon: Icons.tune_rounded,
+                iconColor: const Color(0xFF00E5FF),
+                title: 'Canvas Effects & Filters Studio',
+                subtitle: 'Tune OLED Noir, depth blur, Obsidian vignette & contrast',
+                onTap: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
+                  WallpaperEffectsSheet.show(context, wallpaper);
                 },
               ),
 
               const SizedBox(height: 8),
 
-              // Action 3: Add to Playlist
+              // Action 4: Export Story & Poster
+              _buildActionTile(
+                context: context,
+                icon: Icons.ios_share_rounded,
+                iconColor: const Color(0xFFFF5722),
+                title: 'Export Story & Poster',
+                subtitle: 'Generate 9:16 high-res posters with typography templates',
+                onTap: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
+                  WallpaperExportSheet.show(context, wallpaper);
+                },
+              ),
+
+              const SizedBox(height: 8),
+
+              // Action 5: Add to Playlist
               _buildActionTile(
                 context: context,
                 icon: Icons.playlist_add_rounded,
@@ -389,6 +426,7 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
                 },
               ),
             ],
+          ),
           ),
         );
       },

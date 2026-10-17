@@ -3,13 +3,15 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/motivational_short.dart';
+import '../models/wallpaper_effect_config.dart';
 
 class WallpaperRendererService {
-  /// Renders a crisp 1080x1920 wallpaper with custom typography and ambient gradients.
+  /// Renders a crisp 1080x1920 wallpaper with custom typography, ambient gradients, and effects.
   /// Saves the rendered PNG to cache and returns the local File.
   static Future<File> renderWallpaperToFile({
     required MotivationalShort wallpaper,
     String? quoteOverride,
+    WallpaperEffectConfig? effectConfig,
     int width = 1080,
     int height = 1920,
   }) async {
@@ -37,15 +39,44 @@ class WallpaperRendererService {
       );
     canvas.drawRect(Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()), bgPaint);
 
-    // 2. Draw subtle dark ambient vignette top and bottom
+    // 2. Apply Custom Visual Effects (Tints & Filters)
+    if (effectConfig != null && !effectConfig.isDefault) {
+      if (effectConfig.colorFilterPreset == 'noir') {
+        final noirPaint = Paint()
+          ..colorFilter = const ColorFilter.mode(Colors.black, BlendMode.saturation);
+        canvas.drawRect(Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()), noirPaint);
+      } else if (effectConfig.colorFilterPreset == 'cyber_cyan') {
+        final tintPaint = Paint()
+          ..colorFilter = const ColorFilter.mode(Color(0xFF00E5FF), BlendMode.color);
+        canvas.drawRect(Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()), tintPaint);
+      } else if (effectConfig.colorFilterPreset == 'sunset_amber') {
+        final tintPaint = Paint()
+          ..colorFilter = const ColorFilter.mode(Color(0xFFFF5722), BlendMode.color);
+        canvas.drawRect(Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()), tintPaint);
+      } else if (effectConfig.colorFilterPreset == 'matrix_emerald') {
+        final tintPaint = Paint()
+          ..colorFilter = const ColorFilter.mode(Color(0xFF00E676), BlendMode.color);
+        canvas.drawRect(Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()), tintPaint);
+      } else if (effectConfig.colorFilterPreset == 'aurora_violet') {
+        final tintPaint = Paint()
+          ..colorFilter = const ColorFilter.mode(Color(0xFFD500F9), BlendMode.color);
+        canvas.drawRect(Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()), tintPaint);
+      }
+    }
+
+    // 3. Draw subtle dark ambient vignette top and bottom
+    final double vignetteAlpha = (effectConfig != null && effectConfig.vignetteStrength > 0)
+        ? (0.65 + effectConfig.vignetteStrength * 0.3).clamp(0.0, 0.98)
+        : 0.65;
+
     final vignettePaint = Paint()
       ..shader = ui.Gradient.linear(
         Offset(width / 2, 0),
         Offset(width / 2, height.toDouble()),
         [
-          Colors.black.withValues(alpha: 0.65),
+          Colors.black.withValues(alpha: vignetteAlpha),
           Colors.transparent,
-          Colors.black.withValues(alpha: 0.85),
+          Colors.black.withValues(alpha: (vignetteAlpha + 0.15).clamp(0.0, 0.98)),
         ],
         [0.0, 0.45, 1.0],
       );

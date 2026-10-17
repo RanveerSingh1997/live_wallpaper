@@ -21,6 +21,8 @@ import 'package:live_wallpaper/screens/onboarding_sheet.dart';
 import 'package:live_wallpaper/screens/quote_studio_sheet.dart';
 import 'package:live_wallpaper/screens/settings_sheet.dart';
 import 'package:live_wallpaper/screens/splash_screen.dart';
+import 'package:live_wallpaper/screens/wallpaper_effects_sheet.dart';
+import 'package:live_wallpaper/screens/wallpaper_export_sheet.dart';
 import 'package:live_wallpaper/screens/wallpaper_preview_sheet.dart';
 import 'package:live_wallpaper/screens/wallpaper_quick_actions_sheet.dart';
 import 'package:live_wallpaper/widgets/kinetic_quote_overlay.dart';
@@ -1215,6 +1217,156 @@ void main() {
       await tester.drag(find.text('Create Custom Playlist'), const Offset(0, -500));
       await tester.pumpAndSettle();
       expect(find.text('EDITORIAL COLLECTIONS'), findsOneWidget);
+    });
+
+    testWidgets('WallpaperEffectsSheet renders preset chips, sliders and saves effect configuration',
+        (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final short = CuratedShortsData.shorts.first;
+
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: [short],
+          filteredShorts: [short],
+        ),
+      );
+      addTearDown(bloc.close);
+
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: Scaffold(
+              body: WallpaperEffectsSheet(wallpaper: short),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify Header & Live Mockup
+      expect(find.text('EFFECTS & FILTERS'), findsOneWidget);
+      expect(find.text('Reset'), findsOneWidget);
+      expect(find.text('FILTER PRESETS'), findsOneWidget);
+
+      // Verify preset filter chips
+      expect(find.text('Original'), findsOneWidget);
+      expect(find.text('OLED Noir'), findsOneWidget);
+      expect(find.text('Cyber Cyan'), findsOneWidget);
+
+      // Tap on Cyber Cyan preset chip
+      await tester.tap(find.text('Cyber Cyan'));
+      await tester.pumpAndSettle();
+
+      // Scroll down to reveal Apply button
+      await tester.drag(find.text('EFFECTS & FILTERS'), const Offset(0, -600));
+      await tester.pumpAndSettle();
+
+      expect(find.text('APPLY EFFECTS TO CANVAS'), findsOneWidget);
+
+      // Tap Apply Effects to Canvas
+      await tester.tap(find.text('APPLY EFFECTS TO CANVAS'));
+      await tester.pumpAndSettle();
+
+      // Verify bloc received the custom effect
+      final effect = bloc.state.getEffectiveEffects(short.id);
+      expect(effect.colorFilterPreset, 'cyber_cyan');
+      expect(effect.vignetteStrength, 0.2);
+    });
+
+    testWidgets('WallpaperExportSheet renders 9:16 poster preview, layout choices, and action buttons',
+        (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final short = CuratedShortsData.shorts.first;
+
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: [short],
+          filteredShorts: [short],
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: Scaffold(
+              body: WallpaperExportSheet(wallpaper: short),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify Header
+      expect(find.text('EXPORT STORY & POSTER'), findsOneWidget);
+
+      // Scroll down to reveal story template choices and export buttons
+      await tester.drag(find.text('EXPORT STORY & POSTER'), const Offset(0, -400));
+      await tester.pumpAndSettle();
+
+      expect(find.text('STORY TEMPLATE'), findsOneWidget);
+      expect(find.text('Editorial Story'), findsOneWidget);
+      expect(find.text('Clean Canvas'), findsOneWidget);
+      expect(find.text('Quote Focus'), findsOneWidget);
+
+      // Verify Action Buttons
+      expect(find.text('SAVE POSTER'), findsOneWidget);
+      expect(find.text('SHARE STORY'), findsOneWidget);
+
+      // Switch to Clean Canvas layout
+      await tester.tap(find.text('Clean Canvas'));
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('WallpaperQuickActionsSheet renders Canvas Effects Studio and Story Export options',
+        (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final short = CuratedShortsData.shorts.first;
+
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: [short],
+          filteredShorts: [short],
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: Scaffold(
+              body: WallpaperQuickActionsSheet(wallpaper: short),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify Actions list
+      expect(find.text('Canvas Effects & Filters Studio'), findsOneWidget);
+      expect(find.text('Export Story & Poster'), findsOneWidget);
+      expect(find.text('Add to Playlist'), findsOneWidget);
+      expect(find.text('Customize in Quote Studio'), findsOneWidget);
     });
   });
 }

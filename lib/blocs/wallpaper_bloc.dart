@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/motivational_short.dart';
+import '../models/wallpaper_effect_config.dart';
 import '../repositories/wallpaper_repository.dart';
 import 'wallpaper_intent.dart';
 import 'wallpaper_state.dart';
@@ -46,6 +47,8 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<DeleteCustomCollectionIntent>(_onDeleteCustomCollection);
     on<ToggleWallpaperInCollectionIntent>(_onToggleWallpaperInCollection);
     on<ToggleAmoledSaverModeIntent>(_onToggleAmoledSaverMode);
+    on<UpdateWallpaperEffectIntent>(_onUpdateWallpaperEffect);
+    on<ResetWallpaperEffectIntent>(_onResetWallpaperEffect);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -83,6 +86,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final autoRotationWifiOnly = repository.isAutoRotationWifiOnly();
       final autoRotationTarget = repository.getAutoRotationTarget();
       final isAmoledSaver = repository.isAmoledSaverModeEnabled();
+      final effects = repository.getCustomEffects();
 
       final forYouList = _buildForYouList(shorts, preferences);
 
@@ -97,6 +101,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         recentlyViewedIds: recentlyViewed,
         reportedIds: reported,
         customizedQuotes: quotes,
+        customEffects: effects,
         activeWallpaperId: activeId,
         userPreferences: preferences,
         isTextOverlayVisible: isTextOverlayVisible,
@@ -401,6 +406,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         short: event.short,
         targetScreen: event.targetScreen,
         customQuote: event.customQuote,
+        effectConfig: state.getEffectiveEffects(event.short.id),
       );
 
       final status = result['status']?.toString();
@@ -731,5 +737,35 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
             : 'Removed from "${updatedCol.title}".',
       ));
     }
+  }
+
+  Future<void> _onUpdateWallpaperEffect(
+    UpdateWallpaperEffectIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveCustomEffect(event.wallpaperId, event.effectConfig);
+    final updatedEffects = Map<String, WallpaperEffectConfig>.from(state.customEffects);
+    if (event.effectConfig.isDefault) {
+      updatedEffects.remove(event.wallpaperId);
+    } else {
+      updatedEffects[event.wallpaperId] = event.effectConfig;
+    }
+    emit(state.copyWith(
+      customEffects: updatedEffects,
+      message: 'Visual canvas effects saved.',
+    ));
+  }
+
+  Future<void> _onResetWallpaperEffect(
+    ResetWallpaperEffectIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.resetCustomEffect(event.wallpaperId);
+    final updatedEffects = Map<String, WallpaperEffectConfig>.from(state.customEffects)
+      ..remove(event.wallpaperId);
+    emit(state.copyWith(
+      customEffects: updatedEffects,
+      message: 'Visual canvas effects reset to default.',
+    ));
   }
 }

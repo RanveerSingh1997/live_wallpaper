@@ -8,6 +8,8 @@ import '../blocs/wallpaper_state.dart';
 import '../models/motivational_short.dart';
 import '../widgets/video_player_item.dart';
 import 'ipad_wallpaper_dialog.dart';
+import 'wallpaper_effects_sheet.dart';
+import 'wallpaper_export_sheet.dart';
 
 enum ScreenSimulationMode {
   clean('Clean View', Icons.visibility_rounded),
@@ -291,38 +293,97 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
   }
 
   Widget _buildWallpaperCanvas(MotivationalShort short) {
-    if (short.isLive) {
-      return VideoPlayerItem(
-        key: ValueKey('fullscreen_${short.id}'),
-        videoAssetPath: short.videoAssetPath,
-        isActive: true,
-        isMuted: true,
-        onDoubleTapLike: () {
-          context.read<WallpaperBloc>().add(ToggleFavoriteIntent(short.id));
-        },
-      );
-    }
+    return BlocBuilder<WallpaperBloc, WallpaperState>(
+      builder: (context, state) {
+        final effects = state.getEffectiveEffects(short.id);
+        ColorFilter? colorFilter;
+        switch (effects.colorFilterPreset) {
+          case 'noir':
+            colorFilter = const ColorFilter.mode(Colors.black, BlendMode.saturation);
+            break;
+          case 'cyber_cyan':
+            colorFilter = ColorFilter.mode(
+                const Color(0xFF00E5FF).withValues(alpha: 0.35), BlendMode.color);
+            break;
+          case 'sunset_amber':
+            colorFilter = ColorFilter.mode(
+                const Color(0xFFFF5722).withValues(alpha: 0.35), BlendMode.color);
+            break;
+          case 'matrix_emerald':
+            colorFilter = ColorFilter.mode(
+                const Color(0xFF00E676).withValues(alpha: 0.35), BlendMode.color);
+            break;
+          case 'aurora_violet':
+            colorFilter = ColorFilter.mode(
+                const Color(0xFFD500F9).withValues(alpha: 0.35), BlendMode.color);
+            break;
+          default:
+            colorFilter = null;
+        }
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: short.gradientColors.isNotEmpty
-              ? short.gradientColors
-              : [
-                  short.accentColor.withValues(alpha: 0.45),
-                  Colors.black,
-                ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: Center(
-        child: Icon(
-          Icons.wallpaper_rounded,
-          size: 96,
-          color: short.accentColor.withValues(alpha: 0.5),
-        ),
-      ),
+        Widget canvas;
+        if (short.isLive) {
+          canvas = VideoPlayerItem(
+            key: ValueKey('fullscreen_${short.id}'),
+            videoAssetPath: short.videoAssetPath,
+            isActive: true,
+            isMuted: true,
+            onDoubleTapLike: () {
+              context.read<WallpaperBloc>().add(ToggleFavoriteIntent(short.id));
+            },
+          );
+        } else {
+          canvas = Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: short.gradientColors.isNotEmpty
+                    ? short.gradientColors
+                    : [
+                        short.accentColor.withValues(alpha: 0.45),
+                        Colors.black,
+                      ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: Center(
+              child: Icon(
+                Icons.wallpaper_rounded,
+                size: 96,
+                color: short.accentColor.withValues(alpha: 0.5),
+              ),
+            ),
+          );
+        }
+
+        if (colorFilter != null) {
+          canvas = ColorFiltered(colorFilter: colorFilter, child: canvas);
+        }
+
+        if (effects.vignetteStrength > 0.0) {
+          canvas = Stack(
+            fit: StackFit.expand,
+            children: [
+              canvas,
+              Container(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment.center,
+                    radius: 1.0,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(
+                          alpha: (effects.vignetteStrength * 0.75).clamp(0.0, 0.95)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+
+        return canvas;
+      },
     );
   }
 
@@ -513,6 +574,26 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                           context
                               .read<WallpaperBloc>()
                               .add(DownloadWallpaperIntent(short));
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      // Visual Effects Studio Button
+                      IconButton(
+                        icon: const Icon(Icons.tune_rounded, color: Color(0xFF00E5FF)),
+                        tooltip: 'Visual Effects Studio',
+                        onPressed: () {
+                          HapticFeedback.mediumImpact();
+                          WallpaperEffectsSheet.show(context, short);
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      // Export Story Poster Button
+                      IconButton(
+                        icon: const Icon(Icons.ios_share_rounded, color: Color(0xFFFF5722)),
+                        tooltip: 'Export Story Poster',
+                        onPressed: () {
+                          HapticFeedback.mediumImpact();
+                          WallpaperExportSheet.show(context, short);
                         },
                       ),
                     ],

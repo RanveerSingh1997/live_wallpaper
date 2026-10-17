@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
+import '../models/wallpaper_effect_config.dart';
 import '../services/wallpaper_renderer_service.dart';
 import '../services/wallpaper_service_bridge.dart';
 
@@ -17,6 +18,7 @@ class WallpaperRepository {
   static const String _keyDownloads = 'downloaded_wallpaper_ids';
   static const String _keyActiveId = 'active_wallpaper_id';
   static const String _keyCustomQuotesPrefix = 'custom_quote_';
+  static const String _keyCustomEffectsPrefix = 'custom_effects_';
   static const String _keyUserPreferences = 'user_preferred_categories';
   static const String _keyTextOverlayEnabled = 'text_overlay_enabled_by_default';
   static const String _keyRecentlyViewed = 'recently_viewed_wallpaper_ids';
@@ -285,6 +287,39 @@ class WallpaperRepository {
     await prefs.setString('$_keyCustomQuotesPrefix$shortId', quote);
   }
 
+  /// Returns all stored custom wallpaper effects by wallpaperId.
+  Map<String, WallpaperEffectConfig> getCustomEffects() {
+    final Map<String, WallpaperEffectConfig> map = {};
+    final allShorts = getCuratedShorts();
+    for (final short in allShorts) {
+      final saved = prefs.getString('$_keyCustomEffectsPrefix${short.id}');
+      if (saved != null && saved.isNotEmpty) {
+        try {
+          final json = jsonDecode(saved) as Map<String, dynamic>;
+          map[short.id] = WallpaperEffectConfig.fromJson(json);
+        } catch (_) {}
+      }
+    }
+    return map;
+  }
+
+  /// Saves a custom effect configuration for a given wallpaper.
+  Future<void> saveCustomEffect(String wallpaperId, WallpaperEffectConfig config) async {
+    if (config.isDefault) {
+      await prefs.remove('$_keyCustomEffectsPrefix$wallpaperId');
+    } else {
+      await prefs.setString(
+        '$_keyCustomEffectsPrefix$wallpaperId',
+        jsonEncode(config.toJson()),
+      );
+    }
+  }
+
+  /// Resets custom effect configuration for a given wallpaper back to default.
+  Future<void> resetCustomEffect(String wallpaperId) async {
+    await prefs.remove('$_keyCustomEffectsPrefix$wallpaperId');
+  }
+
   /// Returns the ID of the currently active wallpaper.
   String? getActiveWallpaperId() {
     return prefs.getString(_keyActiveId);
@@ -390,14 +425,16 @@ class WallpaperRepository {
     }
   }
 
-  /// Renders a high-resolution static wallpaper PNG file with custom typography.
+  /// Renders a high-resolution static wallpaper PNG file with custom typography and visual effects.
   Future<File> renderStaticWallpaperFile({
     required MotivationalShort short,
     String? customQuote,
+    WallpaperEffectConfig? effectConfig,
   }) async {
     return await WallpaperRendererService.renderWallpaperToFile(
       wallpaper: short,
       quoteOverride: customQuote,
+      effectConfig: effectConfig,
     );
   }
 
@@ -406,10 +443,12 @@ class WallpaperRepository {
     required MotivationalShort short,
     String targetScreen = 'both',
     String? customQuote,
+    WallpaperEffectConfig? effectConfig,
   }) async {
     final file = await renderStaticWallpaperFile(
       short: short,
       customQuote: customQuote,
+      effectConfig: effectConfig,
     );
 
     if (Platform.isAndroid) {

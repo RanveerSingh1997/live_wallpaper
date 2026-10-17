@@ -6,6 +6,7 @@ import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
+import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -580,6 +581,79 @@ void main() {
 
       expect(monolith.isAmoledCertified, isTrue);
       expect(monolith.trueBlackPercentage, 96);
+    });
+
+    test('UpdateWallpaperEffectIntent updates state and persists effect configuration', () async {
+      const config = WallpaperEffectConfig(
+        blurSigma: 8.0,
+        vignetteStrength: 0.6,
+        contrast: 1.3,
+        brightness: 0.1,
+        colorFilterPreset: 'cyber_cyan',
+      );
+
+      bloc.add(const UpdateWallpaperEffectIntent(
+        wallpaperId: 'ippo_hard_work',
+        effectConfig: config,
+      ));
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) {
+          final effective = s.getEffectiveEffects('ippo_hard_work');
+          return s.customEffects['ippo_hard_work'] == config &&
+              effective.blurSigma == 8.0 &&
+              effective.colorFilterPreset == 'cyber_cyan' &&
+              s.message != null &&
+              s.message!.contains('Visual canvas effects saved');
+        })),
+      );
+
+      // Verify persistence in repository
+      final saved = repository.getCustomEffects();
+      expect(saved['ippo_hard_work'], equals(config));
+    });
+
+    test('ResetWallpaperEffectIntent clears custom effect in state and repository', () async {
+      // First save an effect
+      const config = WallpaperEffectConfig(
+        blurSigma: 12.0,
+        vignetteStrength: 0.8,
+        colorFilterPreset: 'noir',
+      );
+      await repository.saveCustomEffect('ippo_hard_work', config);
+
+      bloc.add(const ResetWallpaperEffectIntent('ippo_hard_work'));
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) {
+          final effective = s.getEffectiveEffects('ippo_hard_work');
+          return !s.customEffects.containsKey('ippo_hard_work') &&
+              effective == WallpaperEffectConfig.defaultConfig &&
+              s.message != null &&
+              s.message!.contains('Visual canvas effects reset');
+        })),
+      );
+
+      final saved = repository.getCustomEffects();
+      expect(saved.containsKey('ippo_hard_work'), isFalse);
+    });
+
+    test('WallpaperEffectConfig presets have distinct aesthetic visual properties', () {
+      expect(WallpaperEffectConfig.defaultConfig.colorFilterPreset, 'original');
+      expect(WallpaperEffectConfig.noirPreset.colorFilterPreset, 'noir');
+      expect(WallpaperEffectConfig.noirPreset.contrast, greaterThan(1.0));
+
+      expect(WallpaperEffectConfig.cyberPreset.colorFilterPreset, 'cyber_cyan');
+      expect(WallpaperEffectConfig.sunsetPreset.colorFilterPreset, 'sunset_amber');
+      expect(WallpaperEffectConfig.matrixPreset.colorFilterPreset, 'matrix_emerald');
+      expect(WallpaperEffectConfig.auroraPreset.colorFilterPreset, 'aurora_violet');
+      expect(WallpaperEffectConfig.softBlurPreset.blurSigma, greaterThan(0.0));
+
+      final json = WallpaperEffectConfig.noirPreset.toJson();
+      final fromJson = WallpaperEffectConfig.fromJson(json);
+      expect(fromJson, equals(WallpaperEffectConfig.noirPreset));
     });
   });
 }
