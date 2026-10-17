@@ -13,6 +13,7 @@ import 'package:live_wallpaper/screens/ipad_wallpaper_dialog.dart';
 import 'package:live_wallpaper/screens/main_navigation_shell.dart';
 import 'package:live_wallpaper/screens/onboarding_sheet.dart';
 import 'package:live_wallpaper/screens/settings_sheet.dart';
+import 'package:live_wallpaper/screens/splash_screen.dart';
 import 'package:live_wallpaper/screens/wallpaper_preview_sheet.dart';
 import 'package:live_wallpaper/widgets/kinetic_quote_overlay.dart';
 import 'package:live_wallpaper/widgets/shorts_action_rail.dart';
@@ -430,6 +431,52 @@ void main() {
       expect(find.text('Try one of these popular aesthetics:'), findsOneWidget);
       expect(find.byType(ActionChip), findsWidgets);
       expect(find.widgetWithText(ActionChip, 'Anime'), findsOneWidget);
+    });
+
+    testWidgets('SplashScreen renders Wallora branding, tagline, and loading bar',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: SplashScreen(
+            duration: Duration(seconds: 10),
+          ),
+        ),
+      );
+
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pump(const Duration(milliseconds: 1000));
+      await tester.pump(const Duration(milliseconds: 800));
+
+      expect(find.text('WALLORA'), findsOneWidget);
+      expect(find.text('Make every screen yours.'), findsOneWidget);
+      expect(find.text('PREPARING CANVASES'), findsOneWidget);
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
+    });
+
+    testWidgets('SplashScreen navigates to next screen on tap or duration completion',
+        (WidgetTester tester) async {
+      bool completed = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: SplashScreen(
+            duration: const Duration(milliseconds: 500),
+            nextScreen: const Scaffold(
+              body: Center(child: Text('HOME_SCREEN_REACHED')),
+            ),
+            onAnimationComplete: () {
+              completed = true;
+            },
+          ),
+        ),
+      );
+
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.tap(find.byType(SplashScreen));
+      await tester.pumpAndSettle();
+
+      expect(completed, isTrue);
+      expect(find.text('HOME_SCREEN_REACHED'), findsOneWidget);
     });
 
     testWidgets('WallpaperPreviewSheet displays technical specs and report button',
