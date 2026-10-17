@@ -14,6 +14,7 @@ import 'package:live_wallpaper/models/particle_effect_config.dart';
 import 'package:live_wallpaper/models/smart_filter_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
+import 'package:live_wallpaper/models/wallora_backup_bundle.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -1232,6 +1233,59 @@ void main() {
       await resetExpectation;
 
       expect(repository.getAuraPaletteConfig(), AuraPaletteConfig.defaultConfig);
+    });
+
+    test('RestoreBackupIntent restores state, persists to storage, and notifies', () async {
+      final bundle = WalloraBackupBundle(
+        exportedAt: DateTime.now(),
+        favoriteIds: const {'wall_imported_1'},
+        customizedQuotes: const {'wall_imported_1': 'Never give up'},
+        isAmoledSaverModeEnabled: true,
+        auraConfig: const AuraPaletteConfig(preset: AuraThemePreset.cyberAurora),
+      );
+
+      final restoreExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.favoriteIds.contains('wall_imported_1') &&
+              s.customizedQuotes['wall_imported_1'] == 'Never give up' &&
+              s.isAmoledSaverModeEnabled == true &&
+              s.auraConfig.preset == AuraThemePreset.cyberAurora &&
+              s.message != null &&
+              s.message!.contains('Successfully restored backup');
+        })),
+      );
+
+      bloc.add(RestoreBackupIntent(bundle: bundle, mergeWithExisting: false));
+      await restoreExpectation;
+
+      expect(repository.getFavorites(), contains('wall_imported_1'));
+      expect(repository.isAmoledSaverModeEnabled(), isTrue);
+    });
+
+    test('ResetFactoryDefaultsIntent wipes customizations and resets all configs to factory defaults', () async {
+      // First populate custom items
+      await repository.toggleFavorite('temp_fav');
+      await repository.setAmoledSaverMode(true);
+
+      final resetExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.favoriteIds.isEmpty &&
+              s.customCollections.isEmpty &&
+              s.customizedQuotes.isEmpty &&
+              s.customEffects.isEmpty &&
+              s.isAmoledSaverModeEnabled == false &&
+              s.auraConfig == AuraPaletteConfig.defaultConfig &&
+              s.message == 'Wallora reset to factory defaults.';
+        })),
+      );
+
+      bloc.add(const ResetFactoryDefaultsIntent());
+      await resetExpectation;
+
+      expect(repository.getFavorites(), isEmpty);
+      expect(repository.isAmoledSaverModeEnabled(), isFalse);
     });
   });
 }

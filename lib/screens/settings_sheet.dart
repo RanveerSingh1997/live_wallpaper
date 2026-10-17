@@ -7,6 +7,7 @@ import '../blocs/wallpaper_state.dart';
 import 'aura_palette_sheet.dart';
 import 'auto_rotation_sheet.dart';
 import 'battery_telemetry_sheet.dart';
+import 'data_portability_sheet.dart';
 import 'day_night_schedule_sheet.dart';
 import 'lock_screen_studio_sheet.dart';
 import 'onboarding_sheet.dart';
@@ -406,6 +407,21 @@ class SettingsSheet extends StatelessWidget {
                         ),
                       ],
                     ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // SECTION: Data Portability & Backup
+                  _buildSectionHeader('DATA PORTABILITY & BACKUP'),
+                  const SizedBox(height: 10),
+                  _buildSettingTile(
+                    icon: Icons.cloud_sync_rounded,
+                    iconColor: const Color(0xFF00E5FF),
+                    title: 'Data Portability & Backup Hub',
+                    subtitle: 'Export, restore & manage playlists, quotes & setups',
+                    onTap: () {
+                      DataPortabilitySheet.show(context);
+                    },
                   ),
 
                   const SizedBox(height: 24),

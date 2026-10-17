@@ -75,6 +75,8 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<UpdateAuraPaletteIntent>(_onUpdateAuraPalette);
     on<SetAuraThemePresetIntent>(_onSetAuraThemePreset);
     on<ResetAuraPaletteIntent>(_onResetAuraPalette);
+    on<RestoreBackupIntent>(_onRestoreBackup);
+    on<ResetFactoryDefaultsIntent>(_onResetFactoryDefaults);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -1150,6 +1152,91 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     emit(state.copyWith(
       auraConfig: defaultConfig,
       message: 'Aura Chromatic Harmonizer reset to defaults.',
+    ));
+  }
+
+  Future<void> _onRestoreBackup(
+    RestoreBackupIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final success = await repository.restoreBackupBundle(
+      event.bundle,
+      mergeWithExisting: event.mergeWithExisting,
+    );
+    if (success) {
+      final favorites = repository.getFavorites();
+      final collections = repository.getCustomCollections();
+      final quotes = repository.getCustomQuotes();
+      final effects = repository.getCustomEffects();
+      final dayNight = repository.getDayNightScheduleConfig();
+      final lockScreen = repository.getLockScreenStyleConfig();
+      final parallax = repository.getParallaxEffectConfig();
+      final particle = repository.getParticleEffectConfig();
+      final aura = repository.getAuraPaletteConfig();
+      final telemetry = repository.getBatteryTelemetryConfig();
+      final smartFilter = repository.getSmartFilterConfig();
+      final preferences = repository.getUserPreferences();
+      final amoled = repository.isAmoledSaverModeEnabled();
+
+      final forYouList = _filterShorts(
+        allShorts: state.allShorts,
+        category: state.selectedCategory,
+        preferences: preferences,
+        smartFilter: smartFilter,
+      );
+
+      emit(state.copyWith(
+        filteredShorts: forYouList,
+        favoriteIds: favorites,
+        customCollections: collections,
+        customizedQuotes: quotes,
+        customEffects: effects,
+        dayNightSchedule: dayNight,
+        lockScreenStyle: lockScreen,
+        parallaxConfig: parallax,
+        particleConfig: particle,
+        auraConfig: aura,
+        batteryTelemetry: telemetry,
+        smartFilter: smartFilter,
+        userPreferences: preferences,
+        isAmoledSaverModeEnabled: amoled,
+        message: 'Successfully restored backup (${event.bundle.summary}).',
+      ));
+    } else {
+      emit(state.copyWith(
+        errorMessage: 'Failed to restore Wallora backup archive.',
+      ));
+    }
+  }
+
+  Future<void> _onResetFactoryDefaults(
+    ResetFactoryDefaultsIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.resetToFactoryDefaults();
+    final forYouList = _filterShorts(
+      allShorts: state.allShorts,
+      category: 'For You',
+      preferences: {},
+      smartFilter: SmartFilterConfig.defaultConfig,
+    );
+
+    emit(state.copyWith(
+      filteredShorts: forYouList,
+      favoriteIds: {},
+      customCollections: [],
+      customizedQuotes: {},
+      customEffects: {},
+      dayNightSchedule: DayNightScheduleConfig.defaultConfig,
+      lockScreenStyle: LockScreenStyleConfig.defaultConfig,
+      parallaxConfig: ParallaxEffectConfig.defaultConfig,
+      particleConfig: ParticleEffectConfig.defaultConfig,
+      auraConfig: AuraPaletteConfig.defaultConfig,
+      batteryTelemetry: BatteryTelemetryConfig.defaultConfig,
+      smartFilter: SmartFilterConfig.defaultConfig,
+      userPreferences: {},
+      isAmoledSaverModeEnabled: false,
+      message: 'Wallora reset to factory defaults.',
     ));
   }
 }

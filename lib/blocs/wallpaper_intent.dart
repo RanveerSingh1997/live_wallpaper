@@ -9,6 +9,7 @@ import '../models/particle_effect_config.dart';
 import '../models/smart_filter_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
+import '../models/wallora_backup_bundle.dart';
 
 abstract class WallpaperIntent extends Equatable {
   const WallpaperIntent();
@@ -456,6 +457,25 @@ class SetAuraThemePresetIntent extends WallpaperIntent {
 /// Intent to reset the Aura Chromatic Harmonizer configuration to defaults.
 class ResetAuraPaletteIntent extends WallpaperIntent {
   const ResetAuraPaletteIntent();
+}
+
+/// Intent to restore user configurations, playlists, and presets from a WalloraBackupBundle.
+class RestoreBackupIntent extends WallpaperIntent {
+  final WalloraBackupBundle bundle;
+  final bool mergeWithExisting;
+
+  const RestoreBackupIntent({
+    required this.bundle,
+    this.mergeWithExisting = false,
+  });
+
+  @override
+  List<Object?> get props => [bundle, mergeWithExisting];
+}
+
+/// Intent to wipe user custom data and restore Wallora to factory defaults.
+class ResetFactoryDefaultsIntent extends WallpaperIntent {
+  const ResetFactoryDefaultsIntent();
 }
 
 

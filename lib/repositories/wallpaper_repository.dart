@@ -14,6 +14,7 @@ import '../models/particle_effect_config.dart';
 import '../models/smart_filter_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
+import '../models/wallora_backup_bundle.dart';
 import '../services/wallpaper_renderer_service.dart';
 import '../services/wallpaper_service_bridge.dart';
 
@@ -213,6 +214,11 @@ class WallpaperRepository {
   /// Saves the Day & Night solar schedule settings.
   Future<void> saveDayNightScheduleConfig(DayNightScheduleConfig config) async {
     await prefs.setString(_keyDayNightSchedule, jsonEncode(config.toJson()));
+  }
+
+  /// Resets the Day & Night solar schedule settings to default.
+  Future<void> resetDayNightScheduleConfig() async {
+    await prefs.remove(_keyDayNightSchedule);
   }
 
   /// Returns whether AMOLED True-Black battery saver mode is enabled.
@@ -450,10 +456,13 @@ class WallpaperRepository {
   /// Returns all stored custom quotes by shortId.
   Map<String, String> getCustomQuotes() {
     final Map<String, String> map = {};
-    for (final short in CuratedShortsData.shorts) {
-      final saved = prefs.getString('$_keyCustomQuotesPrefix${short.id}');
-      if (saved != null && saved.isNotEmpty) {
-        map[short.id] = saved;
+    for (final key in prefs.getKeys()) {
+      if (key.startsWith(_keyCustomQuotesPrefix)) {
+        final shortId = key.substring(_keyCustomQuotesPrefix.length);
+        final saved = prefs.getString(key);
+        if (saved != null && saved.isNotEmpty) {
+          map[shortId] = saved;
+        }
       }
     }
     return map;
@@ -467,14 +476,16 @@ class WallpaperRepository {
   /// Returns all stored custom wallpaper effects by wallpaperId.
   Map<String, WallpaperEffectConfig> getCustomEffects() {
     final Map<String, WallpaperEffectConfig> map = {};
-    final allShorts = getCuratedShorts();
-    for (final short in allShorts) {
-      final saved = prefs.getString('$_keyCustomEffectsPrefix${short.id}');
-      if (saved != null && saved.isNotEmpty) {
-        try {
-          final json = jsonDecode(saved) as Map<String, dynamic>;
-          map[short.id] = WallpaperEffectConfig.fromJson(json);
-        } catch (_) {}
+    for (final key in prefs.getKeys()) {
+      if (key.startsWith(_keyCustomEffectsPrefix)) {
+        final shortId = key.substring(_keyCustomEffectsPrefix.length);
+        final saved = prefs.getString(key);
+        if (saved != null && saved.isNotEmpty) {
+          try {
+            final json = jsonDecode(saved) as Map<String, dynamic>;
+            map[shortId] = WallpaperEffectConfig.fromJson(json);
+          } catch (_) {}
+        }
       }
     }
     return map;
@@ -696,5 +707,133 @@ class WallpaperRepository {
   /// Sets auto wallpaper rotation target screen.
   Future<void> setAutoRotationTarget(String target) async {
     await prefs.setString(_keyAutoRotationTarget, target);
+  }
+
+  /// Creates a versioned, portable backup bundle of all user configurations.
+  Future<WalloraBackupBundle> createBackupBundle() async {
+    return WalloraBackupBundle(
+      exportedAt: DateTime.now(),
+      favoriteIds: getFavorites(),
+      customCollections: getCustomCollections(),
+      customizedQuotes: getCustomQuotes(),
+      customEffects: getCustomEffects(),
+      dayNightSchedule: getDayNightScheduleConfig(),
+      lockScreenStyle: getLockScreenStyleConfig(),
+      parallaxConfig: getParallaxEffectConfig(),
+      particleConfig: getParticleEffectConfig(),
+      auraConfig: getAuraPaletteConfig(),
+      batteryTelemetry: getBatteryTelemetryConfig(),
+      smartFilter: getSmartFilterConfig(),
+      userPreferences: getUserPreferences(),
+      isAmoledSaverModeEnabled: isAmoledSaverModeEnabled(),
+    );
+  }
+
+  /// Restores a backup bundle into local storage.
+  /// If [mergeWithExisting] is true, merges favorites, collections, quotes and effects.
+  /// Otherwise, replaces configurations with the backup bundle contents.
+  Future<bool> restoreBackupBundle(
+    WalloraBackupBundle bundle, {
+    bool mergeWithExisting = false,
+  }) async {
+    try {
+      // 1. Favorites
+      final Set<String> targetFavorites = mergeWithExisting
+          ? (getFavorites()..addAll(bundle.favoriteIds))
+          : bundle.favoriteIds;
+      await prefs.setStringList(_keyFavorites, targetFavorites.toList());
+
+      // 2. Custom Collections
+      if (mergeWithExisting) {
+        final existing = getCustomCollections();
+        final Map<String, WallpaperCollection> map = {
+          for (final c in existing) c.id: c
+        };
+        for (final c in bundle.customCollections) {
+          map[c.id] = c;
+        }
+        await prefs.setStringList(
+          _keyCustomCollections,
+          map.values.map((c) => jsonEncode(c.toJson())).toList(),
+        );
+      } else {
+        await prefs.setStringList(
+          _keyCustomCollections,
+          bundle.customCollections.map((c) => jsonEncode(c.toJson())).toList(),
+        );
+      }
+
+      // 3. Custom Quotes
+      if (!mergeWithExisting) {
+        final existingQuotes = getCustomQuotes();
+        for (final id in existingQuotes.keys) {
+          await prefs.remove('$_keyCustomQuotesPrefix$id');
+        }
+      }
+      for (final entry in bundle.customizedQuotes.entries) {
+        await saveCustomQuote(entry.key, entry.value);
+      }
+
+      // 4. Custom Effects
+      if (!mergeWithExisting) {
+        final existingEffects = getCustomEffects();
+        for (final id in existingEffects.keys) {
+          await resetCustomEffect(id);
+        }
+      }
+      for (final entry in bundle.customEffects.entries) {
+        await saveCustomEffect(entry.key, entry.value);
+      }
+
+      // 5. Configs
+      await saveDayNightScheduleConfig(bundle.dayNightSchedule);
+      await saveLockScreenStyleConfig(bundle.lockScreenStyle);
+      await saveParallaxEffectConfig(bundle.parallaxConfig);
+      await saveParticleEffectConfig(bundle.particleConfig);
+      await saveAuraPaletteConfig(bundle.auraConfig);
+      await saveBatteryTelemetryConfig(bundle.batteryTelemetry);
+      await saveSmartFilterConfig(bundle.smartFilter);
+
+      // 6. Preferences & AMOLED
+      final Set<String> targetPreferences = mergeWithExisting
+          ? (getUserPreferences()..addAll(bundle.userPreferences))
+          : bundle.userPreferences;
+      await saveUserPreferences(targetPreferences);
+      await setAmoledSaverMode(bundle.isAmoledSaverModeEnabled);
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Resets all user configurations, favorites, custom collections, and styles to factory defaults.
+  Future<void> resetToFactoryDefaults() async {
+    // 1. Clear favorites & custom collections
+    await prefs.remove(_keyFavorites);
+    await prefs.remove(_keyCustomCollections);
+
+    // 2. Clear quotes & effects
+    final quotes = getCustomQuotes();
+    for (final id in quotes.keys) {
+      await prefs.remove('$_keyCustomQuotesPrefix$id');
+    }
+    final effects = getCustomEffects();
+    for (final id in effects.keys) {
+      await resetCustomEffect(id);
+    }
+
+    // 3. Reset configs
+    await resetDayNightScheduleConfig();
+    await resetLockScreenStyleConfig();
+    await resetParallaxEffectConfig();
+    await resetParticleEffectConfig();
+    await resetAuraPaletteConfig();
+    await resetBatteryTelemetryConfig();
+    await resetSmartFilterConfig();
+
+    // 4. Reset preferences & flags
+    await saveUserPreferences({});
+    await setAmoledSaverMode(false);
   }
 }

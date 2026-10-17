@@ -10,6 +10,7 @@ import 'package:live_wallpaper/models/particle_effect_config.dart';
 import 'package:live_wallpaper/models/smart_filter_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
+import 'package:live_wallpaper/models/wallora_backup_bundle.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -425,6 +426,71 @@ void main() {
       await repository.resetAuraPaletteConfig();
       final reset = repository.getAuraPaletteConfig();
       expect(reset, equals(AuraPaletteConfig.defaultConfig));
+    });
+
+    test('createBackupBundle and restoreBackupBundle (replace and merge)', () async {
+      // 1. Setup initial state
+      await repository.toggleFavorite('fav_1');
+      await repository.saveCustomQuote('quote_1', 'Original Quote');
+
+      final initialBundle = await repository.createBackupBundle();
+      expect(initialBundle.favoriteIds, contains('fav_1'));
+      expect(initialBundle.customizedQuotes['quote_1'], equals('Original Quote'));
+
+      // 2. Prepare new bundle with different items
+      final importBundle = WalloraBackupBundle(
+        exportedAt: DateTime.now(),
+        favoriteIds: const {'fav_2'},
+        customizedQuotes: const {'quote_2': 'Imported Quote'},
+        isAmoledSaverModeEnabled: true,
+      );
+
+      // 3. Test Replace (!mergeWithExisting)
+      final replaceSuccess = await repository.restoreBackupBundle(
+        importBundle,
+        mergeWithExisting: false,
+      );
+      expect(replaceSuccess, isTrue);
+
+      final replacedFavorites = repository.getFavorites();
+      expect(replacedFavorites, equals({'fav_2'}));
+      expect(repository.getCustomQuotes()['quote_2'], equals('Imported Quote'));
+      expect(repository.getCustomQuotes()['quote_1'], isNull);
+      expect(repository.isAmoledSaverModeEnabled(), isTrue);
+
+      // 4. Test Merge (mergeWithExisting)
+      final mergeBundle = WalloraBackupBundle(
+        exportedAt: DateTime.now(),
+        favoriteIds: const {'fav_3'},
+        customizedQuotes: const {'quote_3': 'Merged Quote'},
+      );
+      final mergeSuccess = await repository.restoreBackupBundle(
+        mergeBundle,
+        mergeWithExisting: true,
+      );
+      expect(mergeSuccess, isTrue);
+
+      final mergedFavorites = repository.getFavorites();
+      expect(mergedFavorites, contains('fav_2'));
+      expect(mergedFavorites, contains('fav_3'));
+      expect(repository.getCustomQuotes()['quote_2'], equals('Imported Quote'));
+      expect(repository.getCustomQuotes()['quote_3'], equals('Merged Quote'));
+    });
+
+    test('resetToFactoryDefaults clears all user customizations and configs', () async {
+      await repository.toggleFavorite('fav_wipe');
+      await repository.saveCustomQuote('wipe_quote', 'Temp Quote');
+      await repository.setAmoledSaverMode(true);
+      await repository.saveAuraPaletteConfig(
+        const AuraPaletteConfig(preset: AuraThemePreset.solarEclipse),
+      );
+
+      await repository.resetToFactoryDefaults();
+
+      expect(repository.getFavorites(), isEmpty);
+      expect(repository.getCustomQuotes(), isEmpty);
+      expect(repository.isAmoledSaverModeEnabled(), isFalse);
+      expect(repository.getAuraPaletteConfig(), equals(AuraPaletteConfig.defaultConfig));
     });
   });
 }

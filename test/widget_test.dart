@@ -12,10 +12,12 @@ import 'package:live_wallpaper/models/parallax_effect_config.dart';
 import 'package:live_wallpaper/models/particle_effect_config.dart';
 import 'package:live_wallpaper/models/smart_filter_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
+import 'package:live_wallpaper/models/wallora_backup_bundle.dart';
 import 'package:live_wallpaper/screens/add_to_collection_sheet.dart';
 import 'package:live_wallpaper/screens/aura_palette_sheet.dart';
 import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
 import 'package:live_wallpaper/screens/battery_telemetry_sheet.dart';
+import 'package:live_wallpaper/screens/data_portability_sheet.dart';
 import 'package:live_wallpaper/screens/particle_effect_sheet.dart';
 import 'package:live_wallpaper/screens/categories_screen.dart';
 import 'package:live_wallpaper/screens/create_collection_sheet.dart';
@@ -2295,6 +2297,183 @@ void main() {
       // Verify AuraPaletteSheet is opened
       expect(find.text('Aura Chromatic Harmonizer'), findsWidgets);
       expect(find.text('EXTRACTED 5-POINT AURA PALETTE'), findsOneWidget);
+    });
+
+    testWidgets('DataPortabilitySheet renders active setup snapshot, JSON input, and buttons',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          favoriteIds: const {'wall_1'},
+          customizedQuotes: const {'wall_1': 'Be Bold'},
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: DataPortabilitySheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // 1. Verify Header
+      expect(find.text('Data Portability & Backup'), findsOneWidget);
+      expect(find.text('Export, restore & manage your Wallora setup'), findsOneWidget);
+
+      // 2. Verify Snapshot Badges
+      expect(find.text('WALLORA ACTIVE SETUP SNAPSHOT'), findsOneWidget);
+      expect(find.text('1 Favorites'), findsOneWidget);
+      expect(find.text('1 Quotes'), findsOneWidget);
+      expect(find.text('Copy Backup Archive (JSON)'), findsOneWidget);
+
+      // 3. Verify Restore Card
+      expect(find.text('RESTORE & IMPORT SETUP'), findsOneWidget);
+      expect(find.text('Paste Backup Archive'), findsOneWidget);
+      expect(find.text('Merge with current setup'), findsOneWidget);
+      expect(find.text('Verify & Restore Setup'), findsOneWidget);
+
+      // 4. Scroll to Storage & Reset
+      await tester.scrollUntilVisible(
+        find.text('Factory Reset All Settings & Playlists'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('STORAGE RECLAMATION & RESET'), findsOneWidget);
+      expect(find.text('Clear Offline Video Cache'), findsOneWidget);
+      expect(find.text('Factory Reset All Settings & Playlists'), findsOneWidget);
+    });
+
+    testWidgets('DataPortabilitySheet validates JSON and triggers restore',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: DataPortabilitySheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // 1. Enter invalid text
+      await tester.enterText(find.byType(TextField), 'invalid json text');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Invalid Wallora backup format or missing version.'), findsOneWidget);
+
+      // 2. Enter valid Wallora backup JSON
+      final validBundle = WalloraBackupBundle(
+        exportedAt: DateTime.now(),
+        favoriteIds: const {'wall_imported_test'},
+        isAmoledSaverModeEnabled: true,
+      );
+      await tester.enterText(find.byType(TextField), validBundle.toJsonString());
+      await tester.pumpAndSettle();
+
+      // Error should disappear
+      expect(find.text('Invalid Wallora backup format or missing version.'), findsNothing);
+
+      // 3. Tap Restore
+      await tester.tap(find.text('Verify & Restore Setup'));
+      await tester.pumpAndSettle();
+
+      // Verify BLoC state received imported favorite
+      expect(bloc.state.favoriteIds, contains('wall_imported_test'));
+      expect(bloc.state.isAmoledSaverModeEnabled, isTrue);
+    });
+
+    testWidgets('SettingsSheet opens DataPortabilitySheet when tapping Data Portability & Backup Hub tile',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SettingsSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Scroll to Data Portability tile
+      await tester.scrollUntilVisible(
+        find.text('Data Portability & Backup Hub'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('Data Portability & Backup Hub'), findsOneWidget);
+
+      // Tap to open sheet
+      await tester.tap(find.text('Data Portability & Backup Hub'));
+      await tester.pumpAndSettle();
+
+      // Verify DataPortabilitySheet is opened
+      expect(find.text('WALLORA ACTIVE SETUP SNAPSHOT'), findsOneWidget);
+      expect(find.text('Copy Backup Archive (JSON)'), findsOneWidget);
     });
   });
 }
