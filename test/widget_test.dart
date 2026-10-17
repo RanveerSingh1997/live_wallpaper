@@ -6,10 +6,12 @@ import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:live_wallpaper/screens/categories_screen.dart';
+import 'package:live_wallpaper/screens/discover_screen.dart';
 import 'package:live_wallpaper/screens/downloads_screen.dart';
 import 'package:live_wallpaper/screens/favorites_screen.dart';
 import 'package:live_wallpaper/screens/ipad_wallpaper_dialog.dart';
 import 'package:live_wallpaper/screens/main_navigation_shell.dart';
+import 'package:live_wallpaper/screens/wallpaper_preview_sheet.dart';
 import 'package:live_wallpaper/widgets/kinetic_quote_overlay.dart';
 import 'package:live_wallpaper/widgets/shorts_action_rail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -270,6 +272,83 @@ void main() {
 
       expect(find.text('No Offline Downloads'), findsOneWidget);
       expect(find.text('Browse Wallpapers'), findsOneWidget);
+    });
+
+    testWidgets('DiscoverScreen displays RECENTLY VIEWED when recentlyViewedShorts is populated',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          recentlyViewedIds: const ['ippo_hard_work', 'nature_aurora'],
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: DiscoverScreen(onOpenLiveFeed: () {}),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      expect(find.text('RECENTLY VIEWED'), findsOneWidget);
+    });
+
+    testWidgets('WallpaperPreviewSheet displays technical specs and report button',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final short = CuratedShortsData.shorts.firstWhere((s) => !s.isLive);
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: Scaffold(
+              body: WallpaperPreviewSheet(wallpaper: short),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      expect(find.text('Resolution'), findsOneWidget);
+      expect(find.text('File Size'), findsOneWidget);
+      expect(find.byIcon(Icons.flag_outlined), findsOneWidget);
+      expect(find.text('APPLY WALLPAPER'), findsOneWidget);
     });
   });
 }
