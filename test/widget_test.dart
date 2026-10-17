@@ -312,6 +312,44 @@ void main() {
       expect(find.text('RECENTLY VIEWED'), findsOneWidget);
     });
 
+    testWidgets('DiscoverScreen displays category filter chips and filters on selection',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: DiscoverScreen(onOpenLiveFeed: () {}),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      expect(find.byType(ChoiceChip), findsWidgets);
+      expect(find.widgetWithText(ChoiceChip, 'Live Wallpapers'), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, 'Static Wallpapers'), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, 'Anime & Gaming'), findsOneWidget);
+    });
+
     testWidgets('WallpaperPreviewSheet displays technical specs and report button',
         (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1080, 2400);

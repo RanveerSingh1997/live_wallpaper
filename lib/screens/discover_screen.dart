@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
 import 'preferences_modal_sheet.dart';
 import 'settings_sheet.dart';
@@ -237,6 +238,48 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ),
                 ),
 
+                // Horizontal Category Filter Pills
+                SliverToBoxAdapter(
+                  child: Container(
+                    height: 40,
+                    margin: const EdgeInsets.only(top: 8, bottom: 6),
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: CuratedShortsData.categories.length,
+                      separatorBuilder: (context, index) => const SizedBox(width: 8),
+                      itemBuilder: (ctx, idx) {
+                        final cat = CuratedShortsData.categories[idx];
+                        final isSelected = state.selectedCategory == cat;
+                        return ChoiceChip(
+                          label: Text(cat),
+                          selected: isSelected,
+                          onSelected: (selected) {
+                            if (selected) {
+                              HapticFeedback.selectionClick();
+                              context.read<WallpaperBloc>().add(FilterByCategoryIntent(cat));
+                            }
+                          },
+                          backgroundColor: const Color(0xFF1E1E22),
+                          selectedColor: const Color(0xFFFF5722),
+                          labelStyle: TextStyle(
+                            color: isSelected ? Colors.white : Colors.white70,
+                            fontSize: 12,
+                            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            side: BorderSide(
+                              color: isSelected ? const Color(0xFFFF5722) : Colors.white10,
+                            ),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+
                 if (isSearching) ...[
                   // Search Results Header & Grid
                   SliverToBoxAdapter(
@@ -256,6 +299,68 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     sliver: _buildWallpaperGrid(searchResults),
+                  ),
+                ] else if (state.selectedCategory != 'For You' && state.selectedCategory != 'All') ...[
+                  // Filtered Category Grid
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                state.selectedCategory.toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF5722).withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: const Color(0xFFFF5722), width: 0.8),
+                                ),
+                                child: Text(
+                                  '${state.filteredShorts.length}',
+                                  style: const TextStyle(
+                                    color: Color(0xFFFF5722),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          TextButton.icon(
+                            onPressed: () {
+                              HapticFeedback.selectionClick();
+                              context.read<WallpaperBloc>().add(
+                                    const FilterByCategoryIntent('For You'),
+                                  );
+                            },
+                            icon: const Icon(Icons.close_rounded, size: 14, color: Colors.white54),
+                            label: const Text(
+                              'Reset Filter',
+                              style: TextStyle(color: Colors.white54, fontSize: 11),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    sliver: _buildWallpaperGrid(state.filteredShorts),
+                  ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 32),
                   ),
                 ] else ...[
                   // Featured Hero Banner
