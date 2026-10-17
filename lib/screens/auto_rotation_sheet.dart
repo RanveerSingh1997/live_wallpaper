@@ -5,6 +5,7 @@ import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import '../data/curated_shorts_data.dart';
+import 'day_night_schedule_sheet.dart';
 
 class AutoRotationSheet extends StatelessWidget {
   const AutoRotationSheet({super.key});
@@ -203,6 +204,76 @@ class AutoRotationSheet extends StatelessWidget {
                                 },
                               ),
                             ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        // Solar Day & Night Schedule Quick Link
+                        Material(
+                          color: const Color(0xFF161622),
+                          borderRadius: BorderRadius.circular(16),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              DayNightScheduleSheet.show(context);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: const Color(0xFF00E5FF).withValues(alpha: 0.25),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF00E5FF).withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Icon(
+                                      Icons.wb_twilight_rounded,
+                                      size: 18,
+                                      color: Color(0xFF00E5FF),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  const Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Circadian Solar Schedule',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        SizedBox(height: 2),
+                                        Text(
+                                          'Dynamic wallpaper shifts across dawn, focus & night',
+                                          style: TextStyle(
+                                            color: Colors.white54,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 12,
+                                    color: Colors.white38,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
 

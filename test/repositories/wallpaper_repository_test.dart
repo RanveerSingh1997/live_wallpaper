@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
@@ -209,6 +210,28 @@ void main() {
       // Curated shorts include custom imported shorts at front
       final all = repository.getCuratedShorts();
       expect(all.first.id, 'custom_creator_1');
+    });
+
+    test('Day & Night schedule config CRUD', () async {
+      // Default fallback
+      final defaultConfig = repository.getDayNightScheduleConfig();
+      expect(defaultConfig.isEnabled, isFalse);
+      expect(defaultConfig.morningHour, 6);
+
+      // Save and read back
+      const customConfig = DayNightScheduleConfig(
+        isEnabled: true,
+        morningHour: 7,
+        morningWallpaperId: 'custom_dawn_wall',
+        autoAmoledAtNight: true,
+      );
+      await repository.saveDayNightScheduleConfig(customConfig);
+
+      final loaded = repository.getDayNightScheduleConfig();
+      expect(loaded.isEnabled, isTrue);
+      expect(loaded.morningHour, 7);
+      expect(loaded.morningWallpaperId, 'custom_dawn_wall');
+      expect(loaded.autoAmoledAtNight, isTrue);
     });
   });
 }

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../data/curated_shorts_data.dart';
+import '../models/day_night_schedule_config.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
@@ -26,6 +27,7 @@ class WallpaperState extends Equatable {
   final Set<String> reportedIds;
   final Map<String, String> customizedQuotes;
   final Map<String, WallpaperEffectConfig> customEffects;
+  final DayNightScheduleConfig dayNightSchedule;
   final bool isFeedMuted;
   final bool isLiveWallpaperActiveOnDevice;
   final String? activeWallpaperId;
@@ -57,6 +59,7 @@ class WallpaperState extends Equatable {
     this.reportedIds = const {},
     this.customizedQuotes = const {},
     this.customEffects = const {},
+    this.dayNightSchedule = DayNightScheduleConfig.defaultConfig,
     this.isFeedMuted = true,
     this.isLiveWallpaperActiveOnDevice = false,
     this.activeWallpaperId,
@@ -83,6 +86,19 @@ class WallpaperState extends Equatable {
       return null;
     }
     return filteredShorts[activeIndex];
+  }
+
+  /// Returns the current active solar slot based on system clock.
+  DayNightSlot get activeScheduleSlot =>
+      dayNightSchedule.getSlotForTime(DateTime.now());
+
+  /// Returns the wallpaper assigned to the current active solar slot.
+  MotivationalShort? get currentScheduledWallpaper {
+    final targetId = dayNightSchedule.getWallpaperIdForTime(DateTime.now());
+    return allShorts.cast<MotivationalShort?>().firstWhere(
+          (s) => s?.id == targetId,
+          orElse: () => null,
+        );
   }
 
   /// Get the effective quote for any short (either user customized or default).
@@ -197,6 +213,7 @@ class WallpaperState extends Equatable {
     Set<String>? reportedIds,
     Map<String, String>? customizedQuotes,
     Map<String, WallpaperEffectConfig>? customEffects,
+    DayNightScheduleConfig? dayNightSchedule,
     bool? isFeedMuted,
     bool? isLiveWallpaperActiveOnDevice,
     String? activeWallpaperId,
@@ -228,6 +245,7 @@ class WallpaperState extends Equatable {
       reportedIds: reportedIds ?? this.reportedIds,
       customizedQuotes: customizedQuotes ?? this.customizedQuotes,
       customEffects: customEffects ?? this.customEffects,
+      dayNightSchedule: dayNightSchedule ?? this.dayNightSchedule,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
       isLiveWallpaperActiveOnDevice:
           isLiveWallpaperActiveOnDevice ?? this.isLiveWallpaperActiveOnDevice,
@@ -265,6 +283,7 @@ class WallpaperState extends Equatable {
         reportedIds,
         customizedQuotes,
         customEffects,
+        dayNightSchedule,
         isFeedMuted,
         isLiveWallpaperActiveOnDevice,
         activeWallpaperId,

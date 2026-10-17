@@ -11,6 +11,7 @@ import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
 import 'package:live_wallpaper/screens/categories_screen.dart';
 import 'package:live_wallpaper/screens/create_collection_sheet.dart';
 import 'package:live_wallpaper/screens/custom_wallpaper_import_sheet.dart';
+import 'package:live_wallpaper/screens/day_night_schedule_sheet.dart';
 import 'package:live_wallpaper/screens/discover_screen.dart';
 import 'package:live_wallpaper/screens/downloads_screen.dart';
 import 'package:live_wallpaper/screens/favorites_screen.dart';
@@ -1367,6 +1368,81 @@ void main() {
       expect(find.text('Export Story & Poster'), findsOneWidget);
       expect(find.text('Add to Playlist'), findsOneWidget);
       expect(find.text('Customize in Quote Studio'), findsOneWidget);
+    });
+
+    testWidgets('DayNightScheduleSheet renders master toggle, 4 solar slots, night AMOLED option, and evaluate button',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: DayNightScheduleSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify Header
+      expect(find.text('SOLAR DAY & NIGHT'), findsOneWidget);
+      expect(find.text('Dynamic Circadian Wallpaper Engine'), findsOneWidget);
+
+      // Verify Master Toggle
+      expect(find.text('Automate Solar Cycle Transitions'), findsOneWidget);
+
+      // Verify 4 Solar Slots
+      expect(find.text('Morning / Dawn'), findsOneWidget);
+      expect(find.text('Afternoon / Focus'), findsOneWidget);
+      expect(find.text('Sunset / Twilight'), findsOneWidget);
+      expect(find.text('Night / AMOLED Black'), findsOneWidget);
+
+      // Verify Night AMOLED Saver
+      expect(find.text('Auto AMOLED True-Black at Night'), findsOneWidget);
+
+      // Verify Action Button
+      expect(find.text('Evaluate & Apply Current Slot Now'), findsOneWidget);
+
+      // Toggle Master Switch
+      final masterSwitchFinder = find.byType(Switch).first;
+      await tester.tap(masterSwitchFinder);
+      await tester.pumpAndSettle();
+
+      // Open wallpaper picker for Morning / Dawn slot
+      await tester.tap(find.text('Morning / Dawn'));
+      await tester.pumpAndSettle();
+
+      // Verify Picker is open
+      expect(find.text('Choose for Morning / Dawn'), findsOneWidget);
+
+      // Tap an option in picker
+      final firstTileFinder = find.byType(ListTile).first;
+      await tester.tap(firstTileFinder);
+      await tester.pumpAndSettle();
+
+      // Verify picker dismissed
+      expect(find.text('Choose for Morning / Dawn'), findsNothing);
     });
   });
 }

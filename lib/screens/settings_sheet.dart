@@ -5,6 +5,7 @@ import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import 'auto_rotation_sheet.dart';
+import 'day_night_schedule_sheet.dart';
 import 'onboarding_sheet.dart';
 import 'preferences_modal_sheet.dart';
 
@@ -216,6 +217,18 @@ class SettingsSheet extends StatelessWidget {
                         : 'Off • Automatically change wallpaper',
                     onTap: () {
                       AutoRotationSheet.show(context);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSettingTile(
+                    icon: Icons.brightness_auto_rounded,
+                    iconColor: const Color(0xFFFFD600),
+                    title: 'Day & Night Solar Schedule',
+                    subtitle: state.dayNightSchedule.isEnabled
+                        ? 'Active • Slot: ${state.activeScheduleSlot.label}'
+                        : 'Off • Dynamic circadian wallpaper shifts',
+                    onTap: () {
+                      DayNightScheduleSheet.show(context);
                     },
                   ),
                   const SizedBox(height: 8),

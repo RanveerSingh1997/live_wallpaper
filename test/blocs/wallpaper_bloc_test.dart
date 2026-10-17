@@ -4,11 +4,36 @@ import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
 import 'package:live_wallpaper/blocs/wallpaper_intent.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
+import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class FakeWallpaperRepository extends WallpaperRepository {
+  FakeWallpaperRepository({required super.prefs});
+
+  @override
+  Future<Map<String, dynamic>> applyAsLiveWallpaper({
+    required MotivationalShort short,
+    bool isMuted = true,
+  }) async {
+    await prefs.setString('active_wallpaper_id', short.id);
+    return {'status': 'applied_mock'};
+  }
+
+  @override
+  Future<Map<String, dynamic>> applyStaticWallpaper({
+    required MotivationalShort short,
+    String targetScreen = 'both',
+    String? customQuote,
+    WallpaperEffectConfig? effectConfig,
+  }) async {
+    await prefs.setString('active_wallpaper_id', short.id);
+    return {'status': 'applied_static'};
+  }
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +47,7 @@ void main() {
       'custom_quote_ippo_hard_work': 'Custom test quote for Ippo',
     });
     final prefs = await SharedPreferences.getInstance();
-    repository = WallpaperRepository(prefs: prefs);
+    repository = FakeWallpaperRepository(prefs: prefs);
     bloc = WallpaperBloc(repository: repository);
   });
 
@@ -654,6 +679,102 @@ void main() {
       final json = WallpaperEffectConfig.noirPreset.toJson();
       final fromJson = WallpaperEffectConfig.fromJson(json);
       expect(fromJson, equals(WallpaperEffectConfig.noirPreset));
+    });
+
+    test('UpdateDayNightScheduleIntent saves config and updates state', () async {
+      const customConfig = DayNightScheduleConfig(
+        isEnabled: false,
+        morningHour: 7,
+        morningWallpaperId: 'custom_dawn',
+      );
+
+      bloc.add(const UpdateDayNightScheduleIntent(customConfig));
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) {
+          return s.dayNightSchedule == customConfig &&
+              s.message != null &&
+              s.message!.contains('Solar Day & Night schedule updated');
+        })),
+      );
+
+      final persisted = repository.getDayNightScheduleConfig();
+      expect(persisted, equals(customConfig));
+    });
+
+    test('ToggleDayNightScheduleIntent toggles isEnabled in state and repository', () async {
+      expect(bloc.state.dayNightSchedule.isEnabled, isFalse);
+
+      bloc.add(const ToggleDayNightScheduleIntent());
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) {
+          return s.dayNightSchedule.isEnabled == true &&
+              s.message != null &&
+              s.message!.contains('Day & Night Solar Schedule enabled');
+        })),
+      );
+
+      expect(repository.getDayNightScheduleConfig().isEnabled, isTrue);
+
+      bloc.add(const ToggleDayNightScheduleIntent());
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) {
+          return s.dayNightSchedule.isEnabled == false &&
+              s.message != null &&
+              s.message!.contains('Day & Night Solar Schedule paused');
+        })),
+      );
+
+      expect(repository.getDayNightScheduleConfig().isEnabled, isFalse);
+    });
+
+    test('CheckDayNightTransitionIntent evaluates slot and applies wallpaper at night', () async {
+      bloc.add(LoadFeedIntent());
+      await bloc.stream.firstWhere((s) => s.allShorts.isNotEmpty);
+
+      const scheduleConfig = DayNightScheduleConfig(
+        isEnabled: false,
+        morningWallpaperId: 'ippo_hard_work',
+        afternoonWallpaperId: 'cyber_netrunner_terminal',
+        eveningWallpaperId: 'silent_ambition',
+        nightWallpaperId: 'minimal_monolith',
+        autoAmoledAtNight: true,
+      );
+      await repository.saveDayNightScheduleConfig(scheduleConfig);
+
+      // Set schedule
+      bloc.add(const UpdateDayNightScheduleIntent(scheduleConfig));
+      await bloc.stream.firstWhere((s) => s.dayNightSchedule.eveningWallpaperId == 'silent_ambition');
+
+      // Enable schedule
+      bloc.add(const ToggleDayNightScheduleIntent());
+      await bloc.stream.firstWhere((s) => s.dayNightSchedule.isEnabled);
+
+      // Transition to evening slot (19:00)
+      final eveningExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.activeWallpaperId == 'silent_ambition')),
+      );
+      bloc.add(CheckDayNightTransitionIntent(DateTime(2026, 1, 1, 19, 0)));
+      await eveningExpectation;
+
+      // Transition to night slot (23:30) with AMOLED saver
+      final nightExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.activeWallpaperId == 'minimal_monolith' &&
+              s.isAmoledSaverModeEnabled == true;
+        })),
+      );
+      bloc.add(CheckDayNightTransitionIntent(DateTime(2026, 1, 1, 23, 30)));
+      await nightExpectation;
+
+      expect(repository.isAmoledSaverModeEnabled(), isTrue);
     });
   });
 }

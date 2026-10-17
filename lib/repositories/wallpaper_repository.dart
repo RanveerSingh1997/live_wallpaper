@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/curated_shorts_data.dart';
+import '../models/day_night_schedule_config.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
@@ -32,11 +33,31 @@ class WallpaperRepository {
   static const String _keyCustomImportedWallpapers = 'custom_imported_wallpapers';
   static const String _keyCustomCollections = 'custom_user_collections';
   static const String _keyAmoledSaverMode = 'amoled_saver_mode_enabled';
+  static const String _keyDayNightSchedule = 'day_night_schedule_config';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
     required this.prefs,
   }) : _bridge = bridge ?? WallpaperServiceBridge();
+
+  /// Returns the configured Day & Night solar schedule settings.
+  DayNightScheduleConfig getDayNightScheduleConfig() {
+    final raw = prefs.getString(_keyDayNightSchedule);
+    if (raw == null || raw.isEmpty) {
+      return DayNightScheduleConfig.defaultConfig;
+    }
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      return DayNightScheduleConfig.fromJson(json);
+    } catch (_) {
+      return DayNightScheduleConfig.defaultConfig;
+    }
+  }
+
+  /// Saves the Day & Night solar schedule settings.
+  Future<void> saveDayNightScheduleConfig(DayNightScheduleConfig config) async {
+    await prefs.setString(_keyDayNightSchedule, jsonEncode(config.toJson()));
+  }
 
   /// Returns whether AMOLED True-Black battery saver mode is enabled.
   bool isAmoledSaverModeEnabled() {

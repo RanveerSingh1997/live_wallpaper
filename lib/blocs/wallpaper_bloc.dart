@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../models/day_night_schedule_config.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../repositories/wallpaper_repository.dart';
@@ -49,6 +50,9 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<ToggleAmoledSaverModeIntent>(_onToggleAmoledSaverMode);
     on<UpdateWallpaperEffectIntent>(_onUpdateWallpaperEffect);
     on<ResetWallpaperEffectIntent>(_onResetWallpaperEffect);
+    on<UpdateDayNightScheduleIntent>(_onUpdateDayNightSchedule);
+    on<ToggleDayNightScheduleIntent>(_onToggleDayNightSchedule);
+    on<CheckDayNightTransitionIntent>(_onCheckDayNightTransition);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -87,6 +91,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final autoRotationTarget = repository.getAutoRotationTarget();
       final isAmoledSaver = repository.isAmoledSaverModeEnabled();
       final effects = repository.getCustomEffects();
+      final dayNightSchedule = repository.getDayNightScheduleConfig();
 
       final forYouList = _buildForYouList(shorts, preferences);
 
@@ -102,6 +107,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         reportedIds: reported,
         customizedQuotes: quotes,
         customEffects: effects,
+        dayNightSchedule: dayNightSchedule,
         activeWallpaperId: activeId,
         userPreferences: preferences,
         isTextOverlayVisible: isTextOverlayVisible,
@@ -768,4 +774,105 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       message: 'Visual canvas effects reset to default.',
     ));
   }
+
+  Future<void> _onUpdateDayNightSchedule(
+    UpdateDayNightScheduleIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveDayNightScheduleConfig(event.config);
+    emit(state.copyWith(
+      dayNightSchedule: event.config,
+      message: 'Solar Day & Night schedule updated.',
+    ));
+    if (event.config.isEnabled) {
+      add(const CheckDayNightTransitionIntent());
+    }
+  }
+
+  Future<void> _onToggleDayNightSchedule(
+    ToggleDayNightScheduleIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final updatedConfig = state.dayNightSchedule.copyWith(
+      isEnabled: !state.dayNightSchedule.isEnabled,
+    );
+    await repository.saveDayNightScheduleConfig(updatedConfig);
+    emit(state.copyWith(
+      dayNightSchedule: updatedConfig,
+      message: updatedConfig.isEnabled
+          ? 'Day & Night Solar Schedule enabled.'
+          : 'Day & Night Solar Schedule paused.',
+    ));
+    if (updatedConfig.isEnabled) {
+      add(const CheckDayNightTransitionIntent());
+    }
+  }
+
+  Future<void> _onCheckDayNightTransition(
+    CheckDayNightTransitionIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    if (!state.dayNightSchedule.isEnabled) return;
+
+    final now = event.currentTime ?? DateTime.now();
+    final slot = state.dayNightSchedule.getSlotForTime(now);
+    final targetId = state.dayNightSchedule.getWallpaperIdForTime(now);
+
+    if (state.activeWallpaperId == targetId) return;
+
+    final matches = state.allShorts.where((s) => s.id == targetId);
+    if (matches.isEmpty) return;
+    final targetWallpaper = matches.first;
+
+    emit(state.copyWith(actionStatus: WallpaperActionStatus.applying));
+
+    try {
+      if (slot == DayNightSlot.night &&
+          state.dayNightSchedule.autoAmoledAtNight &&
+          !state.isAmoledSaverModeEnabled) {
+        await repository.setAmoledSaverMode(true);
+        emit(state.copyWith(isAmoledSaverModeEnabled: true));
+      }
+
+      if (targetWallpaper.isLive) {
+        final res = await repository.applyAsLiveWallpaper(
+          short: targetWallpaper,
+          isMuted: true,
+        );
+        if (res['status'] == 'service_started' ||
+            res['status'] == 'applied_mock' ||
+            res['status'] == 'updated_active' ||
+            res['status'] == 'opened_chooser') {
+          emit(state.copyWith(
+            activeWallpaperId: targetWallpaper.id,
+            isLiveWallpaperActiveOnDevice: true,
+            actionStatus: WallpaperActionStatus.appliedSuccess,
+            message: 'Solar schedule (${slot.label}) transitioned to "${targetWallpaper.title}".',
+          ));
+        } else {
+          emit(state.copyWith(
+            actionStatus: WallpaperActionStatus.idle,
+            message: 'Solar schedule (${slot.label}) active: "${targetWallpaper.title}".',
+          ));
+        }
+      } else {
+        await repository.applyStaticWallpaper(
+          short: targetWallpaper,
+          targetScreen: state.autoRotationTarget,
+          customQuote: state.getEffectiveQuote(targetWallpaper),
+        );
+        emit(state.copyWith(
+          activeWallpaperId: targetWallpaper.id,
+          actionStatus: WallpaperActionStatus.appliedSuccess,
+          message: 'Solar schedule (${slot.label}) transitioned to "${targetWallpaper.title}".',
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        actionStatus: WallpaperActionStatus.error,
+        errorMessage: 'Failed to apply scheduled solar wallpaper: $e',
+      ));
+    }
+  }
 }
+

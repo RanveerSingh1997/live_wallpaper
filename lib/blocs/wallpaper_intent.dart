@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../models/day_night_schedule_config.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
@@ -314,6 +315,29 @@ class ResetWallpaperEffectIntent extends WallpaperIntent {
 
   @override
   List<Object?> get props => [wallpaperId];
+}
+
+/// Intent to update the Day & Night solar dynamic schedule configuration.
+class UpdateDayNightScheduleIntent extends WallpaperIntent {
+  final DayNightScheduleConfig config;
+  const UpdateDayNightScheduleIntent(this.config);
+
+  @override
+  List<Object?> get props => [config];
+}
+
+/// Intent to toggle the Day & Night solar schedule on or off.
+class ToggleDayNightScheduleIntent extends WallpaperIntent {
+  const ToggleDayNightScheduleIntent();
+}
+
+/// Intent to evaluate time transition and apply scheduled wallpaper if active.
+class CheckDayNightTransitionIntent extends WallpaperIntent {
+  final DateTime? currentTime;
+  const CheckDayNightTransitionIntent([this.currentTime]);
+
+  @override
+  List<Object?> get props => [currentTime];
 }
 
 
