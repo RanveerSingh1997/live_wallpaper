@@ -5,6 +5,7 @@ import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/parallax_effect_config.dart';
+import 'package:live_wallpaper/models/particle_effect_config.dart';
 import 'package:live_wallpaper/models/smart_filter_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
@@ -357,6 +358,39 @@ void main() {
       await repository.resetBatteryTelemetryConfig();
       final reset = repository.getBatteryTelemetryConfig();
       expect(reset, equals(BatteryTelemetryConfig.defaultConfig));
+    });
+
+    test('ParticleEffectConfig CRUD and reset persistence', () async {
+      // Default fallback
+      final initial = repository.getParticleEffectConfig();
+      expect(initial, equals(ParticleEffectConfig.defaultConfig));
+
+      // Save custom config
+      const custom = ParticleEffectConfig(
+        preset: ParticlePreset.electricSparks,
+        particleCount: 75,
+        speedMultiplier: 1.8,
+        lifespanSeconds: 3.2,
+        glowIntensity: 0.9,
+        isHapticsEnabled: false,
+        isBatteryGuardEnabled: false,
+      );
+      await repository.saveParticleEffectConfig(custom);
+
+      final loaded = repository.getParticleEffectConfig();
+      expect(loaded, equals(custom));
+      expect(loaded.preset, equals(ParticlePreset.electricSparks));
+      expect(loaded.particleCount, equals(75));
+      expect(loaded.speedMultiplier, equals(1.8));
+      expect(loaded.lifespanSeconds, equals(3.2));
+      expect(loaded.glowIntensity, equals(0.9));
+      expect(loaded.isHapticsEnabled, isFalse);
+      expect(loaded.isBatteryGuardEnabled, isFalse);
+
+      // Reset
+      await repository.resetParticleEffectConfig();
+      final reset = repository.getParticleEffectConfig();
+      expect(reset, equals(ParticleEffectConfig.defaultConfig));
     });
   });
 }

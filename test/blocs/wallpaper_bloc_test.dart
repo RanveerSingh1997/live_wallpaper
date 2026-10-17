@@ -9,6 +9,7 @@ import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/parallax_effect_config.dart';
+import 'package:live_wallpaper/models/particle_effect_config.dart';
 import 'package:live_wallpaper/models/smart_filter_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
@@ -1062,6 +1063,106 @@ void main() {
       await resetExpectation;
 
       expect(repository.getBatteryTelemetryConfig(), BatteryTelemetryConfig.defaultConfig);
+    });
+
+    test('LoadFeedIntent loads persisted particleConfig from repository', () async {
+      const savedConfig = ParticleEffectConfig(
+        preset: ParticlePreset.electricSparks,
+        particleCount: 80,
+      );
+      await repository.saveParticleEffectConfig(savedConfig);
+
+      final loadExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.particleConfig == savedConfig)),
+      );
+
+      bloc.add(const LoadFeedIntent());
+      await loadExpectation;
+
+      expect(bloc.state.particleConfig.preset, ParticlePreset.electricSparks);
+      expect(bloc.state.particleConfig.particleCount, 80);
+    });
+
+    test('UpdateParticleConfigIntent updates state, persists, and notifies', () async {
+      const config = ParticleEffectConfig(
+        preset: ParticlePreset.auroraVortex,
+        particleCount: 60,
+        speedMultiplier: 1.6,
+      );
+
+      final updateExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.particleConfig == config &&
+              s.message == 'Interactive Particle FX updated (Aurora Vortex).';
+        })),
+      );
+
+      bloc.add(const UpdateParticleConfigIntent(config));
+      await updateExpectation;
+
+      final persisted = repository.getParticleEffectConfig();
+      expect(persisted, equals(config));
+    });
+
+    test('ToggleParticleEffectIntent toggles isEnabled, persists, and notifies', () async {
+      expect(bloc.state.particleConfig.isEnabled, isTrue);
+
+      // Toggle OFF
+      final toggleOffExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.particleConfig.isEnabled == false &&
+              s.message != null &&
+              s.message!.contains('Interactive Particle FX disabled');
+        })),
+      );
+
+      bloc.add(const ToggleParticleEffectIntent());
+      await toggleOffExpectation;
+
+      expect(repository.getParticleEffectConfig().isEnabled, isFalse);
+
+      // Toggle ON
+      final toggleOnExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.particleConfig.isEnabled == true &&
+              s.message != null &&
+              s.message!.contains('Interactive Particle FX enabled');
+        })),
+      );
+
+      bloc.add(const ToggleParticleEffectIntent());
+      await toggleOnExpectation;
+
+      expect(repository.getParticleEffectConfig().isEnabled, isTrue);
+    });
+
+    test('ResetParticleConfigIntent restores defaults, cleans persistence, and notifies', () async {
+      const customConfig = ParticleEffectConfig(
+        preset: ParticlePreset.sakuraDrift,
+        particleCount: 90,
+      );
+      bloc.add(const UpdateParticleConfigIntent(customConfig));
+      await expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.particleConfig == customConfig)),
+      );
+
+      final resetExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.particleConfig == ParticleEffectConfig.defaultConfig &&
+              s.message == 'Interactive Particle FX reset to defaults.';
+        })),
+      );
+
+      bloc.add(const ResetParticleConfigIntent());
+      await resetExpectation;
+
+      expect(repository.getParticleEffectConfig(), ParticleEffectConfig.defaultConfig);
     });
   });
 }

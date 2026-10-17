@@ -10,6 +10,7 @@ import 'day_night_schedule_sheet.dart';
 import 'lock_screen_studio_sheet.dart';
 import 'onboarding_sheet.dart';
 import 'parallax_studio_sheet.dart';
+import 'particle_effect_sheet.dart';
 import 'preferences_modal_sheet.dart';
 
 class SettingsSheet extends StatelessWidget {
@@ -259,6 +260,18 @@ class SettingsSheet extends StatelessWidget {
                         backgroundColor: Colors.transparent,
                         builder: (ctx) => const ParallaxStudioSheet(),
                       );
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSettingTile(
+                    icon: Icons.grain_rounded,
+                    iconColor: const Color(0xFF00E5FF),
+                    title: 'Interactive Particle FX Studio',
+                    subtitle: state.particleConfig.isEnabled
+                        ? '${state.particleConfig.preset.label} • ${state.particleConfig.particleCount} particles'
+                        : 'Paused / Clean Canvas',
+                    onTap: () {
+                      ParticleEffectSheet.show(context);
                     },
                   ),
                   const SizedBox(height: 8),

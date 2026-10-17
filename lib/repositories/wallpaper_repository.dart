@@ -9,6 +9,7 @@ import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
+import '../models/particle_effect_config.dart';
 import '../models/smart_filter_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
@@ -40,6 +41,7 @@ class WallpaperRepository {
   static const String _keyDayNightSchedule = 'day_night_schedule_config';
   static const String _keyLockScreenStyle = 'lock_screen_style_config';
   static const String _keyParallaxConfig = 'parallax_effect_config';
+  static const String _keyParticleConfig = 'particle_effect_config';
   static const String _keySmartFilter = 'smart_filter_config';
   static const String _keyBatteryTelemetry = 'battery_telemetry_config';
 
@@ -70,6 +72,30 @@ class WallpaperRepository {
   /// Resets the Battery & Display Telemetry settings to default.
   Future<void> resetBatteryTelemetryConfig() async {
     await prefs.remove(_keyBatteryTelemetry);
+  }
+
+  /// Returns the configured Interactive Particle FX settings.
+  ParticleEffectConfig getParticleEffectConfig() {
+    final raw = prefs.getString(_keyParticleConfig);
+    if (raw == null || raw.isEmpty) {
+      return ParticleEffectConfig.defaultConfig;
+    }
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      return ParticleEffectConfig.fromJson(json);
+    } catch (_) {
+      return ParticleEffectConfig.defaultConfig;
+    }
+  }
+
+  /// Saves the Interactive Particle FX settings.
+  Future<void> saveParticleEffectConfig(ParticleEffectConfig config) async {
+    await prefs.setString(_keyParticleConfig, jsonEncode(config.toJson()));
+  }
+
+  /// Resets the Interactive Particle FX settings to default.
+  Future<void> resetParticleEffectConfig() async {
+    await prefs.remove(_keyParticleConfig);
   }
 
   /// Returns the configured Smart Semantic Discovery filter settings.

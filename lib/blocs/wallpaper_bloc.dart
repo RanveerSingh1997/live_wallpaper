@@ -4,6 +4,7 @@ import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
+import '../models/particle_effect_config.dart';
 import '../models/smart_filter_config.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../repositories/wallpaper_repository.dart';
@@ -67,6 +68,9 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<UpdateBatteryTelemetryIntent>(_onUpdateBatteryTelemetry);
     on<ToggleEcoModeIntent>(_onToggleEcoMode);
     on<ResetBatteryTelemetryIntent>(_onResetBatteryTelemetry);
+    on<UpdateParticleConfigIntent>(_onUpdateParticleConfig);
+    on<ToggleParticleEffectIntent>(_onToggleParticleEffect);
+    on<ResetParticleConfigIntent>(_onResetParticleConfig);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -135,6 +139,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final dayNightSchedule = repository.getDayNightScheduleConfig();
       final lockScreenStyle = repository.getLockScreenStyleConfig();
       final parallaxConfig = repository.getParallaxEffectConfig();
+      final particleConfig = repository.getParticleEffectConfig();
       final smartFilter = repository.getSmartFilterConfig();
       final batteryTelemetry = repository.getBatteryTelemetryConfig();
 
@@ -160,6 +165,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         dayNightSchedule: dayNightSchedule,
         lockScreenStyle: lockScreenStyle,
         parallaxConfig: parallaxConfig,
+        particleConfig: particleConfig,
         smartFilter: smartFilter,
         batteryTelemetry: batteryTelemetry,
         activeWallpaperId: activeId,
@@ -1063,6 +1069,46 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     emit(state.copyWith(
       batteryTelemetry: defaultConfig,
       message: 'Battery & display telemetry reset to defaults.',
+    ));
+  }
+
+  Future<void> _onUpdateParticleConfig(
+    UpdateParticleConfigIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveParticleEffectConfig(event.config);
+    emit(state.copyWith(
+      particleConfig: event.config,
+      message: 'Interactive Particle FX updated (${event.config.preset.label}).',
+    ));
+  }
+
+  Future<void> _onToggleParticleEffect(
+    ToggleParticleEffectIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final newPreset = state.particleConfig.isEnabled
+        ? ParticlePreset.none
+        : ParticlePreset.neonStardust;
+    final updated = state.particleConfig.copyWith(preset: newPreset);
+    await repository.saveParticleEffectConfig(updated);
+    emit(state.copyWith(
+      particleConfig: updated,
+      message: updated.isEnabled
+          ? 'Interactive Particle FX enabled.'
+          : 'Interactive Particle FX disabled.',
+    ));
+  }
+
+  Future<void> _onResetParticleConfig(
+    ResetParticleConfigIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.resetParticleEffectConfig();
+    final defaultConfig = ParticleEffectConfig.defaultConfig;
+    emit(state.copyWith(
+      particleConfig: defaultConfig,
+      message: 'Interactive Particle FX reset to defaults.',
     ));
   }
 }

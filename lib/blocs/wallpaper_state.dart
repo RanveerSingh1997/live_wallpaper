@@ -5,6 +5,7 @@ import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
+import '../models/particle_effect_config.dart';
 import '../models/smart_filter_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
@@ -34,6 +35,7 @@ class WallpaperState extends Equatable {
   final DayNightScheduleConfig dayNightSchedule;
   final LockScreenStyleConfig lockScreenStyle;
   final ParallaxEffectConfig parallaxConfig;
+  final ParticleEffectConfig particleConfig;
   final SmartFilterConfig smartFilter;
   final BatteryTelemetryConfig batteryTelemetry;
   final bool isFeedMuted;
@@ -70,6 +72,7 @@ class WallpaperState extends Equatable {
     this.dayNightSchedule = DayNightScheduleConfig.defaultConfig,
     this.lockScreenStyle = LockScreenStyleConfig.defaultConfig,
     this.parallaxConfig = ParallaxEffectConfig.defaultConfig,
+    this.particleConfig = ParticleEffectConfig.defaultConfig,
     this.smartFilter = SmartFilterConfig.defaultConfig,
     this.batteryTelemetry = BatteryTelemetryConfig.defaultConfig,
     this.isFeedMuted = true,
@@ -235,6 +238,7 @@ class WallpaperState extends Equatable {
     DayNightScheduleConfig? dayNightSchedule,
     LockScreenStyleConfig? lockScreenStyle,
     ParallaxEffectConfig? parallaxConfig,
+    ParticleEffectConfig? particleConfig,
     SmartFilterConfig? smartFilter,
     BatteryTelemetryConfig? batteryTelemetry,
     bool? isFeedMuted,
@@ -271,6 +275,7 @@ class WallpaperState extends Equatable {
       dayNightSchedule: dayNightSchedule ?? this.dayNightSchedule,
       lockScreenStyle: lockScreenStyle ?? this.lockScreenStyle,
       parallaxConfig: parallaxConfig ?? this.parallaxConfig,
+      particleConfig: particleConfig ?? this.particleConfig,
       smartFilter: smartFilter ?? this.smartFilter,
       batteryTelemetry: batteryTelemetry ?? this.batteryTelemetry,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
@@ -313,6 +318,7 @@ class WallpaperState extends Equatable {
         dayNightSchedule,
         lockScreenStyle,
         parallaxConfig,
+        particleConfig,
         smartFilter,
         batteryTelemetry,
         isFeedMuted,

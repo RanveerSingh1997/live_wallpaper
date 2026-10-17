@@ -7,11 +7,13 @@ import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
+import '../widgets/interactive_particle_overlay.dart';
 import '../widgets/video_player_item.dart';
 import 'battery_telemetry_sheet.dart';
 import 'ipad_wallpaper_dialog.dart';
 import 'lock_screen_studio_sheet.dart';
 import 'parallax_studio_sheet.dart';
+import 'particle_effect_sheet.dart';
 import 'wallpaper_effects_sheet.dart';
 import 'wallpaper_export_sheet.dart';
 
@@ -386,6 +388,13 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
           );
         }
 
+        if (state.particleConfig.isEnabled) {
+          canvas = InteractiveParticleOverlay(
+            config: state.particleConfig,
+            child: canvas,
+          );
+        }
+
         return canvas;
       },
     );
@@ -660,6 +669,16 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                             backgroundColor: Colors.transparent,
                             builder: (ctx) => ParallaxStudioSheet(wallpaper: short),
                           );
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      // Interactive Particle FX Studio Button
+                      IconButton(
+                        icon: const Icon(Icons.grain_rounded, color: Color(0xFF00E676)),
+                        tooltip: 'Interactive Particle FX',
+                        onPressed: () {
+                          HapticFeedback.mediumImpact();
+                          ParticleEffectSheet.show(context, wallpaper: short);
                         },
                       ),
                     ],

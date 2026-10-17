@@ -8,11 +8,13 @@ import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:live_wallpaper/models/battery_telemetry_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/parallax_effect_config.dart';
+import 'package:live_wallpaper/models/particle_effect_config.dart';
 import 'package:live_wallpaper/models/smart_filter_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/screens/add_to_collection_sheet.dart';
 import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
 import 'package:live_wallpaper/screens/battery_telemetry_sheet.dart';
+import 'package:live_wallpaper/screens/particle_effect_sheet.dart';
 import 'package:live_wallpaper/screens/categories_screen.dart';
 import 'package:live_wallpaper/screens/create_collection_sheet.dart';
 import 'package:live_wallpaper/screens/custom_wallpaper_import_sheet.dart';
@@ -1037,7 +1039,9 @@ void main() {
       expect(find.text('Browser'), findsWidgets);
       expect(find.text('Wallora'), findsOneWidget);
 
-      // Tap on canvas to toggle UI chrome
+      // Tap on canvas to toggle UI chrome off and back on
+      await tester.tap(find.byType(PageView));
+      await tester.pumpAndSettle();
       await tester.tap(find.byType(PageView));
       await tester.pumpAndSettle();
 
@@ -1903,6 +1907,198 @@ void main() {
       // Verify BatteryTelemetrySheet is opened
       expect(find.text('LIVE OLED & POWER TELEMETRY'), findsOneWidget);
       expect(find.text('Zero Sleep Overhead Verified'), findsOneWidget);
+    });
+
+    testWidgets('ParticleEffectSheet renders header, interactive preview, preset tiles, physics sliders, and saves settings',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: ParticleEffectSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // 1. Verify Header
+      expect(find.text('Interactive Particle FX'), findsOneWidget);
+      expect(find.text('Real-time touch ripples & stardust physics'), findsOneWidget);
+
+      // 2. Verify Sandbox Hint
+      expect(find.textContaining('Touch or drag to test particle physics'), findsOneWidget);
+
+      // 3. Verify Preset Tiles
+      expect(find.text('PARTICLE PRESETS'), findsOneWidget);
+      expect(find.text('Neon Stardust'), findsOneWidget);
+      expect(find.text('Electric Sparks'), findsOneWidget);
+      expect(find.text('Fluid Ripples'), findsOneWidget);
+      expect(find.text('Sakura Petal Drift'), findsOneWidget);
+      expect(find.text('Aurora Vortex'), findsOneWidget);
+      expect(find.text('Clean Canvas (Off)'), findsOneWidget);
+
+      // 4. Tap 'Electric Sparks' preset
+      await tester.tap(find.text('Electric Sparks'));
+      await tester.pumpAndSettle();
+
+      // 5. Scroll down to sliders
+      await tester.scrollUntilVisible(
+        find.text('Ambient Glow Intensity'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('PHYSICS & VISUAL TUNING'), findsOneWidget);
+      expect(find.text('Particle Density'), findsOneWidget);
+      expect(find.text('Touch Velocity & Speed'), findsOneWidget);
+      expect(find.text('Particle Lifespan'), findsOneWidget);
+      expect(find.text('Ambient Glow Intensity'), findsOneWidget);
+
+      // 6. Scroll down to hardware controls & save button
+      await tester.scrollUntilVisible(
+        find.text('Touch Haptic Feedback'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('HARDWARE CONTROLS'), findsOneWidget);
+      expect(find.text('Touch Haptic Feedback'), findsOneWidget);
+      expect(find.text('Low-Battery Auto-Pause (<15%)'), findsOneWidget);
+
+      // 7. Verify Save Button and tap it
+      expect(find.text('Save Particle FX'), findsOneWidget);
+      await tester.tap(find.text('Save Particle FX'));
+      await tester.pumpAndSettle();
+
+      // 8. Verify BLoC state was updated with Electric Sparks preset
+      expect(bloc.state.particleConfig.preset, equals(ParticlePreset.electricSparks));
+    });
+
+    testWidgets('ParticleEffectSheet Reset Defaults restores default configuration',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+
+      const customConfig = ParticleEffectConfig(
+        preset: ParticlePreset.sakuraDrift,
+        particleCount: 90,
+      );
+
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          particleConfig: customConfig,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: ParticleEffectSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Tap Reset Defaults
+      expect(find.text('Reset Defaults'), findsOneWidget);
+      await tester.tap(find.text('Reset Defaults'));
+      await tester.pumpAndSettle();
+
+      // Tap Save Particle FX
+      await tester.tap(find.text('Save Particle FX'));
+      await tester.pumpAndSettle();
+
+      // Verify BLoC received default config
+      expect(bloc.state.particleConfig, equals(ParticleEffectConfig.defaultConfig));
+    });
+
+    testWidgets('SettingsSheet opens ParticleEffectSheet when tapping Interactive Particle FX Studio tile',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SettingsSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Scroll to Interactive Particle FX Studio tile
+      await tester.scrollUntilVisible(
+        find.text('Interactive Particle FX Studio'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('Interactive Particle FX Studio'), findsOneWidget);
+
+      // Tap to open sheet
+      await tester.tap(find.text('Interactive Particle FX Studio'));
+      await tester.pumpAndSettle();
+
+      // Verify ParticleEffectSheet is opened
+      expect(find.text('Interactive Particle FX'), findsOneWidget);
+      expect(find.text('PARTICLE PRESETS'), findsOneWidget);
     });
   });
 }

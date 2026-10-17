@@ -4,6 +4,7 @@ import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
+import '../models/particle_effect_config.dart';
 import '../models/smart_filter_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
@@ -412,6 +413,25 @@ class ToggleEcoModeIntent extends WallpaperIntent {
 /// Intent to reset the Battery & Display Telemetry configuration to defaults.
 class ResetBatteryTelemetryIntent extends WallpaperIntent {
   const ResetBatteryTelemetryIntent();
+}
+
+/// Intent to update the Interactive Particle FX configuration.
+class UpdateParticleConfigIntent extends WallpaperIntent {
+  final ParticleEffectConfig config;
+  const UpdateParticleConfigIntent(this.config);
+
+  @override
+  List<Object?> get props => [config];
+}
+
+/// Intent to toggle Interactive Particle FX on or off.
+class ToggleParticleEffectIntent extends WallpaperIntent {
+  const ToggleParticleEffectIntent();
+}
+
+/// Intent to reset Interactive Particle FX configuration to defaults.
+class ResetParticleConfigIntent extends WallpaperIntent {
+  const ResetParticleConfigIntent();
 }
 
 
