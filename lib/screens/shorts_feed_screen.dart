@@ -11,6 +11,7 @@ import '../widgets/shorts_action_rail.dart';
 import '../widgets/video_player_item.dart';
 import 'preferences_modal_sheet.dart';
 import 'quote_studio_sheet.dart';
+import 'ipad_wallpaper_dialog.dart';
 
 class ShortsFeedScreen extends StatefulWidget {
   const ShortsFeedScreen({super.key});
@@ -261,12 +262,16 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                           isApplying: state.actionStatus == WallpaperActionStatus.applying &&
                               isPageActive,
                           onApplyWallpaper: () {
-                            context.read<WallpaperBloc>().add(
-                                  ApplyLiveWallpaperIntent(
-                                    short: short,
-                                    isMuted: true, // Default muted for battery
-                                  ),
-                                );
+                            if (Platform.isIOS) {
+                              IPadWallpaperDialog.show(context, short);
+                            } else {
+                              context.read<WallpaperBloc>().add(
+                                    ApplyLiveWallpaperIntent(
+                                      short: short,
+                                      isMuted: true, // Default muted for battery
+                                    ),
+                                  );
+                            }
                           },
                           onCustomizeQuote: () {
                             _openQuoteStudio(context, short, effectiveQuote);

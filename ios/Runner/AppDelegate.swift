@@ -158,21 +158,35 @@ import AVFoundation
   }
 
   private func showActivityViewController(with items: [Any], from viewController: UIViewController) {
+    var presenter = viewController
+    while let presented = presenter.presentedViewController, !presented.isBeingDismissed {
+      presenter = presented
+    }
+
+    if presenter.isBeingDismissed {
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+        if let top = self?.getTopViewController() {
+          self?.showActivityViewController(with: items, from: top)
+        }
+      }
+      return
+    }
+
     let activityViewController = UIActivityViewController(activityItems: items, applicationActivities: nil)
 
     // Critical for iPad: Anchor popover to prevent crash
     if let popover = activityViewController.popoverPresentationController {
-      popover.sourceView = viewController.view
+      popover.sourceView = presenter.view
       popover.sourceRect = CGRect(
-        x: viewController.view.bounds.midX,
-        y: viewController.view.bounds.midY,
+        x: presenter.view.bounds.midX,
+        y: presenter.view.bounds.midY,
         width: 1,
         height: 1
       )
       popover.permittedArrowDirections = []
     }
 
-    viewController.present(activityViewController, animated: true, completion: nil)
+    presenter.present(activityViewController, animated: true, completion: nil)
   }
 
   /// Extracts a crisp full-resolution frame from the video asset.
@@ -180,15 +194,21 @@ import AVFoundation
     let asset = AVAsset(url: videoUrl)
     let generator = AVAssetImageGenerator(asset: asset)
     generator.appliesPreferredTrackTransform = true
+    generator.requestedTimeToleranceBefore = .positiveInfinity
+    generator.requestedTimeToleranceAfter = .positiveInfinity
     generator.maximumSize = CGSize(width: 3840, height: 3840) // Full Retina/4K
-    do {
-      let time = CMTime(seconds: 0.1, preferredTimescale: 600)
-      let cgImage = try generator.copyCGImage(at: time, actualTime: nil)
+
+    // Attempt 0.1s keyframe
+    if let cgImage = try? generator.copyCGImage(at: CMTime(seconds: 0.1, preferredTimescale: 600), actualTime: nil) {
       return UIImage(cgImage: cgImage)
-    } catch {
-      print("LiveWallpaper: Failed to extract video frame: \(error)")
-      return nil
     }
+    // Attempt beginning of clip
+    if let cgImage = try? generator.copyCGImage(at: .zero, actualTime: nil) {
+      return UIImage(cgImage: cgImage)
+    }
+
+    print("LiveWallpaper: Failed to extract video frame: \(videoUrl.path)")
+    return nil
   }
 
   /// Validates Photo Library permission using addOnly for iOS 14+.
@@ -241,19 +261,24 @@ import AVFoundation
     if #available(iOS 13.0, *) {
       let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
       for scene in scenes {
-        for window in scene.windows where window.isKeyWindow {
-          var topController = window.rootViewController
-          while let presented = topController?.presentedViewController {
-            topController = presented
+        let window = scene.windows.first(where: { $0.isKeyWindow }) ?? scene.windows.first
+        if let root = window?.rootViewController {
+          var top = root
+          while let presented = top.presentedViewController, !presented.isBeingDismissed {
+            top = presented
           }
-          return topController
+          return top
         }
       }
     }
-    var topController = self.window?.rootViewController
-    while let presented = topController?.presentedViewController {
-      topController = presented
+    let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) ?? UIApplication.shared.windows.first
+    if let root = window?.rootViewController {
+      var top = root
+      while let presented = top.presentedViewController, !presented.isBeingDismissed {
+        top = presented
+      }
+      return top
     }
-    return topController
+    return nil
   }
 }

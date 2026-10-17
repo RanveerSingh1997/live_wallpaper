@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/widgets/kinetic_quote_overlay.dart';
 import 'package:live_wallpaper/widgets/shorts_action_rail.dart';
+import 'package:live_wallpaper/screens/ipad_wallpaper_dialog.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -102,6 +103,33 @@ void main() {
       await tester.tap(find.text('Like'));
       await tester.pump();
       expect(favoriteTapped, true);
+    });
+
+    testWidgets('IPadWallpaperDialog renders instructions and action buttons',
+        (WidgetTester tester) async {
+      final short = CuratedShortsData.shorts.first;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: IPadWallpaperDialog(short: short),
+          ),
+        ),
+      );
+
+      // Verify header & titles
+      expect(find.text('Set Wallpaper on iPad'), findsOneWidget);
+      expect(find.text(short.title), findsOneWidget);
+
+      // Verify 3 steps
+      expect(find.text('HOW TO APPLY ON IPADOS'), findsOneWidget);
+      expect(find.text('Open Share Sheet'), findsOneWidget);
+      expect(find.text('Select "Use as Wallpaper"'), findsOneWidget);
+      expect(find.text('Set as Wallpaper Pair'), findsOneWidget);
+
+      // Verify buttons
+      expect(find.text('Open Wallpaper Share Sheet'), findsOneWidget);
+      expect(find.text('Save Ultra-HD Wallpaper to Photos'), findsOneWidget);
     });
   });
 }
