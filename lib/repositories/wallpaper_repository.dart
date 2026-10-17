@@ -8,6 +8,7 @@ import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
+import '../models/smart_filter_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../services/wallpaper_renderer_service.dart';
@@ -38,11 +39,36 @@ class WallpaperRepository {
   static const String _keyDayNightSchedule = 'day_night_schedule_config';
   static const String _keyLockScreenStyle = 'lock_screen_style_config';
   static const String _keyParallaxConfig = 'parallax_effect_config';
+  static const String _keySmartFilter = 'smart_filter_config';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
     required this.prefs,
   }) : _bridge = bridge ?? WallpaperServiceBridge();
+
+  /// Returns the configured Smart Semantic Discovery filter settings.
+  SmartFilterConfig getSmartFilterConfig() {
+    final raw = prefs.getString(_keySmartFilter);
+    if (raw == null || raw.isEmpty) {
+      return SmartFilterConfig.defaultConfig;
+    }
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      return SmartFilterConfig.fromJson(json);
+    } catch (_) {
+      return SmartFilterConfig.defaultConfig;
+    }
+  }
+
+  /// Saves the Smart Semantic Discovery filter settings.
+  Future<void> saveSmartFilterConfig(SmartFilterConfig config) async {
+    await prefs.setString(_keySmartFilter, jsonEncode(config.toJson()));
+  }
+
+  /// Resets the Smart Semantic Discovery filter settings to default.
+  Future<void> resetSmartFilterConfig() async {
+    await prefs.remove(_keySmartFilter);
+  }
 
   /// Returns the configured 3D Spatial Parallax settings.
   ParallaxEffectConfig getParallaxEffectConfig() {

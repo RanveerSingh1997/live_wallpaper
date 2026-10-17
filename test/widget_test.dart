@@ -7,6 +7,7 @@ import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/parallax_effect_config.dart';
+import 'package:live_wallpaper/models/smart_filter_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/screens/add_to_collection_sheet.dart';
 import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
@@ -25,6 +26,7 @@ import 'package:live_wallpaper/screens/onboarding_sheet.dart';
 import 'package:live_wallpaper/screens/parallax_studio_sheet.dart';
 import 'package:live_wallpaper/screens/quote_studio_sheet.dart';
 import 'package:live_wallpaper/screens/settings_sheet.dart';
+import 'package:live_wallpaper/screens/smart_discovery_sheet.dart';
 import 'package:live_wallpaper/screens/splash_screen.dart';
 import 'package:live_wallpaper/screens/wallpaper_effects_sheet.dart';
 import 'package:live_wallpaper/screens/wallpaper_export_sheet.dart';
@@ -1599,6 +1601,125 @@ void main() {
       expect(bloc.state.parallaxConfig.preset, ParallaxPreset.deepSpatial);
       expect(bloc.state.parallaxConfig.sensitivity, 1.8);
       expect(bloc.state.parallaxConfig.maxAngleDegrees, 18.0);
+    });
+
+    testWidgets('SmartDiscoverySheet renders sections, options, updates filters, and applies to BLoC',
+        (WidgetTester tester) async {
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SmartDiscoverySheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // 1. Verify Header & Subtitle
+      expect(find.text('Smart Semantic Discovery'), findsOneWidget);
+      expect(find.text('Filter by vibe, color harmony & format'), findsOneWidget);
+
+      // 2. Verify Section Headers that are visible
+      expect(find.text('Media Format'), findsOneWidget);
+      expect(find.text('Mood & Energy Vibe'), findsOneWidget);
+      expect(find.text('Color Harmony Palette'), findsOneWidget);
+
+      // 3. Verify & Select Format
+      expect(find.text('All Formats'), findsOneWidget);
+      expect(find.text('60 FPS Live'), findsOneWidget);
+      expect(find.text('4K Ultra-HD'), findsOneWidget);
+
+      await tester.tap(find.text('60 FPS Live'));
+      await tester.pumpAndSettle();
+
+      // 4. Verify & Select Mood Chips
+      expect(find.text('All Moods'), findsOneWidget);
+      expect(find.text('Fighter Spirit'), findsOneWidget);
+      expect(find.text('Deep Focus'), findsOneWidget);
+
+      await tester.tap(find.text('Fighter Spirit'));
+      await tester.pumpAndSettle();
+
+      // 5. Scroll to Display Attributes and verify
+      await tester.scrollUntilVisible(
+        find.text('Requires Text / Quote Overlay'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Display Attributes'), findsOneWidget);
+      expect(find.text('AMOLED Certified Only'), findsOneWidget);
+      expect(find.text('Requires Text / Quote Overlay'), findsOneWidget);
+
+      // 6. Verify Match Pill & Apply Button (Pinned at bottom)
+      expect(find.textContaining('match'), findsOneWidget);
+      expect(find.text('Apply Discovery Filters'), findsOneWidget);
+
+      await tester.tap(find.text('Apply Discovery Filters'));
+      await tester.pumpAndSettle();
+
+      // Verify BLoC state was updated
+      expect(bloc.state.smartFilter.mediaType, equals(SmartMediaType.liveOnly));
+      expect(bloc.state.smartFilter.mood, equals(SmartMood.fighterSpirit));
+      expect(bloc.state.smartFilter.hasActiveFilters, isTrue);
+    });
+
+    testWidgets('DiscoverScreen displays Smart Discovery button and active filter banner',
+        (WidgetTester tester) async {
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      const activeFilter = SmartFilterConfig(
+        mediaType: SmartMediaType.liveOnly,
+        mood: SmartMood.fighterSpirit,
+        paletteColor: SmartPaletteColor.neonCyan,
+      );
+
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts.where((s) => activeFilter.matches(s)).toList(),
+          smartFilter: activeFilter,
+        ),
+      );
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: DiscoverScreen(onOpenLiveFeed: () {}),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // 1. Verify Smart Discovery active count badge
+      expect(find.text('3'), findsOneWidget); // 3 active filters
+
+      // 2. Verify Active Filter banner
+      expect(find.textContaining('Smart Filter: 60 FPS Live'), findsOneWidget);
+      expect(find.textContaining('Fighter Spirit'), findsOneWidget);
+
+      // 3. Tap cancel icon to reset filters
+      await tester.tap(find.byIcon(Icons.cancel_rounded));
+      await tester.pumpAndSettle();
+
+      // Verify BLoC received ResetSmartFilterIntent
+      expect(bloc.state.smartFilter, equals(SmartFilterConfig.defaultConfig));
     });
   });
 }

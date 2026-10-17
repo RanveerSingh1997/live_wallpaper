@@ -4,6 +4,7 @@ import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
+import '../models/smart_filter_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 
@@ -32,6 +33,7 @@ class WallpaperState extends Equatable {
   final DayNightScheduleConfig dayNightSchedule;
   final LockScreenStyleConfig lockScreenStyle;
   final ParallaxEffectConfig parallaxConfig;
+  final SmartFilterConfig smartFilter;
   final bool isFeedMuted;
   final bool isLiveWallpaperActiveOnDevice;
   final String? activeWallpaperId;
@@ -66,6 +68,7 @@ class WallpaperState extends Equatable {
     this.dayNightSchedule = DayNightScheduleConfig.defaultConfig,
     this.lockScreenStyle = LockScreenStyleConfig.defaultConfig,
     this.parallaxConfig = ParallaxEffectConfig.defaultConfig,
+    this.smartFilter = SmartFilterConfig.defaultConfig,
     this.isFeedMuted = true,
     this.isLiveWallpaperActiveOnDevice = false,
     this.activeWallpaperId,
@@ -178,6 +181,13 @@ class WallpaperState extends Equatable {
     }).toList();
   }
 
+  /// Wallpapers matching both the active search query and smart discovery filters.
+  List<MotivationalShort> get discoveredShorts {
+    final list = searchResults;
+    if (!smartFilter.hasActiveFilters) return list;
+    return list.where((s) => smartFilter.matches(s)).toList();
+  }
+
   /// Formatted storage string (e.g. "12.4 MB").
   String get storageFormatted {
     if (totalStorageUsedBytes < 1024 * 1024) {
@@ -222,6 +232,7 @@ class WallpaperState extends Equatable {
     DayNightScheduleConfig? dayNightSchedule,
     LockScreenStyleConfig? lockScreenStyle,
     ParallaxEffectConfig? parallaxConfig,
+    SmartFilterConfig? smartFilter,
     bool? isFeedMuted,
     bool? isLiveWallpaperActiveOnDevice,
     String? activeWallpaperId,
@@ -256,6 +267,7 @@ class WallpaperState extends Equatable {
       dayNightSchedule: dayNightSchedule ?? this.dayNightSchedule,
       lockScreenStyle: lockScreenStyle ?? this.lockScreenStyle,
       parallaxConfig: parallaxConfig ?? this.parallaxConfig,
+      smartFilter: smartFilter ?? this.smartFilter,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
       isLiveWallpaperActiveOnDevice:
           isLiveWallpaperActiveOnDevice ?? this.isLiveWallpaperActiveOnDevice,
@@ -296,6 +308,7 @@ class WallpaperState extends Equatable {
         dayNightSchedule,
         lockScreenStyle,
         parallaxConfig,
+        smartFilter,
         isFeedMuted,
         isLiveWallpaperActiveOnDevice,
         activeWallpaperId,

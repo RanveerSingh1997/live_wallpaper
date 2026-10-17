@@ -3,6 +3,7 @@ import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
+import '../models/smart_filter_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 
@@ -14,7 +15,9 @@ abstract class WallpaperIntent extends Equatable {
 }
 
 /// Intent to load the initial shorts feed, cached quotes, favorites, and downloads.
-class LoadFeedIntent extends WallpaperIntent {}
+class LoadFeedIntent extends WallpaperIntent {
+  const LoadFeedIntent();
+}
 
 /// Intent triggered when user swipes to a new vertical short in the live feed.
 class ChangeActiveShortIntent extends WallpaperIntent {
@@ -248,7 +251,9 @@ class UpdateAutoRotationTargetIntent extends WallpaperIntent {
 }
 
 /// Intent to rotate to the next wallpaper in the active pool immediately on-demand.
-class RotateWallpaperNowIntent extends WallpaperIntent {}
+class RotateWallpaperNowIntent extends WallpaperIntent {
+  const RotateWallpaperNowIntent();
+}
 
 /// Intent to import a creator or custom wallpaper into the personal library.
 class ImportCustomWallpaperIntent extends WallpaperIntent {
@@ -373,6 +378,20 @@ class ToggleParallaxIntent extends WallpaperIntent {
 /// Intent to reset the 3D Spatial Parallax configuration to default.
 class ResetParallaxConfigIntent extends WallpaperIntent {
   const ResetParallaxConfigIntent();
+}
+
+/// Intent to update the Smart Semantic Discovery & Mood Filter configuration.
+class UpdateSmartFilterIntent extends WallpaperIntent {
+  final SmartFilterConfig config;
+  const UpdateSmartFilterIntent(this.config);
+
+  @override
+  List<Object?> get props => [config];
+}
+
+/// Intent to reset the Smart Semantic Discovery & Mood Filter configuration.
+class ResetSmartFilterIntent extends WallpaperIntent {
+  const ResetSmartFilterIntent();
 }
 
 

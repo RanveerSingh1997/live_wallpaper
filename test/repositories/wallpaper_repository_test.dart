@@ -4,6 +4,7 @@ import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/parallax_effect_config.dart';
+import 'package:live_wallpaper/models/smart_filter_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
@@ -298,6 +299,35 @@ void main() {
       await repository.resetParallaxEffectConfig();
       final resetConfig = repository.getParallaxEffectConfig();
       expect(resetConfig, ParallaxEffectConfig.defaultConfig);
+    });
+
+    test('SmartFilterConfig CRUD and reset persistence', () async {
+      // Default fallback
+      final initial = repository.getSmartFilterConfig();
+      expect(initial, equals(SmartFilterConfig.defaultConfig));
+
+      // Save custom config
+      const custom = SmartFilterConfig(
+        mediaType: SmartMediaType.liveOnly,
+        mood: SmartMood.fighterSpirit,
+        paletteColor: SmartPaletteColor.neonCyan,
+        amoledCertifiedOnly: true,
+        hasTextOverlayOnly: true,
+      );
+      await repository.saveSmartFilterConfig(custom);
+
+      final loaded = repository.getSmartFilterConfig();
+      expect(loaded, equals(custom));
+      expect(loaded.mediaType, equals(SmartMediaType.liveOnly));
+      expect(loaded.mood, equals(SmartMood.fighterSpirit));
+      expect(loaded.paletteColor, equals(SmartPaletteColor.neonCyan));
+      expect(loaded.amoledCertifiedOnly, isTrue);
+      expect(loaded.hasTextOverlayOnly, isTrue);
+
+      // Reset
+      await repository.resetSmartFilterConfig();
+      final reset = repository.getSmartFilterConfig();
+      expect(reset, equals(SmartFilterConfig.defaultConfig));
     });
   });
 }

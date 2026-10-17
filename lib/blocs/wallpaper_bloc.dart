@@ -3,6 +3,7 @@ import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
+import '../models/smart_filter_config.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../repositories/wallpaper_repository.dart';
 import 'wallpaper_intent.dart';
@@ -60,6 +61,8 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<UpdateParallaxConfigIntent>(_onUpdateParallaxConfig);
     on<ToggleParallaxIntent>(_onToggleParallax);
     on<ResetParallaxConfigIntent>(_onResetParallaxConfig);
+    on<UpdateSmartFilterIntent>(_onUpdateSmartFilter);
+    on<ResetSmartFilterIntent>(_onResetSmartFilter);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -70,6 +73,33 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     final preferred = all.where((s) => preferences.contains(s.category)).toList();
     final others = all.where((s) => !preferences.contains(s.category)).toList();
     return [...preferred, ...others];
+  }
+
+  List<MotivationalShort> _filterShorts({
+    required List<MotivationalShort> allShorts,
+    required String category,
+    required Set<String> preferences,
+    required SmartFilterConfig smartFilter,
+  }) {
+    List<MotivationalShort> base;
+    if (category == 'All') {
+      base = allShorts;
+    } else if (category == 'For You') {
+      base = _buildForYouList(allShorts, preferences);
+    } else if (category == 'Live Wallpapers') {
+      base = allShorts.where((s) => s.isLive).toList();
+    } else if (category == 'Static Wallpapers') {
+      base = allShorts.where((s) => !s.isLive).toList();
+    } else if (category == 'AMOLED True-Black') {
+      base = allShorts.where((s) => s.isAmoledCertified).toList();
+    } else {
+      base = allShorts.where((s) => s.category == category).toList();
+    }
+
+    if (smartFilter.hasActiveFilters) {
+      base = base.where((s) => smartFilter.matches(s)).toList();
+    }
+    return base;
   }
 
   Future<void> _onLoadFeed(
@@ -101,8 +131,14 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final dayNightSchedule = repository.getDayNightScheduleConfig();
       final lockScreenStyle = repository.getLockScreenStyleConfig();
       final parallaxConfig = repository.getParallaxEffectConfig();
+      final smartFilter = repository.getSmartFilterConfig();
 
-      final forYouList = _buildForYouList(shorts, preferences);
+      final forYouList = _filterShorts(
+        allShorts: shorts,
+        category: 'For You',
+        preferences: preferences,
+        smartFilter: smartFilter,
+      );
 
       emit(state.copyWith(
         allShorts: shorts,
@@ -119,6 +155,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         dayNightSchedule: dayNightSchedule,
         lockScreenStyle: lockScreenStyle,
         parallaxConfig: parallaxConfig,
+        smartFilter: smartFilter,
         activeWallpaperId: activeId,
         userPreferences: preferences,
         isTextOverlayVisible: isTextOverlayVisible,
@@ -249,20 +286,12 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     FilterByCategoryIntent event,
     Emitter<WallpaperState> emit,
   ) {
-    List<MotivationalShort> filtered;
-    if (event.category == 'All') {
-      filtered = state.allShorts;
-    } else if (event.category == 'For You') {
-      filtered = _buildForYouList(state.allShorts, state.userPreferences);
-    } else if (event.category == 'Live Wallpapers') {
-      filtered = state.allShorts.where((s) => s.isLive).toList();
-    } else if (event.category == 'Static Wallpapers') {
-      filtered = state.allShorts.where((s) => !s.isLive).toList();
-    } else if (event.category == 'AMOLED True-Black') {
-      filtered = state.allShorts.where((s) => s.isAmoledCertified).toList();
-    } else {
-      filtered = state.allShorts.where((s) => s.category == event.category).toList();
-    }
+    final filtered = _filterShorts(
+      allShorts: state.allShorts,
+      category: event.category,
+      preferences: state.userPreferences,
+      smartFilter: state.smartFilter,
+    );
 
     emit(state.copyWith(
       selectedCategory: event.category,
@@ -291,11 +320,16 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
   ) async {
     try {
       await repository.saveUserPreferences(event.preferences);
-      final forYouList = _buildForYouList(state.allShorts, event.preferences);
+      final filtered = _filterShorts(
+        allShorts: state.allShorts,
+        category: state.selectedCategory,
+        preferences: event.preferences,
+        smartFilter: state.smartFilter,
+      );
 
       emit(state.copyWith(
         userPreferences: event.preferences,
-        filteredShorts: state.selectedCategory == 'For You' ? forYouList : state.filteredShorts,
+        filteredShorts: filtered,
         message: 'Wallpaper preferences updated! Feed personalized.',
       ));
     } catch (e) {
@@ -943,6 +977,47 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     emit(state.copyWith(
       parallaxConfig: ParallaxEffectConfig.defaultConfig,
       message: '3D Spatial Parallax reset to default.',
+    ));
+  }
+
+  Future<void> _onUpdateSmartFilter(
+    UpdateSmartFilterIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveSmartFilterConfig(event.config);
+    final filtered = _filterShorts(
+      allShorts: state.allShorts,
+      category: state.selectedCategory,
+      preferences: state.userPreferences,
+      smartFilter: event.config,
+    );
+    emit(state.copyWith(
+      smartFilter: event.config,
+      filteredShorts: filtered,
+      activeIndex: 0,
+      message: event.config.hasActiveFilters
+          ? 'Smart discovery filter applied (${event.config.activeFilterCount} active).'
+          : 'Smart discovery filter cleared.',
+    ));
+  }
+
+  Future<void> _onResetSmartFilter(
+    ResetSmartFilterIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.resetSmartFilterConfig();
+    final defaultConfig = SmartFilterConfig.defaultConfig;
+    final filtered = _filterShorts(
+      allShorts: state.allShorts,
+      category: state.selectedCategory,
+      preferences: state.userPreferences,
+      smartFilter: defaultConfig,
+    );
+    emit(state.copyWith(
+      smartFilter: defaultConfig,
+      filteredShorts: filtered,
+      activeIndex: 0,
+      message: 'Smart discovery filters reset.',
     ));
   }
 }

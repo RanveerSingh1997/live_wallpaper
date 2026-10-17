@@ -8,6 +8,7 @@ import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/parallax_effect_config.dart';
+import 'package:live_wallpaper/models/smart_filter_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
@@ -894,6 +895,72 @@ void main() {
 
       final persisted = repository.getParallaxEffectConfig();
       expect(persisted, ParallaxEffectConfig.defaultConfig);
+    });
+
+    test('UpdateSmartFilterIntent updates state, persists, updates filteredShorts, and notifies', () async {
+      // Load feed first
+      final loadExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.allShorts.isNotEmpty)),
+      );
+      bloc.add(const LoadFeedIntent());
+      await loadExpectation;
+
+      final initialShortCount = bloc.state.filteredShorts.length;
+      expect(initialShortCount, greaterThan(0));
+
+      const filter = SmartFilterConfig(
+        mediaType: SmartMediaType.liveOnly,
+        amoledCertifiedOnly: true,
+      );
+
+      final filterExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.smartFilter == filter &&
+              s.filteredShorts.every((w) => w.isLive && w.isAmoledCertified) &&
+              s.message == 'Smart discovery filter applied (2 active).';
+        })),
+      );
+
+      bloc.add(const UpdateSmartFilterIntent(filter));
+      await filterExpectation;
+
+      final persisted = repository.getSmartFilterConfig();
+      expect(persisted, equals(filter));
+    });
+
+    test('ResetSmartFilterIntent restores default filter, cleans persistence, and resets filteredShorts', () async {
+      // Load feed first
+      final loadExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.allShorts.isNotEmpty)),
+      );
+      bloc.add(const LoadFeedIntent());
+      await loadExpectation;
+
+      // Apply filter
+      const filter = SmartFilterConfig(mediaType: SmartMediaType.liveOnly);
+      bloc.add(const UpdateSmartFilterIntent(filter));
+      await expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.smartFilter == filter)),
+      );
+
+      // Now reset
+      final resetExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.smartFilter == SmartFilterConfig.defaultConfig &&
+              s.message == 'Smart discovery filters reset.';
+        })),
+      );
+
+      bloc.add(const ResetSmartFilterIntent());
+      await resetExpectation;
+
+      final persisted = repository.getSmartFilterConfig();
+      expect(persisted, equals(SmartFilterConfig.defaultConfig));
     });
   });
 }

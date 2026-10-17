@@ -12,8 +12,10 @@ import 'custom_wallpaper_import_sheet.dart';
 import 'preferences_modal_sheet.dart';
 import 'quote_studio_sheet.dart';
 import 'settings_sheet.dart';
+import 'smart_discovery_sheet.dart';
 import 'wallpaper_preview_sheet.dart';
 import 'wallpaper_quick_actions_sheet.dart';
+import '../models/smart_filter_config.dart';
 
 class DiscoverScreen extends StatefulWidget {
   final VoidCallback onOpenLiveFeed;
@@ -222,41 +224,106 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ),
                 ),
 
-                // Search Bar
+                // Search Bar with Smart Discovery Button
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E22),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: Colors.white10),
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
-                        onChanged: (val) {
-                          context.read<WallpaperBloc>().add(SearchWallpapersIntent(val));
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Search anime, nature, AMOLED, cars...',
-                          hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
-                          prefixIcon: const Icon(Icons.search_rounded, color: Colors.white38),
-                          suffixIcon: isSearching
-                              ? IconButton(
-                                  icon: const Icon(Icons.clear_rounded, color: Colors.white38),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    context.read<WallpaperBloc>().add(
-                                          const SearchWallpapersIntent(''),
-                                        );
-                                  },
-                                )
-                              : null,
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1E1E22),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: Colors.white10),
+                            ),
+                            child: TextField(
+                              controller: _searchController,
+                              style: const TextStyle(color: Colors.white, fontSize: 14),
+                              onChanged: (val) {
+                                context.read<WallpaperBloc>().add(SearchWallpapersIntent(val));
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Search anime, nature, AMOLED, cars...',
+                                hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
+                                prefixIcon: const Icon(Icons.search_rounded, color: Colors.white38),
+                                suffixIcon: isSearching
+                                    ? IconButton(
+                                        icon: const Icon(Icons.clear_rounded, color: Colors.white38),
+                                        onPressed: () {
+                                          _searchController.clear();
+                                          context.read<WallpaperBloc>().add(
+                                                const SearchWallpapersIntent(''),
+                                              );
+                                        },
+                                      )
+                                    : null,
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        // Smart Discovery Button with dynamic active badge
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: state.smartFilter.hasActiveFilters
+                                    ? const Color(0xFF00E5FF).withAlpha(35)
+                                    : const Color(0xFF1E1E22),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: state.smartFilter.hasActiveFilters
+                                      ? const Color(0xFF00E5FF)
+                                      : Colors.white10,
+                                ),
+                              ),
+                              child: IconButton(
+                                tooltip: 'Smart Discovery & Mood Filter',
+                                icon: Icon(
+                                  Icons.tune_rounded,
+                                  color: state.smartFilter.hasActiveFilters
+                                      ? const Color(0xFF00E5FF)
+                                      : Colors.white70,
+                                ),
+                                onPressed: () {
+                                  HapticFeedback.selectionClick();
+                                  SmartDiscoverySheet.show(context);
+                                },
+                              ),
+                            ),
+                            if (state.smartFilter.hasActiveFilters)
+                              Positioned(
+                                top: -4,
+                                right: -4,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFFF5722),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  constraints: const BoxConstraints(
+                                    minWidth: 18,
+                                    minHeight: 18,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '${state.smartFilter.activeFilterCount}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -302,6 +369,63 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     ),
                   ),
                 ),
+
+                if (state.smartFilter.hasActiveFilters)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF00E5FF).withAlpha(20),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: const Color(0xFF00E5FF).withAlpha(80),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.auto_awesome_rounded,
+                              size: 16,
+                              color: Color(0xFF00E5FF),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Smart Filter: ${state.smartFilter.mediaType.displayName}'
+                                '${state.smartFilter.mood != SmartMood.all ? " • ${state.smartFilter.mood.displayName}" : ""}'
+                                '${state.smartFilter.paletteColor != SmartPaletteColor.all ? " • ${state.smartFilter.paletteColor.displayName}" : ""}'
+                                '${state.smartFilter.amoledCertifiedOnly ? " • AMOLED" : ""}'
+                                '${state.smartFilter.requiresTextOverlay ? " • Quotes" : ""}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                context.read<WallpaperBloc>().add(ResetSmartFilterIntent());
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.only(left: 8),
+                                child: Icon(
+                                  Icons.cancel_rounded,
+                                  size: 18,
+                                  color: Colors.white60,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
 
                 if (isSearching) ...[
                   if (searchResults.isEmpty) ...[
@@ -375,8 +499,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       sliver: _buildWallpaperGrid(searchResults),
                     ),
                   ],
-                ] else if (state.selectedCategory != 'For You' && state.selectedCategory != 'All') ...[
-                  // Filtered Category Grid
+                ] else if ((state.selectedCategory != 'For You' && state.selectedCategory != 'All') || state.smartFilter.hasActiveFilters) ...[
+                  // Filtered Category / Smart Discovery Grid
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
@@ -386,7 +510,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                           Row(
                             children: [
                               Text(
-                                state.selectedCategory.toUpperCase(),
+                                state.smartFilter.hasActiveFilters
+                                    ? 'SMART DISCOVERY'
+                                    : state.selectedCategory.toUpperCase(),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 14,
@@ -416,6 +542,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                           TextButton.icon(
                             onPressed: () {
                               HapticFeedback.selectionClick();
+                              if (state.smartFilter.hasActiveFilters) {
+                                context.read<WallpaperBloc>().add(ResetSmartFilterIntent());
+                              }
                               context.read<WallpaperBloc>().add(
                                     const FilterByCategoryIntent('For You'),
                                   );
@@ -430,10 +559,55 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       ),
                     ),
                   ),
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    sliver: _buildWallpaperGrid(state.filteredShorts),
-                  ),
+                  if (state.filteredShorts.isEmpty)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.05),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.filter_list_off_rounded, size: 40, color: Colors.white38),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'No wallpapers match your active filters',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Try adjusting your mood, color harmony, or format preferences in Smart Discovery.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white54, fontSize: 12),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                context.read<WallpaperBloc>().add(ResetSmartFilterIntent());
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF1E1E22),
+                                foregroundColor: const Color(0xFF00E5FF),
+                                side: const BorderSide(color: Color(0xFF00E5FF)),
+                              ),
+                              icon: const Icon(Icons.refresh_rounded, size: 16),
+                              label: const Text('Reset Smart Filters'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      sliver: _buildWallpaperGrid(state.filteredShorts),
+                    ),
                   const SliverToBoxAdapter(
                     child: SizedBox(height: 32),
                   ),
