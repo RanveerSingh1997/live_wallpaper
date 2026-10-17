@@ -20,6 +20,11 @@ class WallpaperRepository {
   static const String _keyRecentlyViewed = 'recently_viewed_wallpaper_ids';
   static const String _keyReported = 'reported_wallpaper_ids';
   static const String _keyHasSeenOnboarding = 'has_seen_onboarding';
+  static const String _keyAutoRotationEnabled = 'auto_rotation_enabled';
+  static const String _keyAutoRotationIntervalMinutes = 'auto_rotation_interval_minutes';
+  static const String _keyAutoRotationSource = 'auto_rotation_source';
+  static const String _keyAutoRotationWifiOnly = 'auto_rotation_wifi_only';
+  static const String _keyAutoRotationTarget = 'auto_rotation_target';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
@@ -317,5 +322,55 @@ class WallpaperRepository {
         'message': 'Setting static wallpaper is supported on Android and iOS.'
       };
     }
+  }
+
+  /// Returns whether auto wallpaper rotation is enabled.
+  bool isAutoRotationEnabled() {
+    return prefs.getBool(_keyAutoRotationEnabled) ?? false;
+  }
+
+  /// Sets auto wallpaper rotation enabled state.
+  Future<void> setAutoRotationEnabled(bool enabled) async {
+    await prefs.setBool(_keyAutoRotationEnabled, enabled);
+  }
+
+  /// Returns auto wallpaper rotation interval in minutes (default 60).
+  int getAutoRotationIntervalMinutes() {
+    return prefs.getInt(_keyAutoRotationIntervalMinutes) ?? 60;
+  }
+
+  /// Sets auto wallpaper rotation interval in minutes.
+  Future<void> setAutoRotationIntervalMinutes(int minutes) async {
+    await prefs.setInt(_keyAutoRotationIntervalMinutes, minutes);
+  }
+
+  /// Returns auto wallpaper rotation source pool (e.g. 'favorites', 'all', or collection id).
+  String getAutoRotationSource() {
+    return prefs.getString(_keyAutoRotationSource) ?? 'favorites';
+  }
+
+  /// Sets auto wallpaper rotation source pool.
+  Future<void> setAutoRotationSource(String source) async {
+    await prefs.setString(_keyAutoRotationSource, source);
+  }
+
+  /// Returns whether auto rotation only occurs on Wi-Fi.
+  bool isAutoRotationWifiOnly() {
+    return prefs.getBool(_keyAutoRotationWifiOnly) ?? true;
+  }
+
+  /// Sets whether auto rotation only occurs on Wi-Fi.
+  Future<void> setAutoRotationWifiOnly(bool wifiOnly) async {
+    await prefs.setBool(_keyAutoRotationWifiOnly, wifiOnly);
+  }
+
+  /// Returns auto wallpaper rotation target screen ('both', 'home', 'lock').
+  String getAutoRotationTarget() {
+    return prefs.getString(_keyAutoRotationTarget) ?? 'both';
+  }
+
+  /// Sets auto wallpaper rotation target screen.
+  Future<void> setAutoRotationTarget(String target) async {
+    await prefs.setString(_keyAutoRotationTarget, target);
   }
 }

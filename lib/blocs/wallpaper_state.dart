@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
 
 enum WallpaperActionStatus {
@@ -31,6 +32,11 @@ class WallpaperState extends Equatable {
   final String searchQuery;
   final int totalStorageUsedBytes;
   final bool hasSeenOnboarding;
+  final bool isAutoRotationEnabled;
+  final int autoRotationIntervalMinutes;
+  final String autoRotationSource;
+  final bool autoRotationWifiOnly;
+  final String autoRotationTarget;
   final String? message;
   final String? errorMessage;
 
@@ -54,6 +60,11 @@ class WallpaperState extends Equatable {
     this.searchQuery = '',
     this.totalStorageUsedBytes = 0,
     this.hasSeenOnboarding = true,
+    this.isAutoRotationEnabled = false,
+    this.autoRotationIntervalMinutes = 60,
+    this.autoRotationSource = 'favorites',
+    this.autoRotationWifiOnly = true,
+    this.autoRotationTarget = 'both',
     this.message,
     this.errorMessage,
   });
@@ -140,6 +151,21 @@ class WallpaperState extends Equatable {
     return '${(totalStorageUsedBytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
 
+  /// Returns the pool of wallpapers available for auto-rotation based on the source setting.
+  List<MotivationalShort> get rotationPoolShorts {
+    if (autoRotationSource == 'favorites') {
+      return favoriteShorts.isNotEmpty ? favoriteShorts : allShorts;
+    } else if (autoRotationSource.startsWith('col_')) {
+      final col = CuratedShortsData.collections.firstWhere(
+        (c) => c.id == autoRotationSource,
+        orElse: () => CuratedShortsData.collections.first,
+      );
+      final list = allShorts.where((s) => col.wallpaperIds.contains(s.id)).toList();
+      return list.isNotEmpty ? list : allShorts;
+    }
+    return allShorts;
+  }
+
   WallpaperState copyWith({
     List<MotivationalShort>? allShorts,
     List<MotivationalShort>? filteredShorts,
@@ -160,6 +186,11 @@ class WallpaperState extends Equatable {
     String? searchQuery,
     int? totalStorageUsedBytes,
     bool? hasSeenOnboarding,
+    bool? isAutoRotationEnabled,
+    int? autoRotationIntervalMinutes,
+    String? autoRotationSource,
+    bool? autoRotationWifiOnly,
+    String? autoRotationTarget,
     String? message,
     String? errorMessage,
   }) {
@@ -184,6 +215,12 @@ class WallpaperState extends Equatable {
       searchQuery: searchQuery ?? this.searchQuery,
       totalStorageUsedBytes: totalStorageUsedBytes ?? this.totalStorageUsedBytes,
       hasSeenOnboarding: hasSeenOnboarding ?? this.hasSeenOnboarding,
+      isAutoRotationEnabled: isAutoRotationEnabled ?? this.isAutoRotationEnabled,
+      autoRotationIntervalMinutes:
+          autoRotationIntervalMinutes ?? this.autoRotationIntervalMinutes,
+      autoRotationSource: autoRotationSource ?? this.autoRotationSource,
+      autoRotationWifiOnly: autoRotationWifiOnly ?? this.autoRotationWifiOnly,
+      autoRotationTarget: autoRotationTarget ?? this.autoRotationTarget,
       message: message,
       errorMessage: errorMessage,
     );
@@ -210,6 +247,11 @@ class WallpaperState extends Equatable {
         searchQuery,
         totalStorageUsedBytes,
         hasSeenOnboarding,
+        isAutoRotationEnabled,
+        autoRotationIntervalMinutes,
+        autoRotationSource,
+        autoRotationWifiOnly,
+        autoRotationTarget,
         message,
         errorMessage,
       ];

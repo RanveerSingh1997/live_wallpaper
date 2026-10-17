@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import 'auto_rotation_sheet.dart';
 import 'onboarding_sheet.dart';
 import 'preferences_modal_sheet.dart';
 
@@ -204,6 +205,17 @@ class SettingsSheet extends StatelessWidget {
                           initialTextOverlayEnabled: state.isTextOverlayVisible,
                         ),
                       );
+                    },
+                  ),
+                  _buildSettingTile(
+                    icon: Icons.autorenew_rounded,
+                    iconColor: const Color(0xFF00E5FF),
+                    title: 'Aurora Auto-Rotation',
+                    subtitle: state.isAutoRotationEnabled
+                        ? 'Active • Every ${state.autoRotationIntervalMinutes >= 60 ? "${state.autoRotationIntervalMinutes ~/ 60}h" : "${state.autoRotationIntervalMinutes}m"}'
+                        : 'Off • Automatically change wallpaper',
+                    onTap: () {
+                      AutoRotationSheet.show(context);
                     },
                   ),
                   const SizedBox(height: 8),

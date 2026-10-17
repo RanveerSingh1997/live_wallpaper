@@ -5,6 +5,7 @@ import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
+import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
 import 'package:live_wallpaper/screens/categories_screen.dart';
 import 'package:live_wallpaper/screens/discover_screen.dart';
 import 'package:live_wallpaper/screens/downloads_screen.dart';
@@ -781,6 +782,54 @@ void main() {
       await tester.pump();
 
       expect(find.text('Alpine Solitude & Misty Ridge'), findsOneWidget);
+    });
+
+    testWidgets('AutoRotationSheet displays auto rotation controls, intervals, and source options',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          favoriteIds: const {'ippo_hard_work'},
+          isAutoRotationEnabled: true,
+          autoRotationIntervalMinutes: 60,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: AutoRotationSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('AURORA AUTO-ROTATION'), findsOneWidget);
+      expect(find.text('Auto-Rotation Active'), findsOneWidget);
+      expect(find.text('ROTATION FREQUENCY'), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, '1 Hour'), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, 'Daily (24h)'), findsOneWidget);
+      expect(find.text('ROTATE WALLPAPER NOW'), findsOneWidget);
+
+      // Select 3 Hours interval
+      await tester.tap(find.widgetWithText(ChoiceChip, '3 Hours'));
+      await tester.pump();
     });
   });
 }

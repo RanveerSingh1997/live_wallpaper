@@ -35,6 +35,12 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<ClearStatusMessageIntent>(_onClearStatusMessage);
     on<CompleteOnboardingIntent>(_onCompleteOnboarding);
     on<ResetOnboardingIntent>(_onResetOnboarding);
+    on<ToggleAutoRotationIntent>(_onToggleAutoRotation);
+    on<UpdateAutoRotationIntervalIntent>(_onUpdateAutoRotationInterval);
+    on<UpdateAutoRotationSourceIntent>(_onUpdateAutoRotationSource);
+    on<UpdateAutoRotationWifiOnlyIntent>(_onUpdateAutoRotationWifiOnly);
+    on<UpdateAutoRotationTargetIntent>(_onUpdateAutoRotationTarget);
+    on<RotateWallpaperNowIntent>(_onRotateWallpaperNow);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -65,6 +71,11 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final recentlyViewed = repository.getRecentlyViewed();
       final reported = repository.getReportedIds();
       final hasSeenOnboarding = repository.hasSeenOnboarding();
+      final isAutoRotationEnabled = repository.isAutoRotationEnabled();
+      final autoRotationInterval = repository.getAutoRotationIntervalMinutes();
+      final autoRotationSource = repository.getAutoRotationSource();
+      final autoRotationWifiOnly = repository.isAutoRotationWifiOnly();
+      final autoRotationTarget = repository.getAutoRotationTarget();
 
       final forYouList = _buildForYouList(shorts, preferences);
 
@@ -84,6 +95,11 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         isLiveWallpaperActiveOnDevice: isActiveOnDevice,
         totalStorageUsedBytes: totalStorage,
         hasSeenOnboarding: hasSeenOnboarding,
+        isAutoRotationEnabled: isAutoRotationEnabled,
+        autoRotationIntervalMinutes: autoRotationInterval,
+        autoRotationSource: autoRotationSource,
+        autoRotationWifiOnly: autoRotationWifiOnly,
+        autoRotationTarget: autoRotationTarget,
         actionStatus: WallpaperActionStatus.idle,
       ));
     } catch (e) {
@@ -481,5 +497,133 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
   ) async {
     await repository.setHasSeenOnboarding(false);
     emit(state.copyWith(hasSeenOnboarding: false));
+  }
+
+  Future<void> _onToggleAutoRotation(
+    ToggleAutoRotationIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.setAutoRotationEnabled(event.enabled);
+    emit(state.copyWith(
+      isAutoRotationEnabled: event.enabled,
+      message: event.enabled
+          ? 'Aurora Auto-Rotation activated.'
+          : 'Aurora Auto-Rotation paused.',
+    ));
+  }
+
+  Future<void> _onUpdateAutoRotationInterval(
+    UpdateAutoRotationIntervalIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.setAutoRotationIntervalMinutes(event.minutes);
+    emit(state.copyWith(
+      autoRotationIntervalMinutes: event.minutes,
+      message: 'Rotation frequency set to ${event.minutes >= 60 ? "${event.minutes ~/ 60} hour(s)" : "${event.minutes} min"}',
+    ));
+  }
+
+  Future<void> _onUpdateAutoRotationSource(
+    UpdateAutoRotationSourceIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.setAutoRotationSource(event.source);
+    emit(state.copyWith(
+      autoRotationSource: event.source,
+      message: 'Rotation playlist updated.',
+    ));
+  }
+
+  Future<void> _onUpdateAutoRotationWifiOnly(
+    UpdateAutoRotationWifiOnlyIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.setAutoRotationWifiOnly(event.wifiOnly);
+    emit(state.copyWith(
+      autoRotationWifiOnly: event.wifiOnly,
+    ));
+  }
+
+  Future<void> _onUpdateAutoRotationTarget(
+    UpdateAutoRotationTargetIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.setAutoRotationTarget(event.target);
+    emit(state.copyWith(
+      autoRotationTarget: event.target,
+    ));
+  }
+
+  Future<void> _onRotateWallpaperNow(
+    RotateWallpaperNowIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final pool = state.rotationPoolShorts;
+    if (pool.isEmpty) {
+      emit(state.copyWith(
+        errorMessage: 'Rotation pool is empty. Add wallpapers to favorites or select another playlist.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(actionStatus: WallpaperActionStatus.applying));
+
+    MotivationalShort nextWallpaper;
+    if (pool.length == 1) {
+      nextWallpaper = pool.first;
+    } else {
+      final candidates = pool.where((s) => s.id != state.activeWallpaperId).toList();
+      nextWallpaper = candidates.isNotEmpty
+          ? candidates[DateTime.now().millisecond % candidates.length]
+          : pool.first;
+    }
+
+    try {
+      if (nextWallpaper.isLive) {
+        final res = await repository.applyAsLiveWallpaper(
+          short: nextWallpaper,
+          isMuted: true,
+        );
+        if (res['status'] == 'service_started' ||
+            res['status'] == 'applied_mock' ||
+            res['status'] == 'updated_active' ||
+            res['status'] == 'opened_chooser') {
+          emit(state.copyWith(
+            activeWallpaperId: nextWallpaper.id,
+            isLiveWallpaperActiveOnDevice: true,
+            actionStatus: WallpaperActionStatus.appliedSuccess,
+            message: 'Rotated to "${nextWallpaper.title}"',
+          ));
+        } else {
+          emit(state.copyWith(
+            actionStatus: WallpaperActionStatus.idle,
+            message: 'Opened wallpaper rotation chooser for "${nextWallpaper.title}"',
+          ));
+        }
+      } else {
+        final res = await repository.applyStaticWallpaper(
+          short: nextWallpaper,
+          targetScreen: state.autoRotationTarget,
+          customQuote: state.getEffectiveQuote(nextWallpaper),
+        );
+        if (res['status'] == 'applied_static' || res['status'] == 'shared_ios') {
+          emit(state.copyWith(
+            activeWallpaperId: nextWallpaper.id,
+            actionStatus: WallpaperActionStatus.appliedSuccess,
+            message: 'Rotated to "${nextWallpaper.title}"',
+          ));
+        } else {
+          emit(state.copyWith(
+            actionStatus: WallpaperActionStatus.idle,
+            message: 'Rotated to "${nextWallpaper.title}"',
+          ));
+        }
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        actionStatus: WallpaperActionStatus.error,
+        errorMessage: 'Failed to rotate wallpaper: $e',
+      ));
+    }
   }
 }

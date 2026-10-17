@@ -315,5 +315,35 @@ void main() {
         emits(predicate<WallpaperState>((s) => s.hasSeenOnboarding == false)),
       );
     });
+
+    test('ToggleAutoRotationIntent activates and pauses auto rotation', () async {
+      bloc.add(const ToggleAutoRotationIntent(true));
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) => s.isAutoRotationEnabled == true)),
+      );
+
+      bloc.add(const ToggleAutoRotationIntent(false));
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) => s.isAutoRotationEnabled == false)),
+      );
+    });
+
+    test('UpdateAutoRotationIntervalIntent updates frequency minutes', () async {
+      bloc.add(const UpdateAutoRotationIntervalIntent(180));
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) => s.autoRotationIntervalMinutes == 180)),
+      );
+    });
+
+    test('UpdateAutoRotationSourceIntent updates rotation playlist pool', () async {
+      bloc.add(const UpdateAutoRotationSourceIntent('col_oled'));
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) => s.autoRotationSource == 'col_oled')),
+      );
+    });
   });
 }

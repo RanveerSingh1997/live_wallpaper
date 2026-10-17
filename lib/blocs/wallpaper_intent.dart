@@ -196,3 +196,51 @@ class CompleteOnboardingIntent extends WallpaperIntent {
 
 /// Intent to reset onboarding status so user can experience setup again.
 class ResetOnboardingIntent extends WallpaperIntent {}
+
+/// Intent to toggle auto wallpaper rotation on or off.
+class ToggleAutoRotationIntent extends WallpaperIntent {
+  final bool enabled;
+  const ToggleAutoRotationIntent(this.enabled);
+
+  @override
+  List<Object?> get props => [enabled];
+}
+
+/// Intent to update auto wallpaper rotation frequency interval in minutes.
+class UpdateAutoRotationIntervalIntent extends WallpaperIntent {
+  final int minutes;
+  const UpdateAutoRotationIntervalIntent(this.minutes);
+
+  @override
+  List<Object?> get props => [minutes];
+}
+
+/// Intent to update auto wallpaper rotation source pool (e.g. 'favorites', 'all', or collection ID).
+class UpdateAutoRotationSourceIntent extends WallpaperIntent {
+  final String source;
+  const UpdateAutoRotationSourceIntent(this.source);
+
+  @override
+  List<Object?> get props => [source];
+}
+
+/// Intent to update auto wallpaper rotation Wi-Fi only guard.
+class UpdateAutoRotationWifiOnlyIntent extends WallpaperIntent {
+  final bool wifiOnly;
+  const UpdateAutoRotationWifiOnlyIntent(this.wifiOnly);
+
+  @override
+  List<Object?> get props => [wifiOnly];
+}
+
+/// Intent to update auto wallpaper rotation target screen ('both', 'home', 'lock').
+class UpdateAutoRotationTargetIntent extends WallpaperIntent {
+  final String target;
+  const UpdateAutoRotationTargetIntent(this.target);
+
+  @override
+  List<Object?> get props => [target];
+}
+
+/// Intent to rotate to the next wallpaper in the active pool immediately on-demand.
+class RotateWallpaperNowIntent extends WallpaperIntent {}
