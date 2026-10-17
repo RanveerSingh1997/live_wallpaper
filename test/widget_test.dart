@@ -1,9 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
+import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
+import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
+import 'package:live_wallpaper/screens/categories_screen.dart';
+import 'package:live_wallpaper/screens/downloads_screen.dart';
+import 'package:live_wallpaper/screens/favorites_screen.dart';
+import 'package:live_wallpaper/screens/ipad_wallpaper_dialog.dart';
+import 'package:live_wallpaper/screens/main_navigation_shell.dart';
 import 'package:live_wallpaper/widgets/kinetic_quote_overlay.dart';
 import 'package:live_wallpaper/widgets/shorts_action_rail.dart';
-import 'package:live_wallpaper/screens/ipad_wallpaper_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class FakeWallpaperRepository extends WallpaperRepository {
+  FakeWallpaperRepository({required super.prefs});
+
+  @override
+  Future<int> getTotalDownloadSizeBytes() async => 0;
+
+  @override
+  Future<bool> isWallpaperActiveOnDevice() async => false;
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -130,6 +149,127 @@ void main() {
       // Verify buttons
       expect(find.text('Open Wallpaper Share Sheet'), findsOneWidget);
       expect(find.text('Save Ultra-HD Wallpaper to Photos'), findsOneWidget);
+    });
+
+    testWidgets('MainNavigationShell renders 4 tabs: Discover, Categories, Favorites, Downloads',
+        (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: MainNavigationShell(),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      // Check bottom navigation items
+      expect(find.text('Discover'), findsOneWidget);
+      expect(find.text('Categories'), findsOneWidget);
+      expect(find.text('Favorites'), findsOneWidget);
+      expect(find.text('Downloads'), findsOneWidget);
+    });
+
+    testWidgets('CategoriesScreen displays category list properly',
+        (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: CategoriesScreen(),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      expect(find.text('CATEGORIES'), findsOneWidget);
+      expect(find.text('Anime & Gaming'), findsOneWidget);
+      expect(find.text('Nature & Scenery'), findsOneWidget);
+      expect(find.text('Cars & Speed'), findsOneWidget);
+    });
+
+    testWidgets('FavoritesScreen displays empty state when no favorites exist',
+        (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: FavoritesScreen(onBrowseWallpapers: () {}),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      expect(find.text('No Favorites Saved Yet'), findsOneWidget);
+      expect(find.text('Discover Wallpapers'), findsOneWidget);
+    });
+
+    testWidgets('DownloadsScreen displays empty state when no offline downloads exist',
+        (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: DownloadsScreen(onBrowseWallpapers: () {}),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      expect(find.text('No Offline Downloads'), findsOneWidget);
+      expect(find.text('Browse Wallpapers'), findsOneWidget);
     });
   });
 }

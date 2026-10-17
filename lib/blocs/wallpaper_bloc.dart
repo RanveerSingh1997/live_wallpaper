@@ -7,12 +7,19 @@ import 'wallpaper_state.dart';
 class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
   final WallpaperRepository repository;
 
-  WallpaperBloc({required this.repository})
-      : super(const WallpaperState()) {
+  WallpaperBloc({
+    required this.repository,
+    WallpaperState? initialState,
+  }) : super(initialState ?? const WallpaperState()) {
     on<LoadFeedIntent>(_onLoadFeed);
     on<ChangeActiveShortIntent>(_onChangeActiveShort);
+    on<ChangeNavigationTabIntent>(_onChangeNavigationTab);
     on<ToggleFeedMuteIntent>(_onToggleFeedMute);
     on<ToggleFavoriteIntent>(_onToggleFavorite);
+    on<DownloadWallpaperIntent>(_onDownloadWallpaper);
+    on<DeleteDownloadIntent>(_onDeleteDownload);
+    on<ClearAllDownloadsIntent>(_onClearAllDownloads);
+    on<SearchWallpapersIntent>(_onSearchWallpapers);
     on<FilterByCategoryIntent>(_onFilterByCategory);
     on<UpdateUserPreferencesIntent>(_onUpdateUserPreferences);
     on<ToggleTextOverlayVisibilityIntent>(_onToggleTextOverlayVisibility);
@@ -43,11 +50,13 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     try {
       final shorts = repository.getCuratedShorts();
       final favorites = repository.getFavorites();
+      final downloads = repository.getDownloads();
       final quotes = repository.getCustomQuotes();
       final activeId = repository.getActiveWallpaperId();
       final preferences = repository.getUserPreferences();
       final isTextOverlayVisible = repository.isTextOverlayEnabledByDefault();
       final isActiveOnDevice = await repository.isWallpaperActiveOnDevice();
+      final totalStorage = await repository.getTotalDownloadSizeBytes();
 
       final forYouList = _buildForYouList(shorts, preferences);
 
@@ -57,11 +66,13 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         activeIndex: 0,
         selectedCategory: 'For You',
         favoriteIds: favorites,
+        downloadedIds: downloads,
         customizedQuotes: quotes,
         activeWallpaperId: activeId,
         userPreferences: preferences,
         isTextOverlayVisible: isTextOverlayVisible,
         isLiveWallpaperActiveOnDevice: isActiveOnDevice,
+        totalStorageUsedBytes: totalStorage,
         actionStatus: WallpaperActionStatus.idle,
       ));
     } catch (e) {
@@ -81,6 +92,13 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     }
   }
 
+  void _onChangeNavigationTab(
+    ChangeNavigationTabIntent event,
+    Emitter<WallpaperState> emit,
+  ) {
+    emit(state.copyWith(currentNavigationTab: event.tabIndex));
+  }
+
   void _onToggleFeedMute(
     ToggleFeedMuteIntent event,
     Emitter<WallpaperState> emit,
@@ -94,8 +112,79 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
   ) async {
     try {
       final updatedFavorites = await repository.toggleFavorite(event.shortId);
-      emit(state.copyWith(favoriteIds: updatedFavorites));
+      final isNowFav = updatedFavorites.contains(event.shortId);
+      emit(state.copyWith(
+        favoriteIds: updatedFavorites,
+        message: isNowFav ? 'Added to Favorites ❤️' : 'Removed from Favorites',
+      ));
     } catch (_) {}
+  }
+
+  Future<void> _onDownloadWallpaper(
+    DownloadWallpaperIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    emit(state.copyWith(actionStatus: WallpaperActionStatus.downloading));
+    try {
+      final success = await repository.downloadWallpaper(event.short);
+      if (success) {
+        final updatedDownloads = repository.getDownloads();
+        final totalStorage = await repository.getTotalDownloadSizeBytes();
+        emit(state.copyWith(
+          downloadedIds: updatedDownloads,
+          totalStorageUsedBytes: totalStorage,
+          actionStatus: WallpaperActionStatus.downloadSuccess,
+          message: 'Downloaded for offline use! (${event.short.fileSizeFormatted})',
+        ));
+      } else {
+        emit(state.copyWith(
+          actionStatus: WallpaperActionStatus.error,
+          errorMessage: 'Failed to save wallpaper offline',
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        actionStatus: WallpaperActionStatus.error,
+        errorMessage: 'Download error: $e',
+      ));
+    }
+  }
+
+  Future<void> _onDeleteDownload(
+    DeleteDownloadIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    try {
+      await repository.deleteDownload(event.shortId);
+      final updatedDownloads = repository.getDownloads();
+      final totalStorage = await repository.getTotalDownloadSizeBytes();
+      emit(state.copyWith(
+        downloadedIds: updatedDownloads,
+        totalStorageUsedBytes: totalStorage,
+        message: 'Wallpaper removed from device storage',
+      ));
+    } catch (_) {}
+  }
+
+  Future<void> _onClearAllDownloads(
+    ClearAllDownloadsIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    try {
+      await repository.clearAllDownloads();
+      emit(state.copyWith(
+        downloadedIds: const {},
+        totalStorageUsedBytes: 0,
+        message: 'All offline downloads cleared! Storage reclaimed.',
+      ));
+    } catch (_) {}
+  }
+
+  void _onSearchWallpapers(
+    SearchWallpapersIntent event,
+    Emitter<WallpaperState> emit,
+  ) {
+    emit(state.copyWith(searchQuery: event.query));
   }
 
   void _onFilterByCategory(
@@ -107,6 +196,10 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       filtered = state.allShorts;
     } else if (event.category == 'For You') {
       filtered = _buildForYouList(state.allShorts, state.userPreferences);
+    } else if (event.category == 'Live Wallpapers') {
+      filtered = state.allShorts.where((s) => s.isLive).toList();
+    } else if (event.category == 'Static Wallpapers') {
+      filtered = state.allShorts.where((s) => !s.isLive).toList();
     } else {
       filtered = state.allShorts.where((s) => s.category == event.category).toList();
     }

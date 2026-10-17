@@ -199,5 +199,69 @@ void main() {
             !s.customizedQuotes.containsKey('discipline_grind'))),
       );
     });
+
+    test('ChangeNavigationTabIntent updates currentNavigationTab', () async {
+      expect(bloc.state.currentNavigationTab, 0);
+
+      bloc.add(const ChangeNavigationTabIntent(2));
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) => s.currentNavigationTab == 2)),
+      );
+    });
+
+    test('SearchWallpapersIntent updates search query and filters results', () async {
+      bloc.add(LoadFeedIntent());
+      await bloc.stream.firstWhere((s) => s.allShorts.isNotEmpty);
+
+      bloc.add(const SearchWallpapersIntent('anime'));
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) {
+          return s.searchQuery == 'anime' &&
+              s.searchResults.isNotEmpty &&
+              s.searchResults.every((w) =>
+                  w.title.toLowerCase().contains('anime') ||
+                  w.tags.toLowerCase().contains('anime') ||
+                  w.category.toLowerCase().contains('anime'));
+        })),
+      );
+    });
+
+    test('FilterByCategoryIntent filters live and static wallpapers specifically', () async {
+      bloc.add(LoadFeedIntent());
+      await bloc.stream.firstWhere((s) => s.allShorts.isNotEmpty);
+
+      // Filter Live Only
+      bloc.add(const FilterByCategoryIntent('Live Wallpapers'));
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) {
+          return s.selectedCategory == 'Live Wallpapers' &&
+              s.filteredShorts.isNotEmpty &&
+              s.filteredShorts.every((w) => w.isLive);
+        })),
+      );
+
+      // Filter Static Only
+      bloc.add(const FilterByCategoryIntent('Static Wallpapers'));
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) {
+          return s.selectedCategory == 'Static Wallpapers' &&
+              s.filteredShorts.isNotEmpty &&
+              s.filteredShorts.every((w) => !w.isLive);
+        })),
+      );
+    });
+
+    test('ClearAllDownloadsIntent resets downloadedIds and storage', () async {
+      bloc.add(ClearAllDownloadsIntent());
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>(
+            (s) => s.downloadedIds.isEmpty && s.totalStorageUsedBytes == 0)),
+      );
+    });
   });
 }

@@ -11,6 +11,7 @@ class WallpaperRepository {
   final SharedPreferences prefs;
 
   static const String _keyFavorites = 'favorite_short_ids';
+  static const String _keyDownloads = 'downloaded_wallpaper_ids';
   static const String _keyActiveId = 'active_wallpaper_id';
   static const String _keyCustomQuotesPrefix = 'custom_quote_';
   static const String _keyUserPreferences = 'user_preferred_categories';
@@ -21,7 +22,7 @@ class WallpaperRepository {
     required this.prefs,
   }) : _bridge = bridge ?? WallpaperServiceBridge();
 
-  /// Returns list of all curated motivational shorts.
+  /// Returns list of all curated motivational shorts and static wallpapers.
   List<MotivationalShort> getCuratedShorts() {
     return CuratedShortsData.shorts;
   }
@@ -67,6 +68,77 @@ class WallpaperRepository {
     }
     await prefs.setStringList(_keyFavorites, current.toList());
     return current;
+  }
+
+  /// Returns set of physically downloaded wallpaper IDs for offline use.
+  Set<String> getDownloads() {
+    final list = prefs.getStringList(_keyDownloads) ?? [];
+    return list.toSet();
+  }
+
+  /// Downloads and caches the full-resolution wallpaper file for offline storage.
+  Future<bool> downloadWallpaper(MotivationalShort short) async {
+    try {
+      await prepareVideoFile(short);
+      final current = getDownloads();
+      current.add(short.id);
+      await prefs.setStringList(_keyDownloads, current.toList());
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Removes a downloaded wallpaper file from storage and reclaims disk space.
+  Future<bool> deleteDownload(String shortId) async {
+    try {
+      final Directory dir = await getApplicationDocumentsDirectory();
+      final File targetFile = File('${dir.path}/wallpaper_$shortId.mp4');
+      if (await targetFile.exists()) {
+        await targetFile.delete();
+      }
+      final current = getDownloads();
+      current.remove(shortId);
+      await prefs.setStringList(_keyDownloads, current.toList());
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Removes all downloaded files from storage and resets downloads index.
+  Future<void> clearAllDownloads() async {
+    try {
+      final Directory dir = await getApplicationDocumentsDirectory();
+      final List<FileSystemEntity> entities = dir.listSync();
+      for (final entity in entities) {
+        if (entity is File && entity.path.contains('wallpaper_')) {
+          try {
+            await entity.delete();
+          } catch (_) {}
+        }
+      }
+      await prefs.setStringList(_keyDownloads, []);
+    } catch (_) {}
+  }
+
+  /// Calculates total bytes of disk space occupied by downloaded wallpapers.
+  Future<int> getTotalDownloadSizeBytes() async {
+    try {
+      final Directory dir = await getApplicationDocumentsDirectory();
+      int total = 0;
+      final List<FileSystemEntity> entities = dir.listSync();
+      for (final entity in entities) {
+        if (entity is File && entity.path.contains('wallpaper_')) {
+          try {
+            total += await entity.length();
+          } catch (_) {}
+        }
+      }
+      return total;
+    } catch (_) {
+      return 0;
+    }
   }
 
   /// Returns all stored custom quotes by shortId.

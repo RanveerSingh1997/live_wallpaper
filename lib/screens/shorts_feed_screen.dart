@@ -326,11 +326,24 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Row(
+                            Row(
                               children: [
-                                Icon(Icons.bolt_rounded, color: Color(0xFFFFD600), size: 22),
-                                SizedBox(width: 6),
-                                Text(
+                                if (Navigator.canPop(context)) ...[
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.arrow_back_ios_new_rounded,
+                                      color: Colors.white,
+                                      size: 18,
+                                    ),
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  ),
+                                  const SizedBox(width: 10),
+                                ],
+                                const Icon(Icons.bolt_rounded, color: Color(0xFFFFD600), size: 22),
+                                const SizedBox(width: 6),
+                                const Text(
                                   'LIVE WALLPAPER',
                                   style: TextStyle(
                                     fontSize: 16,

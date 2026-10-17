@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'blocs/wallpaper_bloc.dart';
 import 'blocs/wallpaper_intent.dart';
 import 'repositories/wallpaper_repository.dart';
-import 'screens/shorts_feed_screen.dart';
+import 'screens/main_navigation_shell.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,7 +53,7 @@ class LiveWallpaperApp extends StatelessWidget {
                 displayColor: Colors.white,
               ),
         ),
-        home: const ShortsFeedScreen(),
+        home: const MainNavigationShell(),
       ),
     );
   }

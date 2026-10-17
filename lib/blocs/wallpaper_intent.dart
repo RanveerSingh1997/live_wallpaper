@@ -8,16 +8,25 @@ abstract class WallpaperIntent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Intent to load the initial shorts feed, cached quotes, and favorites.
+/// Intent to load the initial shorts feed, cached quotes, favorites, and downloads.
 class LoadFeedIntent extends WallpaperIntent {}
 
-/// Intent triggered when user swipes to a new vertical short in the feed.
+/// Intent triggered when user swipes to a new vertical short in the live feed.
 class ChangeActiveShortIntent extends WallpaperIntent {
   final int index;
   const ChangeActiveShortIntent(this.index);
 
   @override
   List<Object?> get props => [index];
+}
+
+/// Intent to switch bottom navigation destination tab (0: Discover, 1: Live, 2: Categories, 3: Favorites, 4: Downloads).
+class ChangeNavigationTabIntent extends WallpaperIntent {
+  final int tabIndex;
+  const ChangeNavigationTabIntent(this.tabIndex);
+
+  @override
+  List<Object?> get props => [tabIndex];
 }
 
 /// Intent to toggle in-app feed preview audio.
@@ -32,7 +41,37 @@ class ToggleFavoriteIntent extends WallpaperIntent {
   List<Object?> get props => [shortId];
 }
 
-/// Intent to filter the shorts feed by category (e.g. All, Fighter, Discipline).
+/// Intent to download a wallpaper for offline use.
+class DownloadWallpaperIntent extends WallpaperIntent {
+  final MotivationalShort short;
+  const DownloadWallpaperIntent(this.short);
+
+  @override
+  List<Object?> get props => [short];
+}
+
+/// Intent to delete a downloaded wallpaper to reclaim disk space.
+class DeleteDownloadIntent extends WallpaperIntent {
+  final String shortId;
+  const DeleteDownloadIntent(this.shortId);
+
+  @override
+  List<Object?> get props => [shortId];
+}
+
+/// Intent to clear all offline downloads.
+class ClearAllDownloadsIntent extends WallpaperIntent {}
+
+/// Intent to search wallpapers by query string.
+class SearchWallpapersIntent extends WallpaperIntent {
+  final String query;
+  const SearchWallpapersIntent(this.query);
+
+  @override
+  List<Object?> get props => [query];
+}
+
+/// Intent to filter the feed by category (e.g. All, Nature, Minimal, Cars).
 class FilterByCategoryIntent extends WallpaperIntent {
   final String category;
   const FilterByCategoryIntent(this.category);
