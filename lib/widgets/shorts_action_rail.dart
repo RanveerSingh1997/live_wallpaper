@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/motivational_short.dart';
 
 class ShortsActionRail extends StatelessWidget {
@@ -94,7 +95,12 @@ class ShortsActionRail extends StatelessWidget {
 
   Widget _buildApplyButton(BuildContext context) {
     return GestureDetector(
-      onTap: isApplying ? null : onApplyWallpaper,
+      onTap: isApplying
+          ? null
+          : () {
+              HapticFeedback.mediumImpact();
+              onApplyWallpaper();
+            },
       behavior: HitTestBehavior.opaque,
       child: Column(
         children: [
@@ -159,7 +165,10 @@ class ShortsActionRail extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
       child: Column(
         children: [
           Container(

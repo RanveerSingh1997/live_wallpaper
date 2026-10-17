@@ -77,18 +77,46 @@ class VideoWallpaperService : WallpaperService() {
         }
 
         private fun loadAndPlayVideo() {
+            val surface = surfaceHolder.surface
+            if (surface == null || !surface.isValid) {
+                Log.w(TAG, "Surface is invalid, skipping video playback.")
+                return
+            }
+
             val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             val videoPath = prefs.getString(KEY_VIDEO_PATH, null)
             val isMuted = prefs.getBoolean(KEY_IS_MUTED, true)
 
-            if (videoPath == null) {
-                Log.w(TAG, "No video path saved in preferences yet.")
-                return
+            var videoFile: File? = if (!videoPath.isNullOrEmpty()) File(videoPath) else null
+
+            // Fallback recovery: if saved path does not exist, find any available wallpaper file
+            if (videoFile == null || !videoFile.exists()) {
+                Log.w(TAG, "Specified video file not found, searching fallback storage...")
+                val candidate = applicationContext.filesDir.listFiles { _, name -> name.endsWith(".mp4") }?.firstOrNull()
+                if (candidate != null && candidate.exists()) {
+                    videoFile = candidate
+                } else {
+                    // Extract bundled default asset so wallpaper is NEVER blank
+                    try {
+                        val fallback = File(applicationContext.filesDir, "default_wallpaper.mp4")
+                        if (!fallback.exists()) {
+                            applicationContext.assets.open("flutter_assets/assets/videos/ippo_motivation.mp4").use { input ->
+                                fallback.outputStream().use { output ->
+                                    input.copyTo(output)
+                                }
+                            }
+                        }
+                        if (fallback.exists()) {
+                            videoFile = fallback
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Fallback asset extraction failed", e)
+                    }
+                }
             }
 
-            val videoFile = File(videoPath)
-            if (!videoFile.exists()) {
-                Log.e(TAG, "Video file does not exist: $videoPath")
+            if (videoFile == null || !videoFile.exists()) {
+                Log.e(TAG, "No valid video file could be prepared for wallpaper service.")
                 return
             }
 
@@ -98,7 +126,7 @@ class VideoWallpaperService : WallpaperService() {
                 mediaPlayer = null
 
                 val player = MediaPlayer()
-                player.setSurface(surfaceHolder.surface)
+                player.setSurface(surface)
 
                 FileInputStream(videoFile).use { fis ->
                     player.setDataSource(fis.fd)
@@ -123,9 +151,13 @@ class VideoWallpaperService : WallpaperService() {
 
                 player.prepareAsync()
                 mediaPlayer = player
-                Log.d(TAG, "Successfully prepared video wallpaper: $videoPath")
+                Log.d(TAG, "Successfully loaded live wallpaper: ${videoFile.absolutePath}")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to load and play video", e)
+                try {
+                    mediaPlayer?.release()
+                    mediaPlayer = null
+                } catch (_: Exception) {}
             }
         }
 

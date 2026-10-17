@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPlayerItem extends StatefulWidget {
@@ -23,6 +24,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem>
     with SingleTickerProviderStateMixin {
   VideoPlayerController? _controller;
   bool _isInitialized = false;
+  bool _hasError = false;
   bool _showHeartAnimation = false;
   late AnimationController _heartAnimController;
 
@@ -47,6 +49,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem>
         setState(() {
           _controller = controller;
           _isInitialized = true;
+          _hasError = false;
         });
 
         if (widget.isActive) {
@@ -57,6 +60,11 @@ class _VideoPlayerItemState extends State<VideoPlayerItem>
       }
     } catch (e) {
       debugPrint('Error initializing video player: $e');
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+        });
+      }
     }
   }
 
@@ -82,6 +90,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem>
   }
 
   void _handleDoubleTap() {
+    HapticFeedback.mediumImpact();
     widget.onDoubleTapLike();
     setState(() {
       _showHeartAnimation = true;
@@ -97,6 +106,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem>
 
   void _handleSingleTap() {
     if (_controller == null || !_isInitialized) return;
+    HapticFeedback.selectionClick();
     if (_controller!.value.isPlaying) {
       _controller!.pause();
     } else {
@@ -127,9 +137,53 @@ class _VideoPlayerItemState extends State<VideoPlayerItem>
                 fit: BoxFit.cover,
                 clipBehavior: Clip.hardEdge,
                 child: SizedBox(
-                  width: _controller!.value.size.width,
-                  height: _controller!.value.size.height,
+                  width: _controller!.value.size.width > 0
+                      ? _controller!.value.size.width
+                      : 1080,
+                  height: _controller!.value.size.height > 0
+                      ? _controller!.value.size.height
+                      : 1920,
                   child: VideoPlayer(_controller!),
+                ),
+              ),
+            )
+          else if (_hasError)
+            Container(
+              color: const Color(0xFF141416),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.play_disabled_rounded,
+                      color: Colors.white38,
+                      size: 40,
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Video loop could not be loaded',
+                      style: TextStyle(color: Colors.white54, fontSize: 13),
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _hasError = false;
+                          _isInitialized = false;
+                        });
+                        _initializePlayer();
+                      },
+                      icon: const Icon(Icons.refresh_rounded, size: 16),
+                      label: const Text('Retry'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white12,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             )
