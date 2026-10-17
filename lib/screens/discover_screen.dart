@@ -288,6 +288,46 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     ),
                   ),
 
+                  // Section: Recently Viewed
+                  if (state.recentlyViewedShorts.isNotEmpty) ...[
+                    const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(16, 26, 16, 12),
+                        child: Row(
+                          children: [
+                            Icon(Icons.history_rounded,
+                                color: Color(0xFFFFD600), size: 18),
+                            SizedBox(width: 6),
+                            Text(
+                              'RECENTLY VIEWED',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 140,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          scrollDirection: Axis.horizontal,
+                          itemCount: state.recentlyViewedShorts.length,
+                          separatorBuilder: (context, index) => const SizedBox(width: 10),
+                          itemBuilder: (ctx, idx) {
+                            final item = state.recentlyViewedShorts[idx];
+                            return _buildRecentlyViewedCard(item);
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+
                   // Section 2: Static & AMOLED Wallpapers (Responsive Grid)
                   const SliverToBoxAdapter(
                     child: Padding(
@@ -653,6 +693,94 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           );
         },
         childCount: wallpapers.length,
+      ),
+    );
+  }
+
+  Widget _buildRecentlyViewedCard(MotivationalShort item) {
+    return GestureDetector(
+      onTap: () {
+        WallpaperPreviewSheet.show(context, item);
+      },
+      child: Container(
+        width: 105,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          gradient: LinearGradient(
+            colors: item.gradientColors.isNotEmpty
+                ? item.gradientColors
+                : [item.accentColor.withValues(alpha: 0.3), Colors.black],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(color: Colors.white10),
+        ),
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.8),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  item.isLive ? 'LIVE' : '4K',
+                  style: TextStyle(
+                    color: item.accentColor,
+                    fontSize: 8,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 8,
+              left: 8,
+              right: 8,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    item.category,
+                    style: TextStyle(
+                      color: item.accentColor,
+                      fontSize: 8,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

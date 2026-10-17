@@ -19,6 +19,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
   });
 
   static Future<void> show(BuildContext context, MotivationalShort wallpaper) {
+    context.read<WallpaperBloc>().add(RecordWallpaperViewedIntent(wallpaper.id));
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -279,6 +280,11 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                            IconButton(
+                              icon: const Icon(Icons.flag_outlined, size: 20, color: Colors.white38),
+                              tooltip: 'Report Content',
+                              onPressed: () => _showReportDialog(context, wallpaper),
+                            ),
                           ],
                         ),
 
@@ -312,7 +318,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
                         // Action Buttons Dock (Apply, Download, Favorite, Share)
                         Row(
                           children: [
-                            // Primary CTA: Apply Live Wallpaper
+                            // Primary CTA: Apply Live / Static Wallpaper
                             Expanded(
                               child: SizedBox(
                                 height: 50,
@@ -322,13 +328,19 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                     Navigator.of(context).pop();
                                     if (Platform.isIOS) {
                                       IPadWallpaperDialog.show(context, wallpaper);
-                                    } else {
+                                    } else if (wallpaper.isLive) {
                                       context.read<WallpaperBloc>().add(
                                             ApplyLiveWallpaperIntent(
                                               short: wallpaper,
                                               isMuted: true,
                                             ),
                                           );
+                                    } else {
+                                      _showStaticTargetSelector(
+                                        context,
+                                        wallpaper,
+                                        effectiveQuote,
+                                      );
                                     }
                                   },
                                   style: ElevatedButton.styleFrom(
@@ -556,6 +568,236 @@ class WallpaperPreviewSheet extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showStaticTargetSelector(
+    BuildContext context,
+    MotivationalShort wallpaper,
+    String effectiveQuote,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF141418),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'APPLY STATIC WALLPAPER',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.2,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Choose where to apply "${wallpaper.title}"',
+                  style: const TextStyle(fontSize: 13, color: Colors.white38),
+                ),
+                const SizedBox(height: 16),
+                _buildTargetOption(
+                  ctx,
+                  title: 'Home Screen',
+                  subtitle: 'Set on main home screen only',
+                  icon: Icons.home_rounded,
+                  color: const Color(0xFFFF5722),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    context.read<WallpaperBloc>().add(
+                          ApplyStaticWallpaperIntent(
+                            short: wallpaper,
+                            targetScreen: 'home',
+                            customQuote: effectiveQuote,
+                          ),
+                        );
+                  },
+                ),
+                const SizedBox(height: 8),
+                _buildTargetOption(
+                  ctx,
+                  title: 'Lock Screen',
+                  subtitle: 'Set on device lock screen only',
+                  icon: Icons.lock_outline_rounded,
+                  color: const Color(0xFF00E5FF),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    context.read<WallpaperBloc>().add(
+                          ApplyStaticWallpaperIntent(
+                            short: wallpaper,
+                            targetScreen: 'lock',
+                            customQuote: effectiveQuote,
+                          ),
+                        );
+                  },
+                ),
+                const SizedBox(height: 8),
+                _buildTargetOption(
+                  ctx,
+                  title: 'Home & Lock Screen',
+                  subtitle: 'Apply seamlessly across both screens',
+                  icon: Icons.smartphone_rounded,
+                  color: const Color(0xFF00E676),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    context.read<WallpaperBloc>().add(
+                          ApplyStaticWallpaperIntent(
+                            short: wallpaper,
+                            targetScreen: 'both',
+                            customQuote: effectiveQuote,
+                          ),
+                        );
+                  },
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTargetOption(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E1E24),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white10),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 22),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      color: Colors.white54,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white24, size: 14),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showReportDialog(BuildContext context, MotivationalShort wallpaper) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        final reasons = [
+          'Inappropriate or offensive content',
+          'Copyright or trademark infringement',
+          'Poor resolution or broken media',
+          'Misleading tags or category',
+        ];
+
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1E1E24),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Row(
+            children: [
+              Icon(Icons.flag_rounded, color: Color(0xFFFF5252), size: 22),
+              SizedBox(width: 8),
+              Text(
+                'Report Wallpaper',
+                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Help us keep the wallpaper community clean and safe. Why are you reporting "${wallpaper.title}"?',
+                style: const TextStyle(color: Colors.white70, fontSize: 13),
+              ),
+              const SizedBox(height: 16),
+              ...reasons.map((reason) => ListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.radio_button_unchecked, color: Colors.white38, size: 18),
+                    title: Text(reason, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      context.read<WallpaperBloc>().add(
+                            ReportWallpaperIntent(
+                              wallpaperId: wallpaper.id,
+                              reason: reason,
+                            ),
+                          );
+                    },
+                  )),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel', style: TextStyle(color: Colors.white38)),
+            ),
+          ],
+        );
+      },
     );
   }
 }

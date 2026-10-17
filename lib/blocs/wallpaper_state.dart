@@ -18,6 +18,8 @@ class WallpaperState extends Equatable {
   final String selectedCategory;
   final Set<String> favoriteIds;
   final Set<String> downloadedIds;
+  final List<String> recentlyViewedIds;
+  final Set<String> reportedIds;
   final Map<String, String> customizedQuotes;
   final bool isFeedMuted;
   final bool isLiveWallpaperActiveOnDevice;
@@ -38,6 +40,8 @@ class WallpaperState extends Equatable {
     this.selectedCategory = 'For You',
     this.favoriteIds = const {},
     this.downloadedIds = const {},
+    this.recentlyViewedIds = const [],
+    this.reportedIds = const {},
     this.customizedQuotes = const {},
     this.isFeedMuted = true,
     this.isLiveWallpaperActiveOnDevice = false,
@@ -93,6 +97,15 @@ class WallpaperState extends Equatable {
     return allShorts.where((s) => downloadedIds.contains(s.id)).toList();
   }
 
+  /// List of recently viewed wallpapers in MRU order.
+  List<MotivationalShort> get recentlyViewedShorts {
+    final Map<String, MotivationalShort> map = {for (var s in allShorts) s.id: s};
+    return recentlyViewedIds
+        .map((id) => map[id])
+        .whereType<MotivationalShort>()
+        .toList();
+  }
+
   /// All live wallpapers.
   List<MotivationalShort> get liveShorts {
     return allShorts.where((s) => s.isLive).toList();
@@ -132,6 +145,8 @@ class WallpaperState extends Equatable {
     String? selectedCategory,
     Set<String>? favoriteIds,
     Set<String>? downloadedIds,
+    List<String>? recentlyViewedIds,
+    Set<String>? reportedIds,
     Map<String, String>? customizedQuotes,
     bool? isFeedMuted,
     bool? isLiveWallpaperActiveOnDevice,
@@ -152,6 +167,8 @@ class WallpaperState extends Equatable {
       selectedCategory: selectedCategory ?? this.selectedCategory,
       favoriteIds: favoriteIds ?? this.favoriteIds,
       downloadedIds: downloadedIds ?? this.downloadedIds,
+      recentlyViewedIds: recentlyViewedIds ?? this.recentlyViewedIds,
+      reportedIds: reportedIds ?? this.reportedIds,
       customizedQuotes: customizedQuotes ?? this.customizedQuotes,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
       isLiveWallpaperActiveOnDevice:
@@ -176,6 +193,8 @@ class WallpaperState extends Equatable {
         selectedCategory,
         favoriteIds,
         downloadedIds,
+        recentlyViewedIds,
+        reportedIds,
         customizedQuotes,
         isFeedMuted,
         isLiveWallpaperActiveOnDevice,

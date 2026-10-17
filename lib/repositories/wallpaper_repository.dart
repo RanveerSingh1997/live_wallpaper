@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
+import '../services/wallpaper_renderer_service.dart';
 import '../services/wallpaper_service_bridge.dart';
 
 class WallpaperRepository {
@@ -16,6 +17,8 @@ class WallpaperRepository {
   static const String _keyCustomQuotesPrefix = 'custom_quote_';
   static const String _keyUserPreferences = 'user_preferred_categories';
   static const String _keyTextOverlayEnabled = 'text_overlay_enabled_by_default';
+  static const String _keyRecentlyViewed = 'recently_viewed_wallpaper_ids';
+  static const String _keyReported = 'reported_wallpaper_ids';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
@@ -230,5 +233,78 @@ class WallpaperRepository {
   /// Re-opens chooser.
   Future<void> openChooser() async {
     await _bridge.openChooser();
+  }
+
+  /// Returns list of recently viewed wallpaper IDs in MRU order.
+  List<String> getRecentlyViewed() {
+    return prefs.getStringList(_keyRecentlyViewed) ?? [];
+  }
+
+  /// Records a wallpaper as recently viewed (persists top 20 unique items).
+  Future<void> recordRecentlyViewed(String id) async {
+    final list = prefs.getStringList(_keyRecentlyViewed) ?? [];
+    list.remove(id);
+    list.insert(0, id);
+    if (list.length > 20) {
+      list.removeRange(20, list.length);
+    }
+    await prefs.setStringList(_keyRecentlyViewed, list);
+  }
+
+  /// Returns set of reported wallpaper IDs.
+  Set<String> getReportedIds() {
+    final list = prefs.getStringList(_keyReported) ?? [];
+    return list.toSet();
+  }
+
+  /// Reports a wallpaper for copyright, broken asset, or policy violations.
+  Future<void> reportWallpaper(String id, String reason) async {
+    final list = prefs.getStringList(_keyReported) ?? [];
+    if (!list.contains(id)) {
+      list.add(id);
+      await prefs.setStringList(_keyReported, list);
+    }
+  }
+
+  /// Renders a high-resolution static wallpaper PNG file with custom typography.
+  Future<File> renderStaticWallpaperFile({
+    required MotivationalShort short,
+    String? customQuote,
+  }) async {
+    return await WallpaperRendererService.renderWallpaperToFile(
+      wallpaper: short,
+      quoteOverride: customQuote,
+    );
+  }
+
+  /// Sets static wallpaper on Android directly (home, lock, or both).
+  Future<Map<String, dynamic>> applyStaticWallpaper({
+    required MotivationalShort short,
+    String targetScreen = 'both',
+    String? customQuote,
+  }) async {
+    final file = await renderStaticWallpaperFile(
+      short: short,
+      customQuote: customQuote,
+    );
+
+    if (Platform.isAndroid) {
+      final result = await _bridge.setStaticWallpaper(
+        filePath: file.path,
+        targetScreen: targetScreen,
+      );
+      if (result['status'] == 'applied_static') {
+        await prefs.setString(_keyActiveId, short.id);
+      }
+      return result;
+    } else if (Platform.isIOS) {
+      await _bridge.shareVideo(file.path);
+      return {'status': 'shared_ios', 'targetScreen': targetScreen};
+    } else {
+      return {
+        'status': 'unsupported_platform',
+        'message': 'Setting static wallpaper is supported on Android and iOS.'
+      };
+    }
   }
 }

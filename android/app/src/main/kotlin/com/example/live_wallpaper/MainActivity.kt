@@ -4,6 +4,8 @@ import android.app.WallpaperManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.os.Build
 import android.util.Log
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -65,6 +67,44 @@ class MainActivity : FlutterActivity() {
                     } catch (e: Exception) {
                         Log.e(TAG, "Failed to set live wallpaper", e)
                         result.error("SET_WALLPAPER_FAILED", e.localizedMessage, null)
+                    }
+                }
+
+                "setStaticWallpaper" -> {
+                    val filePath = call.argument<String>("filePath")
+                    val targetScreen = call.argument<String>("targetScreen") ?: "both"
+
+                    if (filePath.isNullOrEmpty()) {
+                        result.error("INVALID_ARGS", "filePath cannot be null or empty", null)
+                        return@setMethodCallHandler
+                    }
+
+                    try {
+                        val bitmap = BitmapFactory.decodeFile(filePath)
+                        if (bitmap == null) {
+                            result.error("DECODE_FAILED", "Failed to decode bitmap from path: $filePath", null)
+                            return@setMethodCallHandler
+                        }
+
+                        val wm = WallpaperManager.getInstance(applicationContext)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            val flag = when (targetScreen.lowercase()) {
+                                "home" -> WallpaperManager.FLAG_SYSTEM
+                                "lock" -> WallpaperManager.FLAG_LOCK
+                                else -> WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
+                            }
+                            wm.setBitmap(bitmap, null, true, flag)
+                        } else {
+                            wm.setBitmap(bitmap)
+                        }
+
+                        result.success(mapOf(
+                            "status" to "applied_static",
+                            "targetScreen" to targetScreen
+                        ))
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to set static wallpaper", e)
+                        result.error("SET_STATIC_WALLPAPER_FAILED", e.localizedMessage, null)
                     }
                 }
 

@@ -263,5 +263,36 @@ void main() {
             (s) => s.downloadedIds.isEmpty && s.totalStorageUsedBytes == 0)),
       );
     });
+
+    test('RecordWallpaperViewedIntent updates recentlyViewedIds in MRU order', () async {
+      bloc.add(const RecordWallpaperViewedIntent('amoled_void_black'));
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) =>
+            s.recentlyViewedIds.first == 'amoled_void_black')),
+      );
+
+      bloc.add(const RecordWallpaperViewedIntent('nature_cyber_rain'));
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) =>
+            s.recentlyViewedIds.first == 'nature_cyber_rain' &&
+            s.recentlyViewedIds[1] == 'amoled_void_black')),
+      );
+    });
+
+    test('ReportWallpaperIntent records reported wallpaper id', () async {
+      bloc.add(const ReportWallpaperIntent(
+        wallpaperId: 'nature_cyber_rain',
+        reason: 'Poor resolution',
+      ));
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) =>
+            s.reportedIds.contains('nature_cyber_rain') &&
+            s.message != null)),
+      );
+    });
   });
 }

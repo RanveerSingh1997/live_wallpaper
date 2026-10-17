@@ -145,3 +145,42 @@ class CheckWallpaperStatusIntent extends WallpaperIntent {}
 
 /// Intent to clear temporary status messages / snackbars.
 class ClearStatusMessageIntent extends WallpaperIntent {}
+
+/// Intent to apply a static wallpaper directly on Android (home, lock, or both).
+class ApplyStaticWallpaperIntent extends WallpaperIntent {
+  final MotivationalShort short;
+  final String targetScreen; // 'home', 'lock', 'both'
+  final String? customQuote;
+
+  const ApplyStaticWallpaperIntent({
+    required this.short,
+    this.targetScreen = 'both',
+    this.customQuote,
+  });
+
+  @override
+  List<Object?> get props => [short, targetScreen, customQuote];
+}
+
+/// Intent to record that a wallpaper was viewed in the preview sheet or feed.
+class RecordWallpaperViewedIntent extends WallpaperIntent {
+  final String wallpaperId;
+  const RecordWallpaperViewedIntent(this.wallpaperId);
+
+  @override
+  List<Object?> get props => [wallpaperId];
+}
+
+/// Intent to report inappropriate or infringing content.
+class ReportWallpaperIntent extends WallpaperIntent {
+  final String wallpaperId;
+  final String reason;
+
+  const ReportWallpaperIntent({
+    required this.wallpaperId,
+    required this.reason,
+  });
+
+  @override
+  List<Object?> get props => [wallpaperId, reason];
+}

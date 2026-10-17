@@ -39,6 +39,37 @@ class WallpaperServiceBridge {
     }
   }
 
+  /// Sets a static wallpaper bitmap on Android.
+  /// [targetScreen]: 'home', 'lock', or 'both'.
+  Future<Map<String, dynamic>> setStaticWallpaper({
+    required String filePath,
+    String targetScreen = 'both',
+  }) async {
+    if (!Platform.isAndroid) {
+      return {
+        'status': 'unsupported_platform',
+        'message': 'Direct static wallpaper setting via WallpaperManager is an Android feature.'
+      };
+    }
+
+    try {
+      final dynamic result = await _channel.invokeMethod('setStaticWallpaper', {
+        'filePath': filePath,
+        'targetScreen': targetScreen,
+      });
+
+      if (result is Map) {
+        return Map<String, dynamic>.from(result);
+      }
+      return {'status': 'applied_static', 'targetScreen': targetScreen};
+    } on PlatformException catch (e) {
+      return {
+        'status': 'error',
+        'error': e.message ?? e.code,
+      };
+    }
+  }
+
   /// Opens the iOS/iPad share sheet with "Use as Wallpaper" option.
   Future<void> shareVideo(String videoPath) async {
     if (!Platform.isIOS) return;

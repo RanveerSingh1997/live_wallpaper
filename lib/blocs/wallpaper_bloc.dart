@@ -26,6 +26,9 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<UpdateCustomQuoteIntent>(_onUpdateCustomQuote);
     on<ResetCustomQuoteIntent>(_onResetCustomQuote);
     on<ApplyLiveWallpaperIntent>(_onApplyLiveWallpaper);
+    on<ApplyStaticWallpaperIntent>(_onApplyStaticWallpaper);
+    on<RecordWallpaperViewedIntent>(_onRecordWallpaperViewed);
+    on<ReportWallpaperIntent>(_onReportWallpaper);
     on<ShareVideoIntent>(_onShareVideo);
     on<OpenPhotosIntent>(_onOpenPhotos);
     on<CheckWallpaperStatusIntent>(_onCheckWallpaperStatus);
@@ -57,6 +60,8 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final isTextOverlayVisible = repository.isTextOverlayEnabledByDefault();
       final isActiveOnDevice = await repository.isWallpaperActiveOnDevice();
       final totalStorage = await repository.getTotalDownloadSizeBytes();
+      final recentlyViewed = repository.getRecentlyViewed();
+      final reported = repository.getReportedIds();
 
       final forYouList = _buildForYouList(shorts, preferences);
 
@@ -67,6 +72,8 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         selectedCategory: 'For You',
         favoriteIds: favorites,
         downloadedIds: downloads,
+        recentlyViewedIds: recentlyViewed,
+        reportedIds: reported,
         customizedQuotes: quotes,
         activeWallpaperId: activeId,
         userPreferences: preferences,
@@ -337,6 +344,74 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         errorMessage: 'Error applying live wallpaper: $e',
       ));
     }
+  }
+
+  Future<void> _onApplyStaticWallpaper(
+    ApplyStaticWallpaperIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    emit(state.copyWith(actionStatus: WallpaperActionStatus.applying));
+    try {
+      final result = await repository.applyStaticWallpaper(
+        short: event.short,
+        targetScreen: event.targetScreen,
+        customQuote: event.customQuote,
+      );
+
+      final status = result['status']?.toString();
+      if (status == 'applied_static') {
+        final screenLabel = event.targetScreen == 'home'
+            ? 'Home Screen'
+            : (event.targetScreen == 'lock' ? 'Lock Screen' : 'Home & Lock Screen');
+        emit(state.copyWith(
+          actionStatus: WallpaperActionStatus.appliedSuccess,
+          activeWallpaperId: event.short.id,
+          message: '✨ Ultra-HD static wallpaper applied to $screenLabel!',
+        ));
+      } else if (status == 'shared_ios') {
+        emit(state.copyWith(
+          actionStatus: WallpaperActionStatus.appliedSuccess,
+          activeWallpaperId: event.short.id,
+          message: 'Wallpaper generated! Select "Use as Wallpaper" in the share sheet.',
+        ));
+      } else {
+        emit(state.copyWith(
+          actionStatus: WallpaperActionStatus.error,
+          errorMessage: result['error']?.toString() ?? 'Failed to apply static wallpaper',
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        actionStatus: WallpaperActionStatus.error,
+        errorMessage: 'Error applying static wallpaper: $e',
+      ));
+    }
+  }
+
+  Future<void> _onRecordWallpaperViewed(
+    RecordWallpaperViewedIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final list = List<String>.from(state.recentlyViewedIds);
+    list.remove(event.wallpaperId);
+    list.insert(0, event.wallpaperId);
+    if (list.length > 20) {
+      list.removeRange(20, list.length);
+    }
+    emit(state.copyWith(recentlyViewedIds: list));
+    await repository.recordRecentlyViewed(event.wallpaperId);
+  }
+
+  Future<void> _onReportWallpaper(
+    ReportWallpaperIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final reported = Set<String>.from(state.reportedIds)..add(event.wallpaperId);
+    await repository.reportWallpaper(event.wallpaperId, event.reason);
+    emit(state.copyWith(
+      reportedIds: reported,
+      message: 'Thank you for reporting. This wallpaper has been flagged for review.',
+    ));
   }
 
   Future<void> _onShareVideo(
