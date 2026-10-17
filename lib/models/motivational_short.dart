@@ -90,6 +90,56 @@ class MotivationalShort extends Equatable {
     return '${(fileSizeBytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'quote': quote,
+      'author': author,
+      'category': category,
+      'videoAssetPath': videoAssetPath,
+      'imageUrl': imageUrl,
+      'accentColor': accentColor.toARGB32(),
+      'alternativeQuotes': alternativeQuotes,
+      'tags': tags,
+      'hasTextByDefault': hasTextByDefault,
+      'mood': mood,
+      'isLive': isLive,
+      'resolution': resolution,
+      'fileSizeBytes': fileSizeBytes,
+      'durationSeconds': durationSeconds,
+      'gradientColors': gradientColors.map((c) => c.toARGB32()).toList(),
+    };
+  }
+
+  factory MotivationalShort.fromJson(Map<String, dynamic> json) {
+    return MotivationalShort(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      quote: json['quote'] as String,
+      author: json['author'] as String,
+      category: json['category'] as String,
+      videoAssetPath: json['videoAssetPath'] as String,
+      imageUrl: json['imageUrl'] as String?,
+      accentColor: Color(json['accentColor'] as int),
+      alternativeQuotes: (json['alternativeQuotes'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
+      tags: json['tags'] as String? ?? '',
+      hasTextByDefault: json['hasTextByDefault'] as bool? ?? true,
+      mood: json['mood'] as String? ?? 'Custom Creator',
+      isLive: json['isLive'] as bool? ?? true,
+      resolution: json['resolution'] as String? ?? '1080x1920 (FHD)',
+      fileSizeBytes: json['fileSizeBytes'] as int? ?? 2500000,
+      durationSeconds: json['durationSeconds'] as int? ?? 15,
+      gradientColors: (json['gradientColors'] as List<dynamic>?)
+              ?.map((c) => Color(c as int))
+              .toList() ??
+          const [],
+    );
+  }
+
   @override
   List<Object?> get props => [
         id,

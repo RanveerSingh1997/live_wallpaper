@@ -41,6 +41,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<UpdateAutoRotationWifiOnlyIntent>(_onUpdateAutoRotationWifiOnly);
     on<UpdateAutoRotationTargetIntent>(_onUpdateAutoRotationTarget);
     on<RotateWallpaperNowIntent>(_onRotateWallpaperNow);
+    on<ImportCustomWallpaperIntent>(_onImportCustomWallpaper);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -625,5 +626,22 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         errorMessage: 'Failed to rotate wallpaper: $e',
       ));
     }
+  }
+
+  Future<void> _onImportCustomWallpaper(
+    ImportCustomWallpaperIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveCustomImportedWallpaper(event.wallpaper);
+    final updatedAll = [
+      event.wallpaper,
+      ...state.allShorts.where((s) => s.id != event.wallpaper.id),
+    ];
+    final updatedFiltered = _buildForYouList(updatedAll, state.userPreferences);
+    emit(state.copyWith(
+      allShorts: updatedAll,
+      filteredShorts: updatedFiltered,
+      message: 'Imported "${event.wallpaper.title}" into your Wallora catalog.',
+    ));
   }
 }

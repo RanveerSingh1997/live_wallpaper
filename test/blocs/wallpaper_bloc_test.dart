@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
 import 'package:live_wallpaper/blocs/wallpaper_intent.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
+import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -344,6 +346,35 @@ void main() {
         bloc.stream,
         emits(predicate<WallpaperState>((s) => s.autoRotationSource == 'col_oled')),
       );
+    });
+
+    test('ImportCustomWallpaperIntent saves custom wallpaper to catalog and updates state', () async {
+      const customWallpaper = MotivationalShort(
+        id: 'custom_test_1',
+        title: 'Custom Neon Apex',
+        quote: 'Speed defines existence.',
+        author: 'Creator Test',
+        category: 'Cars & Speed',
+        videoAssetPath: 'assets/videos/ippo_motivation.mp4',
+        accentColor: Color(0xFFFF5722),
+        tags: 'cars speed test',
+        isLive: true,
+      );
+
+      bloc.add(const ImportCustomWallpaperIntent(customWallpaper));
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) =>
+            s.allShorts.isNotEmpty &&
+            s.allShorts.first.id == 'custom_test_1' &&
+            s.message != null &&
+            s.message!.contains('Custom Neon Apex'))),
+      );
+
+      // Verify persisted in repository
+      final saved = repository.getCustomImportedWallpapers();
+      expect(saved.any((w) => w.id == 'custom_test_1'), isTrue);
     });
   });
 }

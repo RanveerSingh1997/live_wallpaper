@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
@@ -25,6 +26,7 @@ class WallpaperRepository {
   static const String _keyAutoRotationSource = 'auto_rotation_source';
   static const String _keyAutoRotationWifiOnly = 'auto_rotation_wifi_only';
   static const String _keyAutoRotationTarget = 'auto_rotation_target';
+  static const String _keyCustomImportedWallpapers = 'custom_imported_wallpapers';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
@@ -41,9 +43,38 @@ class WallpaperRepository {
     await prefs.setBool(_keyHasSeenOnboarding, seen);
   }
 
-  /// Returns list of all curated motivational shorts and static wallpapers.
+  /// Returns list of custom imported creator wallpapers.
+  List<MotivationalShort> getCustomImportedWallpapers() {
+    final list = prefs.getStringList(_keyCustomImportedWallpapers) ?? [];
+    final List<MotivationalShort> result = [];
+    for (final item in list) {
+      try {
+        final map = jsonDecode(item) as Map<String, dynamic>;
+        result.add(MotivationalShort.fromJson(map));
+      } catch (_) {}
+    }
+    return result;
+  }
+
+  /// Saves a custom imported creator wallpaper into local storage.
+  Future<void> saveCustomImportedWallpaper(MotivationalShort short) async {
+    final list = prefs.getStringList(_keyCustomImportedWallpapers) ?? [];
+    list.removeWhere((item) {
+      try {
+        final map = jsonDecode(item) as Map<String, dynamic>;
+        return map['id'] == short.id;
+      } catch (_) {
+        return false;
+      }
+    });
+    list.insert(0, jsonEncode(short.toJson()));
+    await prefs.setStringList(_keyCustomImportedWallpapers, list);
+  }
+
+  /// Returns list of all curated motivational shorts and static wallpapers, including custom imported wallpapers.
   List<MotivationalShort> getCuratedShorts() {
-    return CuratedShortsData.shorts;
+    final custom = getCustomImportedWallpapers();
+    return [...custom, ...CuratedShortsData.shorts];
   }
 
   /// Returns set of user preferred wallpaper categories.

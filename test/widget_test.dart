@@ -7,6 +7,7 @@ import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
 import 'package:live_wallpaper/screens/categories_screen.dart';
+import 'package:live_wallpaper/screens/custom_wallpaper_import_sheet.dart';
 import 'package:live_wallpaper/screens/discover_screen.dart';
 import 'package:live_wallpaper/screens/downloads_screen.dart';
 import 'package:live_wallpaper/screens/favorites_screen.dart';
@@ -830,6 +831,71 @@ void main() {
       // Select 3 Hours interval
       await tester.tap(find.widgetWithText(ChoiceChip, '3 Hours'));
       await tester.pump();
+    });
+
+    testWidgets('CustomWallpaperImportSheet renders creator controls, formats, and handles import',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CustomWallpaperImportSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify UI elements
+      expect(find.text('CREATOR STUDIO'), findsOneWidget);
+      expect(find.text('WALLPAPER FORMAT'), findsOneWidget);
+      expect(find.text('Live Video (MP4)'), findsOneWidget);
+      expect(find.text('Static 4K Image'), findsOneWidget);
+      expect(find.text('QUICK SAMPLE PRESETS'), findsOneWidget);
+      expect(find.text('Apex Live Video'), findsOneWidget);
+      expect(find.text('Glass Canvas 4K'), findsOneWidget);
+      expect(find.text('FILE PATH OR ASSET URI'), findsOneWidget);
+      expect(find.text('WALLPAPER TITLE'), findsOneWidget);
+      expect(find.text('CREATOR / ARTIST'), findsOneWidget);
+      expect(find.text('CATEGORY'), findsOneWidget);
+      expect(find.text('AURORA ACCENT PALETTE'), findsOneWidget);
+      expect(find.text('IMPORT TO LIBRARY'), findsOneWidget);
+      expect(find.text('IMPORT & APPLY'), findsOneWidget);
+
+      // Tap preset
+      await tester.tap(find.text('Glass Canvas 4K'));
+      await tester.pumpAndSettle();
+
+      // Switch to Static 4K Image
+      await tester.tap(find.text('Static 4K Image'));
+      await tester.pumpAndSettle();
+
+      // Tap IMPORT TO LIBRARY
+      await tester.tap(find.text('IMPORT TO LIBRARY'));
+      await tester.pumpAndSettle();
+
+      // Verify imported wallpaper is in bloc state
+      expect(bloc.state.allShorts.any((s) => s.title.contains('Wallora Obsidian Canvas') || s.title.contains('Custom')), isTrue);
     });
   });
 }

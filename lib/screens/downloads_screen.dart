@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import 'custom_wallpaper_import_sheet.dart';
 import 'wallpaper_preview_sheet.dart';
 
 class DownloadsScreen extends StatefulWidget {
@@ -83,6 +84,14 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               ],
             ),
             actions: [
+              IconButton(
+                icon: const Icon(Icons.add_photo_alternate_rounded, color: Color(0xFFFFD600), size: 20),
+                tooltip: 'Import Wallpaper',
+                onPressed: () {
+                  HapticFeedback.selectionClick();
+                  CustomWallpaperImportSheet.show(context);
+                },
+              ),
               if (downloads.isNotEmpty)
                 TextButton.icon(
                   onPressed: () => _confirmClearAll(context),
@@ -133,24 +142,49 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            HapticFeedback.selectionClick();
-                            widget.onBrowseWallpapers();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF00E676),
-                            foregroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                widget.onBrowseWallpapers();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF00E676),
+                                foregroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              icon: const Icon(Icons.explore_rounded, size: 18),
+                              label: const Text(
+                                'Browse Wallpapers',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          ),
-                          icon: const Icon(Icons.explore_rounded, size: 18),
-                          label: const Text(
-                            'Browse Wallpapers',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
+                            const SizedBox(width: 10),
+                            OutlinedButton.icon(
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                CustomWallpaperImportSheet.show(context);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFFFFD600),
+                                side: const BorderSide(color: Color(0xFFFFD600)),
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              icon: const Icon(Icons.add_photo_alternate_rounded, size: 18),
+                              label: const Text(
+                                'Import',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

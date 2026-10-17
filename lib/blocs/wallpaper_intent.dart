@@ -244,3 +244,12 @@ class UpdateAutoRotationTargetIntent extends WallpaperIntent {
 
 /// Intent to rotate to the next wallpaper in the active pool immediately on-demand.
 class RotateWallpaperNowIntent extends WallpaperIntent {}
+
+/// Intent to import a creator or custom wallpaper into the personal library.
+class ImportCustomWallpaperIntent extends WallpaperIntent {
+  final MotivationalShort wallpaper;
+  const ImportCustomWallpaperIntent(this.wallpaper);
+
+  @override
+  List<Object?> get props => [wallpaper];
+}

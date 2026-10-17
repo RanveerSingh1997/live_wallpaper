@@ -8,6 +8,7 @@ import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
 import 'collection_detail_sheet.dart';
+import 'custom_wallpaper_import_sheet.dart';
 import 'preferences_modal_sheet.dart';
 import 'quote_studio_sheet.dart';
 import 'settings_sheet.dart';
@@ -168,6 +169,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               onPressed: () {
                                 HapticFeedback.selectionClick();
                                 QuoteStudioSheet.show(context);
+                              },
+                            ),
+                            // Creator Import Studio button
+                            IconButton(
+                              icon: const Icon(Icons.add_photo_alternate_rounded, color: Color(0xFFFFD600)),
+                              tooltip: 'Import Wallpaper',
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                CustomWallpaperImportSheet.show(context);
                               },
                             ),
                             // Settings & Trust button
@@ -578,6 +588,110 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       ),
                     ),
                   ],
+
+                  // Section: Creator Studio Import Banner
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 26, 16, 8),
+                      child: Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF2A163B), Color(0xFF14141E)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: const Color(0xFFD500F9).withValues(alpha: 0.3),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFD500F9).withValues(alpha: 0.15),
+                              blurRadius: 18,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFFFD600), Color(0xFFFF5722)],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Icon(
+                                Icons.add_photo_alternate_rounded,
+                                color: Colors.black,
+                                size: 28,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'CREATOR STUDIO',
+                                    style: TextStyle(
+                                      color: Color(0xFFFFD600),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 1.0,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  const Text(
+                                    'Import Your Custom Wallpapers',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Bring your own 4K videos, live loops, and artwork into Wallora.',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: 0.6),
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: () {
+                                HapticFeedback.mediumImpact();
+                                CustomWallpaperImportSheet.show(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFFD600),
+                                foregroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 10),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'IMPORT',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 11,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
 
                   // Section 2: Static & AMOLED Wallpapers (Responsive Grid)
                   const SliverToBoxAdapter(
