@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
+import 'package:live_wallpaper/models/parallax_effect_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
@@ -264,6 +265,39 @@ void main() {
       await repository.resetLockScreenStyleConfig();
       final resetConfig = repository.getLockScreenStyleConfig();
       expect(resetConfig, LockScreenStyleConfig.defaultConfig);
+    });
+
+    test('3D Spatial Parallax config CRUD and reset', () async {
+      // Default fallback
+      final defaultConfig = repository.getParallaxEffectConfig();
+      expect(defaultConfig.isEnabled, isTrue);
+      expect(defaultConfig.preset, ParallaxPreset.cinematic3D);
+
+      // Save custom config
+      const customConfig = ParallaxEffectConfig(
+        isEnabled: true,
+        sensitivity: 2.2,
+        maxAngleDegrees: 20.0,
+        invertPitch: true,
+        invertRoll: true,
+        depthZoomScale: 1.15,
+        preset: ParallaxPreset.hyperFloat,
+      );
+      await repository.saveParallaxEffectConfig(customConfig);
+
+      final loaded = repository.getParallaxEffectConfig();
+      expect(loaded.isEnabled, isTrue);
+      expect(loaded.sensitivity, 2.2);
+      expect(loaded.maxAngleDegrees, 20.0);
+      expect(loaded.invertPitch, isTrue);
+      expect(loaded.invertRoll, isTrue);
+      expect(loaded.depthZoomScale, 1.15);
+      expect(loaded.preset, ParallaxPreset.hyperFloat);
+
+      // Reset
+      await repository.resetParallaxEffectConfig();
+      final resetConfig = repository.getParallaxEffectConfig();
+      expect(resetConfig, ParallaxEffectConfig.defaultConfig);
     });
   });
 }

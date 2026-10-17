@@ -8,6 +8,7 @@ import 'auto_rotation_sheet.dart';
 import 'day_night_schedule_sheet.dart';
 import 'lock_screen_studio_sheet.dart';
 import 'onboarding_sheet.dart';
+import 'parallax_studio_sheet.dart';
 import 'preferences_modal_sheet.dart';
 
 class SettingsSheet extends StatelessWidget {
@@ -240,6 +241,23 @@ class SettingsSheet extends StatelessWidget {
                     subtitle: '${state.lockScreenStyle.clockFont.label} • ${state.lockScreenStyle.clockLayout.label}',
                     onTap: () {
                       LockScreenStudioSheet.show(context);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSettingTile(
+                    icon: Icons.view_in_ar_rounded,
+                    iconColor: const Color(0xFF00E5FF),
+                    title: '3D Spatial Parallax Studio',
+                    subtitle: state.parallaxConfig.isEnabled
+                        ? '${state.parallaxConfig.preset.label} (${state.parallaxConfig.sensitivity.toStringAsFixed(1)}x)'
+                        : 'Paused / Disabled',
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (ctx) => const ParallaxStudioSheet(),
+                      );
                     },
                   ),
                   const SizedBox(height: 8),

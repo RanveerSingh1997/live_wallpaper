@@ -6,6 +6,7 @@ import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
+import 'package:live_wallpaper/models/parallax_effect_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/screens/add_to_collection_sheet.dart';
 import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
@@ -21,6 +22,7 @@ import 'package:live_wallpaper/screens/ipad_wallpaper_dialog.dart';
 import 'package:live_wallpaper/screens/lock_screen_studio_sheet.dart';
 import 'package:live_wallpaper/screens/main_navigation_shell.dart';
 import 'package:live_wallpaper/screens/onboarding_sheet.dart';
+import 'package:live_wallpaper/screens/parallax_studio_sheet.dart';
 import 'package:live_wallpaper/screens/quote_studio_sheet.dart';
 import 'package:live_wallpaper/screens/settings_sheet.dart';
 import 'package:live_wallpaper/screens/splash_screen.dart';
@@ -1519,6 +1521,84 @@ void main() {
       expect(bloc.state.lockScreenStyle.clockFont, LockScreenClockFont.cyber);
       expect(bloc.state.lockScreenStyle.clockLayout, LockScreenClockLayout.stacked);
       expect(bloc.state.lockScreenStyle.widgetType, LockScreenWidgetType.batteryGlance);
+    });
+
+    testWidgets('ParallaxStudioSheet renders 3D mockup, presets, sliders, and applies configuration',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      final short = CuratedShortsData.shorts.first;
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: Scaffold(
+              body: ParallaxStudioSheet(wallpaper: short),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // 1. Verify Header
+      expect(find.text('3D SPATIAL PARALLAX STUDIO'), findsOneWidget);
+      expect(find.text('Gyroscopic Motion & Depth Hologram'), findsOneWidget);
+
+      // 2. Verify Bubble Indicator & Hologram Badge
+      expect(find.text('3D SPATIAL PLANE'), findsOneWidget);
+      expect(find.text('ENGINE ACTIVE'), findsOneWidget);
+
+      // 3. Verify Presets
+      expect(find.text('Subtle Depth'), findsOneWidget);
+      expect(find.text('Cinematic 3D'), findsOneWidget);
+      expect(find.text('Deep Spatial'), findsOneWidget);
+      expect(find.text('Hyper Float'), findsOneWidget);
+      expect(find.text('Disabled'), findsOneWidget);
+
+      // 4. Verify Sliders
+      expect(find.text('Motion Sensitivity'), findsOneWidget);
+      expect(find.text('Max Tilt Angle'), findsOneWidget);
+      expect(find.text('Depth Zoom Scale'), findsOneWidget);
+
+      // 5. Verify Toggles
+      expect(find.text('Enable 3D Spatial Parallax'), findsOneWidget);
+      expect(find.text('Invert Pitch (Vertical Axis)'), findsOneWidget);
+      expect(find.text('Invert Roll (Horizontal Axis)'), findsOneWidget);
+
+      // 6. Verify Apply Button
+      expect(find.text('APPLY 3D SPATIAL PARALLAX'), findsOneWidget);
+
+      // 7. Tap 'Deep Spatial' preset
+      await tester.tap(find.text('Deep Spatial'));
+      await tester.pumpAndSettle();
+
+      // 8. Tap 'APPLY 3D SPATIAL PARALLAX'
+      await tester.tap(find.text('APPLY 3D SPATIAL PARALLAX'));
+      await tester.pumpAndSettle();
+
+      // Verify BLoC state updated with Deep Spatial values
+      expect(bloc.state.parallaxConfig.preset, ParallaxPreset.deepSpatial);
+      expect(bloc.state.parallaxConfig.sensitivity, 1.8);
+      expect(bloc.state.parallaxConfig.maxAngleDegrees, 18.0);
     });
   });
 }

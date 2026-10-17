@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
+import '../models/parallax_effect_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 
@@ -353,6 +354,25 @@ class UpdateLockScreenStyleIntent extends WallpaperIntent {
 /// Intent to reset the Lock Screen clock & widget simulation style to default.
 class ResetLockScreenStyleIntent extends WallpaperIntent {
   const ResetLockScreenStyleIntent();
+}
+
+/// Intent to update the 3D Spatial Parallax motion configuration.
+class UpdateParallaxConfigIntent extends WallpaperIntent {
+  final ParallaxEffectConfig config;
+  const UpdateParallaxConfigIntent(this.config);
+
+  @override
+  List<Object?> get props => [config];
+}
+
+/// Intent to toggle the 3D Spatial Parallax motion engine on or off.
+class ToggleParallaxIntent extends WallpaperIntent {
+  const ToggleParallaxIntent();
+}
+
+/// Intent to reset the 3D Spatial Parallax configuration to default.
+class ResetParallaxConfigIntent extends WallpaperIntent {
+  const ResetParallaxConfigIntent();
 }
 
 

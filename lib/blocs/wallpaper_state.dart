@@ -3,6 +3,7 @@ import '../data/curated_shorts_data.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
+import '../models/parallax_effect_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 
@@ -30,6 +31,7 @@ class WallpaperState extends Equatable {
   final Map<String, WallpaperEffectConfig> customEffects;
   final DayNightScheduleConfig dayNightSchedule;
   final LockScreenStyleConfig lockScreenStyle;
+  final ParallaxEffectConfig parallaxConfig;
   final bool isFeedMuted;
   final bool isLiveWallpaperActiveOnDevice;
   final String? activeWallpaperId;
@@ -63,6 +65,7 @@ class WallpaperState extends Equatable {
     this.customEffects = const {},
     this.dayNightSchedule = DayNightScheduleConfig.defaultConfig,
     this.lockScreenStyle = LockScreenStyleConfig.defaultConfig,
+    this.parallaxConfig = ParallaxEffectConfig.defaultConfig,
     this.isFeedMuted = true,
     this.isLiveWallpaperActiveOnDevice = false,
     this.activeWallpaperId,
@@ -218,6 +221,7 @@ class WallpaperState extends Equatable {
     Map<String, WallpaperEffectConfig>? customEffects,
     DayNightScheduleConfig? dayNightSchedule,
     LockScreenStyleConfig? lockScreenStyle,
+    ParallaxEffectConfig? parallaxConfig,
     bool? isFeedMuted,
     bool? isLiveWallpaperActiveOnDevice,
     String? activeWallpaperId,
@@ -251,6 +255,7 @@ class WallpaperState extends Equatable {
       customEffects: customEffects ?? this.customEffects,
       dayNightSchedule: dayNightSchedule ?? this.dayNightSchedule,
       lockScreenStyle: lockScreenStyle ?? this.lockScreenStyle,
+      parallaxConfig: parallaxConfig ?? this.parallaxConfig,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
       isLiveWallpaperActiveOnDevice:
           isLiveWallpaperActiveOnDevice ?? this.isLiveWallpaperActiveOnDevice,
@@ -290,6 +295,7 @@ class WallpaperState extends Equatable {
         customEffects,
         dayNightSchedule,
         lockScreenStyle,
+        parallaxConfig,
         isFeedMuted,
         isLiveWallpaperActiveOnDevice,
         activeWallpaperId,

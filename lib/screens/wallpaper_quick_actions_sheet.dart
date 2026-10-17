@@ -10,6 +10,7 @@ import 'add_to_collection_sheet.dart';
 import 'fullscreen_wallpaper_viewer.dart';
 import 'ipad_wallpaper_dialog.dart';
 import 'lock_screen_studio_sheet.dart';
+import 'parallax_studio_sheet.dart';
 import 'quote_studio_sheet.dart';
 import 'wallpaper_effects_sheet.dart';
 import 'wallpaper_export_sheet.dart';
@@ -345,6 +346,28 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
                     Navigator.of(context).pop();
                   }
                   LockScreenStudioSheet.show(context, wallpaper: wallpaper);
+                },
+              ),
+
+              const SizedBox(height: 8),
+
+              // Action 5: 3D Spatial Parallax Studio
+              _buildActionTile(
+                context: context,
+                icon: Icons.view_in_ar_rounded,
+                iconColor: const Color(0xFF00E5FF),
+                title: '3D Spatial Parallax Studio',
+                subtitle: 'Sensor-driven 3D depth tilt & holographic layer separation',
+                onTap: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (ctx) => ParallaxStudioSheet(wallpaper: wallpaper),
+                  );
                 },
               ),
 

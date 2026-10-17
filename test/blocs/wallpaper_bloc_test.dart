@@ -7,6 +7,7 @@ import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
+import 'package:live_wallpaper/models/parallax_effect_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
@@ -820,6 +821,79 @@ void main() {
 
       final persisted = repository.getLockScreenStyleConfig();
       expect(persisted, LockScreenStyleConfig.defaultConfig);
+    });
+
+    test('UpdateParallaxConfigIntent updates state, persists, and emits notification', () async {
+      const customParallax = ParallaxEffectConfig(
+        isEnabled: true,
+        sensitivity: 2.0,
+        maxAngleDegrees: 18.0,
+        invertPitch: true,
+        preset: ParallaxPreset.deepSpatial,
+      );
+
+      final updateExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.parallaxConfig == customParallax &&
+              s.message == '3D Spatial Parallax motion updated.';
+        })),
+      );
+
+      bloc.add(const UpdateParallaxConfigIntent(customParallax));
+      await updateExpectation;
+
+      final persisted = repository.getParallaxEffectConfig();
+      expect(persisted, customParallax);
+    });
+
+    test('ToggleParallaxIntent toggles isEnabled in state, persists, and notifies', () async {
+      expect(bloc.state.parallaxConfig.isEnabled, isTrue);
+
+      // Toggle to false
+      final pauseExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.parallaxConfig.isEnabled == false &&
+              s.message == '3D Spatial Parallax paused.';
+        })),
+      );
+      bloc.add(const ToggleParallaxIntent());
+      await pauseExpectation;
+
+      expect(repository.getParallaxEffectConfig().isEnabled, isFalse);
+
+      // Toggle back to true
+      final activateExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.parallaxConfig.isEnabled == true &&
+              s.message == '3D Spatial Parallax active.';
+        })),
+      );
+      bloc.add(const ToggleParallaxIntent());
+      await activateExpectation;
+
+      expect(repository.getParallaxEffectConfig().isEnabled, isTrue);
+    });
+
+    test('ResetParallaxConfigIntent resets configuration to default and cleans persistence', () async {
+      // First save custom config
+      await repository.saveParallaxEffectConfig(ParallaxEffectConfig.hyperFloatPreset);
+
+      final resetExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.parallaxConfig == ParallaxEffectConfig.defaultConfig &&
+              s.message == '3D Spatial Parallax reset to default.';
+        })),
+      );
+
+      bloc.add(const ResetParallaxConfigIntent());
+      await resetExpectation;
+
+      final persisted = repository.getParallaxEffectConfig();
+      expect(persisted, ParallaxEffectConfig.defaultConfig);
     });
   });
 }

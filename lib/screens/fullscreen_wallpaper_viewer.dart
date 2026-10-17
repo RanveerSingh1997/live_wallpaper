@@ -10,6 +10,7 @@ import '../models/motivational_short.dart';
 import '../widgets/video_player_item.dart';
 import 'ipad_wallpaper_dialog.dart';
 import 'lock_screen_studio_sheet.dart';
+import 'parallax_studio_sheet.dart';
 import 'wallpaper_effects_sheet.dart';
 import 'wallpaper_export_sheet.dart';
 
@@ -606,6 +607,21 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                         onPressed: () {
                           HapticFeedback.mediumImpact();
                           LockScreenStudioSheet.show(context, wallpaper: short);
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      // 3D Spatial Parallax Studio Button
+                      IconButton(
+                        icon: const Icon(Icons.view_in_ar_rounded, color: Color(0xFF00E5FF)),
+                        tooltip: '3D Spatial Parallax Studio',
+                        onPressed: () {
+                          HapticFeedback.mediumImpact();
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (ctx) => ParallaxStudioSheet(wallpaper: short),
+                          );
                         },
                       ),
                     ],

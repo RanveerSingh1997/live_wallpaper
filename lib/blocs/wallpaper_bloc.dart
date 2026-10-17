@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
+import '../models/parallax_effect_config.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../repositories/wallpaper_repository.dart';
 import 'wallpaper_intent.dart';
@@ -56,6 +57,9 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<CheckDayNightTransitionIntent>(_onCheckDayNightTransition);
     on<UpdateLockScreenStyleIntent>(_onUpdateLockScreenStyle);
     on<ResetLockScreenStyleIntent>(_onResetLockScreenStyle);
+    on<UpdateParallaxConfigIntent>(_onUpdateParallaxConfig);
+    on<ToggleParallaxIntent>(_onToggleParallax);
+    on<ResetParallaxConfigIntent>(_onResetParallaxConfig);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -96,6 +100,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final effects = repository.getCustomEffects();
       final dayNightSchedule = repository.getDayNightScheduleConfig();
       final lockScreenStyle = repository.getLockScreenStyleConfig();
+      final parallaxConfig = repository.getParallaxEffectConfig();
 
       final forYouList = _buildForYouList(shorts, preferences);
 
@@ -113,6 +118,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         customEffects: effects,
         dayNightSchedule: dayNightSchedule,
         lockScreenStyle: lockScreenStyle,
+        parallaxConfig: parallaxConfig,
         activeWallpaperId: activeId,
         userPreferences: preferences,
         isTextOverlayVisible: isTextOverlayVisible,
@@ -899,6 +905,44 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     emit(state.copyWith(
       lockScreenStyle: LockScreenStyleConfig.defaultConfig,
       message: 'Lock screen aesthetic reset to default.',
+    ));
+  }
+
+  Future<void> _onUpdateParallaxConfig(
+    UpdateParallaxConfigIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveParallaxEffectConfig(event.config);
+    emit(state.copyWith(
+      parallaxConfig: event.config,
+      message: '3D Spatial Parallax motion updated.',
+    ));
+  }
+
+  Future<void> _onToggleParallax(
+    ToggleParallaxIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final updated = state.parallaxConfig.copyWith(
+      isEnabled: !state.parallaxConfig.isEnabled,
+    );
+    await repository.saveParallaxEffectConfig(updated);
+    emit(state.copyWith(
+      parallaxConfig: updated,
+      message: updated.isEnabled
+          ? '3D Spatial Parallax active.'
+          : '3D Spatial Parallax paused.',
+    ));
+  }
+
+  Future<void> _onResetParallaxConfig(
+    ResetParallaxConfigIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.resetParallaxEffectConfig();
+    emit(state.copyWith(
+      parallaxConfig: ParallaxEffectConfig.defaultConfig,
+      message: '3D Spatial Parallax reset to default.',
     ));
   }
 }

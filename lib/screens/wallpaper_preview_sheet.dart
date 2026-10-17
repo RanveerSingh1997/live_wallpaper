@@ -11,6 +11,7 @@ import 'add_to_collection_sheet.dart';
 import 'fullscreen_wallpaper_viewer.dart';
 import 'ipad_wallpaper_dialog.dart';
 import 'lock_screen_studio_sheet.dart';
+import 'parallax_studio_sheet.dart';
 import 'quote_studio_sheet.dart';
 import 'wallpaper_effects_sheet.dart';
 import 'wallpaper_export_sheet.dart';
@@ -218,6 +219,19 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                         onPressed: () {
                                           HapticFeedback.mediumImpact();
                                           WallpaperEffectsSheet.show(context, wallpaper);
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.view_in_ar_rounded, color: Color(0xFF00E5FF)),
+                                        tooltip: '3D Spatial Parallax Studio',
+                                        onPressed: () {
+                                          HapticFeedback.mediumImpact();
+                                          showModalBottomSheet(
+                                            context: context,
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.transparent,
+                                            builder: (ctx) => ParallaxStudioSheet(wallpaper: wallpaper),
+                                          );
                                         },
                                       ),
                                       IconButton(

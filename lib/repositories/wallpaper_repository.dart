@@ -7,6 +7,7 @@ import '../data/curated_shorts_data.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
+import '../models/parallax_effect_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../services/wallpaper_renderer_service.dart';
@@ -36,11 +37,36 @@ class WallpaperRepository {
   static const String _keyAmoledSaverMode = 'amoled_saver_mode_enabled';
   static const String _keyDayNightSchedule = 'day_night_schedule_config';
   static const String _keyLockScreenStyle = 'lock_screen_style_config';
+  static const String _keyParallaxConfig = 'parallax_effect_config';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
     required this.prefs,
   }) : _bridge = bridge ?? WallpaperServiceBridge();
+
+  /// Returns the configured 3D Spatial Parallax settings.
+  ParallaxEffectConfig getParallaxEffectConfig() {
+    final raw = prefs.getString(_keyParallaxConfig);
+    if (raw == null || raw.isEmpty) {
+      return ParallaxEffectConfig.defaultConfig;
+    }
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      return ParallaxEffectConfig.fromJson(json);
+    } catch (_) {
+      return ParallaxEffectConfig.defaultConfig;
+    }
+  }
+
+  /// Saves the 3D Spatial Parallax settings.
+  Future<void> saveParallaxEffectConfig(ParallaxEffectConfig config) async {
+    await prefs.setString(_keyParallaxConfig, jsonEncode(config.toJson()));
+  }
+
+  /// Resets the 3D Spatial Parallax settings to default.
+  Future<void> resetParallaxEffectConfig() async {
+    await prefs.remove(_keyParallaxConfig);
+  }
 
   /// Returns the configured Lock Screen clock & widget simulation style.
   LockScreenStyleConfig getLockScreenStyleConfig() {
