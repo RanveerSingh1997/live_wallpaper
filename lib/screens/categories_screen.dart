@@ -9,6 +9,7 @@ import '../models/wallpaper_collection.dart';
 import 'collection_detail_sheet.dart';
 import 'create_collection_sheet.dart';
 import 'wallpaper_preview_sheet.dart';
+import 'wallpaper_quick_actions_sheet.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -713,6 +714,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           onTap: () {
                             WallpaperPreviewSheet.show(context, item);
                           },
+                          onLongPress: () {
+                            HapticFeedback.heavyImpact();
+                            WallpaperQuickActionsSheet.show(context, item);
+                          },
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
@@ -730,21 +735,48 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.6),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    item.isLive ? 'LIVE' : '4K',
-                                    style: TextStyle(
-                                      color: item.accentColor,
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.w800,
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withValues(alpha: 0.6),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        item.isLive ? 'LIVE' : '4K',
+                                        style: TextStyle(
+                                          color: item.accentColor,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    if (item.isAmoledCertified) ...[
+                                      const SizedBox(width: 4),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 4, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withValues(alpha: 0.7),
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(
+                                            color: const Color(0xFF00E676).withValues(alpha: 0.5),
+                                            width: 0.6,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${item.trueBlackPercentage}% OLED',
+                                          style: const TextStyle(
+                                            color: Color(0xFF00E676),
+                                            fontSize: 8,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                                 const SizedBox(height: 6),
                                 Text(

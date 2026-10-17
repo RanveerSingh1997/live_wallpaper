@@ -5,6 +5,7 @@ import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import 'wallpaper_preview_sheet.dart';
+import 'wallpaper_quick_actions_sheet.dart';
 
 class FavoritesScreen extends StatefulWidget {
   final VoidCallback onBrowseWallpapers;
@@ -162,6 +163,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       return GestureDetector(
                         onTap: () {
                           WallpaperPreviewSheet.show(context, item);
+                        },
+                        onLongPress: () {
+                          WallpaperQuickActionsSheet.show(context, item);
                         },
                         child: Container(
                           decoration: BoxDecoration(

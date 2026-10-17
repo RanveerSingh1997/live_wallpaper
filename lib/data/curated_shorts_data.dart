@@ -127,6 +127,7 @@ class CuratedShortsData {
       durationSeconds: 15,
       gradientColors: [Color(0xFF100028), Color(0xFF7C4DFF), Color(0xFF000000)],
       tags: 'minimal amoled dark black liquid geometry abstract clean elegance luxury live',
+      trueBlackPercentage: 90,
       alternativeQuotes: [
         'Silence is where power accumulates.',
         'Less noise, more signal.',
@@ -199,6 +200,7 @@ class CuratedShortsData {
       durationSeconds: 0,
       gradientColors: [Color(0xFF050014), Color(0xFF311B92), Color(0xFF000000)],
       tags: 'static amoled dark space nebula stars cosmic minimal 4k wallpaper',
+      trueBlackPercentage: 85,
       alternativeQuotes: [
         'In the infinity of the void, craft your own constellation.',
         'Darkness is the canvas upon which stars shine brightest.',
@@ -267,16 +269,113 @@ class CuratedShortsData {
       fileSizeBytes: 1320100,
       durationSeconds: 0,
       gradientColors: [Color(0xFF211700), Color(0xFFFF8F00), Color(0xFF0A0802)],
-      tags: 'static motivation stoic citadel gold quote typography inspiring 4k wallpaper',
+      tags: 'static motivation stoic citadel gold quote typography inspiring 4k wallpaper amoled',
+      trueBlackPercentage: 84,
       alternativeQuotes: [
         'Stand firm like a rock against which the waves continually break.',
         'You have power over your thoughts. Master them.',
       ],
     ),
+
+    // 12. Anime & Gaming - STATIC (AMOLED 88%)
+    MotivationalShort(
+      id: 'solo_shadow_monarch',
+      title: 'Shadow Monarch: Arise',
+      quote: 'Arise. In the darkness of battle, awaken your true strength.',
+      author: 'Sung Jin-Woo',
+      category: 'Anime & Gaming',
+      videoAssetPath: 'assets/videos/ippo_motivation.mp4',
+      accentColor: Color(0xFF7C4DFF),
+      mood: 'Shadow Monarch',
+      hasTextByDefault: true,
+      isLive: false,
+      resolution: '2160x3840 (4K UHD)',
+      fileSizeBytes: 1890000,
+      durationSeconds: 0,
+      gradientColors: [Color(0xFF090014), Color(0xFF6200EA), Color(0xFF000000)],
+      tags: 'anime solo leveling shadow monarch arise jin woo dark violet amoled 4k wallpaper',
+      trueBlackPercentage: 88,
+      alternativeQuotes: [
+        'I will protect what matters, from the shadows or from the light.',
+        'Never fear the dark. It is where power takes form.',
+      ],
+    ),
+
+    // 13. Cyberpunk & Tech - STATIC (AMOLED 92%)
+    MotivationalShort(
+      id: 'cyber_netrunner_terminal',
+      title: 'Netrunner Terminal: Ghost Shell',
+      quote: 'Code the future you want to exist in.',
+      author: 'Net Protocol 0x',
+      category: 'Cyberpunk & Tech',
+      videoAssetPath: 'assets/videos/silent_ambition.mp4',
+      accentColor: Color(0xFF00E5FF),
+      mood: 'Matrix Flow',
+      hasTextByDefault: true,
+      isLive: false,
+      resolution: '2160x3840 (4K UHD)',
+      fileSizeBytes: 1720000,
+      durationSeconds: 0,
+      gradientColors: [Color(0xFF00151A), Color(0xFF00E5FF), Color(0xFF000000)],
+      tags: 'cyberpunk netrunner matrix terminal coding cyber tech neon 4k amoled wallpaper',
+      trueBlackPercentage: 92,
+      alternativeQuotes: [
+        'In an age of algorithms, human will remains supreme.',
+        'Break the firewall of limitations.',
+      ],
+    ),
+
+    // 14. Fitness & Grind - STATIC (AMOLED 86%)
+    MotivationalShort(
+      id: 'olympia_heavy_iron',
+      title: 'Chalk Dust & Iron Will',
+      quote: 'The iron never lies to you. 200 pounds will always be 200 pounds.',
+      author: 'Henry Rollins',
+      category: 'Fitness & Grind',
+      videoAssetPath: 'assets/videos/discipline_grind.mp4',
+      accentColor: Color(0xFFFFD600),
+      mood: 'Pure Strength',
+      hasTextByDefault: true,
+      isLive: false,
+      resolution: '2160x3840 (4K UHD)',
+      fileSizeBytes: 1640000,
+      durationSeconds: 0,
+      gradientColors: [Color(0xFF141200), Color(0xFFFFD600), Color(0xFF000000)],
+      tags: 'fitness gym barbell bodybuilding iron lift heavy strength 4k amoled wallpaper',
+      trueBlackPercentage: 86,
+      alternativeQuotes: [
+        'Discipline is choosing between what you want now and what you want most.',
+        'Heavy weights forge unbreakable spirits.',
+      ],
+    ),
+
+    // 15. Minimal & AMOLED - STATIC (AMOLED 96%)
+    MotivationalShort(
+      id: 'minimal_monolith',
+      title: 'Obsidian Monolith & Horizon',
+      quote: 'Silence is the sleep that nourishes wisdom.',
+      author: 'Francis Bacon',
+      category: 'Minimal & AMOLED',
+      videoAssetPath: 'assets/videos/iron_mind.mp4',
+      accentColor: Color(0xFF00E676),
+      mood: 'Zen Minimal',
+      hasTextByDefault: false,
+      isLive: false,
+      resolution: '2160x3840 (4K UHD)',
+      fileSizeBytes: 1250000,
+      durationSeconds: 0,
+      gradientColors: [Color(0xFF000F05), Color(0xFF00E676), Color(0xFF000000)],
+      tags: 'minimal amoled monolith black clean elegant horizon zen 4k wallpaper',
+      trueBlackPercentage: 96,
+      alternativeQuotes: [
+        'In pure obsidian, light discovers its true contrast.',
+        'Elegance through subtraction.',
+      ],
+    ),
   ];
 
   static List<String> get categories {
-    final Set<String> set = {'All', 'For You', 'Live Wallpapers', 'Static Wallpapers'};
+    final Set<String> set = {'All', 'For You', 'AMOLED True-Black', 'Live Wallpapers', 'Static Wallpapers'};
     for (final short in shorts) {
       set.add(short.category);
     }
@@ -290,7 +389,7 @@ class CuratedShortsData {
       subtitle: 'Pure blacks & luminous geometry optimized for battery saving on AMOLED displays',
       badge: 'BATTERY SAVER',
       icon: Icons.dark_mode_rounded,
-      wallpaperIds: ['minimal_amoled', 'static_amoled_nebula', 'silent_ambition'],
+      wallpaperIds: ['minimal_amoled', 'static_amoled_nebula', 'silent_ambition', 'minimal_monolith', 'cyber_netrunner_terminal'],
       gradientColors: [Color(0xFF0F0020), Color(0xFF7C4DFF), Color(0xFF000000)],
     ),
     WallpaperCollection(
@@ -308,7 +407,7 @@ class CuratedShortsData {
       subtitle: 'Coach Kamogawa creed, 5:00 AM protocol & unbreakable discipline',
       badge: 'MOTIVATION',
       icon: Icons.sports_mma_rounded,
-      wallpaperIds: ['ippo_hard_work', 'discipline_grind', 'static_stoic_citadel', 'stoic_wisdom'],
+      wallpaperIds: ['ippo_hard_work', 'discipline_grind', 'static_stoic_citadel', 'stoic_wisdom', 'solo_shadow_monarch', 'olympia_heavy_iron'],
       gradientColors: [Color(0xFF2A0D00), Color(0xFFFF5722), Color(0xFF000000)],
     ),
     WallpaperCollection(

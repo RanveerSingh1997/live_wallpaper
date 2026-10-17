@@ -7,6 +7,7 @@ import '../blocs/wallpaper_state.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
 import 'wallpaper_preview_sheet.dart';
+import 'wallpaper_quick_actions_sheet.dart';
 
 class CollectionDetailSheet extends StatelessWidget {
   final WallpaperCollection collection;
@@ -324,6 +325,9 @@ class CollectionDetailSheet extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         WallpaperPreviewSheet.show(context, item);
+      },
+      onLongPress: () {
+        WallpaperQuickActionsSheet.show(context, item);
       },
       child: Container(
         decoration: BoxDecoration(

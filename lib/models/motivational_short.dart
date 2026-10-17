@@ -21,6 +21,7 @@ class MotivationalShort extends Equatable {
   final int fileSizeBytes;
   final int durationSeconds;
   final List<Color> gradientColors;
+  final int trueBlackPercentage;
 
   const MotivationalShort({
     required this.id,
@@ -40,6 +41,7 @@ class MotivationalShort extends Equatable {
     this.fileSizeBytes = 2848208,
     this.durationSeconds = 15,
     this.gradientColors = const [],
+    this.trueBlackPercentage = 0,
   });
 
   MotivationalShort copyWith({
@@ -60,6 +62,7 @@ class MotivationalShort extends Equatable {
     int? fileSizeBytes,
     int? durationSeconds,
     List<Color>? gradientColors,
+    int? trueBlackPercentage,
   }) {
     return MotivationalShort(
       id: id ?? this.id,
@@ -79,8 +82,13 @@ class MotivationalShort extends Equatable {
       fileSizeBytes: fileSizeBytes ?? this.fileSizeBytes,
       durationSeconds: durationSeconds ?? this.durationSeconds,
       gradientColors: gradientColors ?? this.gradientColors,
+      trueBlackPercentage: trueBlackPercentage ?? this.trueBlackPercentage,
     );
   }
+
+  /// Whether this wallpaper satisfies true-black AMOLED criteria (>=75% pure black pixels or Minimal & AMOLED category).
+  bool get isAmoledCertified =>
+      trueBlackPercentage >= 75 || category == 'Minimal & AMOLED';
 
   /// Human-readable file size string (e.g. "2.7 MB")
   String get fileSizeFormatted {
@@ -109,6 +117,7 @@ class MotivationalShort extends Equatable {
       'fileSizeBytes': fileSizeBytes,
       'durationSeconds': durationSeconds,
       'gradientColors': gradientColors.map((c) => c.toARGB32()).toList(),
+      'trueBlackPercentage': trueBlackPercentage,
     };
   }
 
@@ -137,6 +146,7 @@ class MotivationalShort extends Equatable {
               ?.map((c) => Color(c as int))
               .toList() ??
           const [],
+      trueBlackPercentage: json['trueBlackPercentage'] as int? ?? 0,
     );
   }
 
@@ -159,6 +169,7 @@ class MotivationalShort extends Equatable {
         fileSizeBytes,
         durationSeconds,
         gradientColors,
+        trueBlackPercentage,
       ];
 }
 

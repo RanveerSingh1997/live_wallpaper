@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
 import 'package:live_wallpaper/blocs/wallpaper_intent.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
+import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
@@ -509,6 +510,76 @@ void main() {
               pool.first.id == 'ippo_hard_work';
         })),
       );
+    });
+
+    test('ToggleAmoledSaverModeIntent toggles AMOLED battery saver mode and persists', () async {
+      expect(bloc.state.isAmoledSaverModeEnabled, isFalse);
+
+      // 1. Toggle ON
+      bloc.add(const ToggleAmoledSaverModeIntent());
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) =>
+            s.isAmoledSaverModeEnabled == true &&
+            s.message != null &&
+            s.message!.contains('AMOLED Battery Saver active'))),
+      );
+
+      expect(repository.isAmoledSaverModeEnabled(), isTrue);
+
+      // 2. Toggle OFF
+      bloc.add(const ToggleAmoledSaverModeIntent());
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) =>
+            s.isAmoledSaverModeEnabled == false &&
+            s.message != null &&
+            s.message!.contains('Standard display mode active'))),
+      );
+
+      expect(repository.isAmoledSaverModeEnabled(), isFalse);
+    });
+
+    test('FilterByCategoryIntent with AMOLED True-Black isolates certified high-contrast canvases', () async {
+      bloc.add(LoadFeedIntent());
+      await bloc.stream.firstWhere((s) => s.allShorts.isNotEmpty);
+
+      bloc.add(const FilterByCategoryIntent('AMOLED True-Black'));
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) {
+          final isAmoled = s.selectedCategory == 'AMOLED True-Black';
+          final allCertified = s.filteredShorts.every((w) => w.isAmoledCertified && w.trueBlackPercentage >= 75);
+          final hasKeyItems = s.filteredShorts.any((w) => w.id == 'minimal_monolith') &&
+              s.filteredShorts.any((w) => w.id == 'cyber_netrunner_terminal') &&
+              s.filteredShorts.any((w) => w.id == 'solo_shadow_monarch') &&
+              s.filteredShorts.any((w) => w.id == 'olympia_heavy_iron');
+          return isAmoled && allCertified && hasKeyItems && s.filteredShorts.isNotEmpty;
+        })),
+      );
+    });
+
+    test('Catalog contains certified 4K Ultra-HD AMOLED canvases with true black ratings', () {
+      final catalog = CuratedShortsData.shorts;
+      final solo = catalog.firstWhere((w) => w.id == 'solo_shadow_monarch');
+      final cyber = catalog.firstWhere((w) => w.id == 'cyber_netrunner_terminal');
+      final iron = catalog.firstWhere((w) => w.id == 'olympia_heavy_iron');
+      final monolith = catalog.firstWhere((w) => w.id == 'minimal_monolith');
+
+      expect(solo.isAmoledCertified, isTrue);
+      expect(solo.trueBlackPercentage, 88);
+
+      expect(cyber.isAmoledCertified, isTrue);
+      expect(cyber.trueBlackPercentage, 92);
+
+      expect(iron.isAmoledCertified, isTrue);
+      expect(iron.trueBlackPercentage, 86);
+
+      expect(monolith.isAmoledCertified, isTrue);
+      expect(monolith.trueBlackPercentage, 96);
     });
   });
 }

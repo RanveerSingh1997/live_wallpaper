@@ -22,6 +22,7 @@ import 'package:live_wallpaper/screens/quote_studio_sheet.dart';
 import 'package:live_wallpaper/screens/settings_sheet.dart';
 import 'package:live_wallpaper/screens/splash_screen.dart';
 import 'package:live_wallpaper/screens/wallpaper_preview_sheet.dart';
+import 'package:live_wallpaper/screens/wallpaper_quick_actions_sheet.dart';
 import 'package:live_wallpaper/widgets/kinetic_quote_overlay.dart';
 import 'package:live_wallpaper/widgets/shorts_action_rail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -701,6 +702,69 @@ void main() {
       expect(find.text('BATTERY & HARDWARE INTEGRITY'), findsOneWidget);
       expect(find.text('5.0 MB'), findsOneWidget);
       expect(find.text('Replay Onboarding Tour'), findsOneWidget);
+
+      // Verify AMOLED Mode switch and initial status
+      expect(find.text('AMOLED True-Black Mode'), findsOneWidget);
+      expect(find.text('STANDARD'), findsOneWidget);
+
+      // Toggle AMOLED Switch
+      final switchFinder = find.byType(Switch);
+      expect(switchFinder, findsOneWidget);
+      await tester.tap(switchFinder);
+      await tester.pumpAndSettle();
+
+      // Verify status flipped to OPTIMIZED (Zero Draw)
+      expect(find.text('OPTIMIZED (Zero Draw)'), findsOneWidget);
+    });
+
+    testWidgets('WallpaperQuickActionsSheet renders AMOLED certified badge and action rows',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      final amoledItem = CuratedShortsData.shorts.firstWhere(
+        (w) => w.id == 'minimal_monolith',
+      );
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: Scaffold(
+              body: WallpaperQuickActionsSheet(wallpaper: amoledItem),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // AMOLED Badge Verification
+      expect(find.text('AMOLED 96% BLACK'), findsOneWidget);
+      expect(find.text('Obsidian Monolith & Horizon'), findsOneWidget);
+
+      // Actions Verification
+      expect(find.text('Apply to Device'), findsOneWidget);
+      expect(find.text('Interactive Screen Simulator'), findsOneWidget);
+      expect(find.text('Add to Playlist'), findsOneWidget);
+      expect(find.text('Customize in Quote Studio'), findsOneWidget);
+      expect(find.text('Save to Favorites'), findsOneWidget);
+      expect(find.text('Download for Offline'), findsOneWidget);
     });
 
     testWidgets('DownloadsScreen displays offline filter chips and switches segments',

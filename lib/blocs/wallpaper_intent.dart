@@ -285,3 +285,9 @@ class ToggleWallpaperInCollectionIntent extends WallpaperIntent {
   @override
   List<Object?> get props => [collectionId, wallpaperId];
 }
+
+/// Intent to toggle AMOLED True-Black battery saver mode.
+class ToggleAmoledSaverModeIntent extends WallpaperIntent {
+  const ToggleAmoledSaverModeIntent();
+}
+

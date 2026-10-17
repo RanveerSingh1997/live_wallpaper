@@ -6,6 +6,7 @@ import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import 'custom_wallpaper_import_sheet.dart';
 import 'wallpaper_preview_sheet.dart';
+import 'wallpaper_quick_actions_sheet.dart';
 
 class DownloadsScreen extends StatefulWidget {
   final VoidCallback onBrowseWallpapers;
@@ -304,11 +305,15 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF18181C),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: Colors.white10),
                         ),
-                        child: ListTile(
+                        child: Material(
+                          color: const Color(0xFF18181C),
+                          borderRadius: BorderRadius.circular(16),
+                          child: ListTile(
+                          onTap: () => WallpaperPreviewSheet.show(context, item),
+                          onLongPress: () => WallpaperQuickActionsSheet.show(context, item),
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                           leading: Container(
@@ -371,8 +376,9 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                             ],
                           ),
                         ),
-                      );
-                    }),
+                      ),
+                    );
+                  }),
                   ],
                 ),
         );

@@ -244,6 +244,60 @@ class SettingsSheet extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF00E676).withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.energy_savings_leaf_rounded,
+                                color: Color(0xFF00E676),
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'AMOLED True-Black Mode',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    state.isAmoledSaverModeEnabled
+                                        ? 'Active • Pure black (#000000) pixels shut off OLED diodes'
+                                        : 'Standard • Dynamic color depth enabled',
+                                    style: const TextStyle(
+                                      color: Colors.white54,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Switch.adaptive(
+                              value: state.isAmoledSaverModeEnabled,
+                              activeThumbColor: const Color(0xFF00E676),
+                              activeTrackColor: const Color(0xFF00E676).withValues(alpha: 0.35),
+                              onChanged: (val) {
+                                HapticFeedback.selectionClick();
+                                context.read<WallpaperBloc>().add(
+                                      const ToggleAmoledSaverModeIntent(),
+                                    );
+                              },
+                            ),
+                          ],
+                        ),
+                        const Divider(color: Colors.white10, height: 20),
                         _buildStatusRow(
                           title: 'Live Engine Status',
                           value: state.isLiveWallpaperActiveOnDevice ? 'ACTIVE' : 'STANDBY',
@@ -256,6 +310,14 @@ class SettingsSheet extends StatelessWidget {
                           title: 'Sleep Power Consumption',
                           value: '0% (Decoders Paused)',
                           valueColor: const Color(0xFF00E676),
+                        ),
+                        const Divider(color: Colors.white10, height: 20),
+                        _buildStatusRow(
+                          title: 'OLED Sub-Pixel Power',
+                          value: state.isAmoledSaverModeEnabled ? 'OPTIMIZED (Zero Draw)' : 'STANDARD',
+                          valueColor: state.isAmoledSaverModeEnabled
+                              ? const Color(0xFF00E676)
+                              : Colors.white54,
                         ),
                         const Divider(color: Colors.white10, height: 20),
                         _buildStatusRow(

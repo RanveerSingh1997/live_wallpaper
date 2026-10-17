@@ -13,6 +13,7 @@ import 'preferences_modal_sheet.dart';
 import 'quote_studio_sheet.dart';
 import 'settings_sheet.dart';
 import 'wallpaper_preview_sheet.dart';
+import 'wallpaper_quick_actions_sheet.dart';
 
 class DiscoverScreen extends StatefulWidget {
   final VoidCallback onOpenLiveFeed;
@@ -737,6 +738,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       onTap: () {
         WallpaperPreviewSheet.show(context, featured);
       },
+      onLongPress: () {
+        HapticFeedback.heavyImpact();
+        WallpaperQuickActionsSheet.show(context, featured);
+      },
       child: Container(
         height: 180,
         decoration: BoxDecoration(
@@ -873,6 +878,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       onTap: () {
         WallpaperPreviewSheet.show(context, item);
       },
+      onLongPress: () {
+        HapticFeedback.heavyImpact();
+        WallpaperQuickActionsSheet.show(context, item);
+      },
       child: Container(
         width: 130,
         decoration: BoxDecoration(
@@ -978,6 +987,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             onTap: () {
               WallpaperPreviewSheet.show(context, item);
             },
+            onLongPress: () {
+              HapticFeedback.heavyImpact();
+              WallpaperQuickActionsSheet.show(context, item);
+            },
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
@@ -1008,20 +1021,47 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   Positioned(
                     top: 10,
                     right: 10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.7),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        item.isLive ? 'LIVE' : '4K',
-                        style: TextStyle(
-                          color: item.accentColor,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (item.isAmoledCertified) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.75),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFF00E676).withValues(alpha: 0.5),
+                                width: 0.6,
+                              ),
+                            ),
+                            child: Text(
+                              '${item.trueBlackPercentage}% OLED',
+                              style: const TextStyle(
+                                color: Color(0xFF00E676),
+                                fontSize: 8,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                        ],
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.7),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            item.isLive ? 'LIVE' : '4K',
+                            style: TextStyle(
+                              color: item.accentColor,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                   Positioned(
@@ -1066,6 +1106,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     return GestureDetector(
       onTap: () {
         WallpaperPreviewSheet.show(context, item);
+      },
+      onLongPress: () {
+        HapticFeedback.heavyImpact();
+        WallpaperQuickActionsSheet.show(context, item);
       },
       child: Container(
         width: 105,

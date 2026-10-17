@@ -45,6 +45,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<CreateCustomCollectionIntent>(_onCreateCustomCollection);
     on<DeleteCustomCollectionIntent>(_onDeleteCustomCollection);
     on<ToggleWallpaperInCollectionIntent>(_onToggleWallpaperInCollection);
+    on<ToggleAmoledSaverModeIntent>(_onToggleAmoledSaverMode);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -81,6 +82,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final autoRotationSource = repository.getAutoRotationSource();
       final autoRotationWifiOnly = repository.isAutoRotationWifiOnly();
       final autoRotationTarget = repository.getAutoRotationTarget();
+      final isAmoledSaver = repository.isAmoledSaverModeEnabled();
 
       final forYouList = _buildForYouList(shorts, preferences);
 
@@ -106,6 +108,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         autoRotationSource: autoRotationSource,
         autoRotationWifiOnly: autoRotationWifiOnly,
         autoRotationTarget: autoRotationTarget,
+        isAmoledSaverModeEnabled: isAmoledSaver,
         actionStatus: WallpaperActionStatus.idle,
       ));
     } catch (e) {
@@ -233,6 +236,8 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       filtered = state.allShorts.where((s) => s.isLive).toList();
     } else if (event.category == 'Static Wallpapers') {
       filtered = state.allShorts.where((s) => !s.isLive).toList();
+    } else if (event.category == 'AMOLED True-Black') {
+      filtered = state.allShorts.where((s) => s.isAmoledCertified).toList();
     } else {
       filtered = state.allShorts.where((s) => s.category == event.category).toList();
     }
@@ -241,6 +246,20 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       selectedCategory: event.category,
       filteredShorts: filtered,
       activeIndex: 0,
+    ));
+  }
+
+  Future<void> _onToggleAmoledSaverMode(
+    ToggleAmoledSaverModeIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final newMode = !state.isAmoledSaverModeEnabled;
+    await repository.setAmoledSaverMode(newMode);
+    emit(state.copyWith(
+      isAmoledSaverModeEnabled: newMode,
+      message: newMode
+          ? 'AMOLED Battery Saver active. Zero subpixel drain on black pixels.'
+          : 'Standard display mode active.',
     ));
   }
 

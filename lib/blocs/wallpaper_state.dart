@@ -39,6 +39,7 @@ class WallpaperState extends Equatable {
   final String autoRotationSource;
   final bool autoRotationWifiOnly;
   final String autoRotationTarget;
+  final bool isAmoledSaverModeEnabled;
   final String? message;
   final String? errorMessage;
 
@@ -68,6 +69,7 @@ class WallpaperState extends Equatable {
     this.autoRotationSource = 'favorites',
     this.autoRotationWifiOnly = true,
     this.autoRotationTarget = 'both',
+    this.isAmoledSaverModeEnabled = false,
     this.message,
     this.errorMessage,
   });
@@ -201,6 +203,7 @@ class WallpaperState extends Equatable {
     String? autoRotationSource,
     bool? autoRotationWifiOnly,
     String? autoRotationTarget,
+    bool? isAmoledSaverModeEnabled,
     String? message,
     String? errorMessage,
   }) {
@@ -232,6 +235,8 @@ class WallpaperState extends Equatable {
       autoRotationSource: autoRotationSource ?? this.autoRotationSource,
       autoRotationWifiOnly: autoRotationWifiOnly ?? this.autoRotationWifiOnly,
       autoRotationTarget: autoRotationTarget ?? this.autoRotationTarget,
+      isAmoledSaverModeEnabled:
+          isAmoledSaverModeEnabled ?? this.isAmoledSaverModeEnabled,
       message: message,
       errorMessage: errorMessage,
     );
@@ -264,6 +269,7 @@ class WallpaperState extends Equatable {
         autoRotationSource,
         autoRotationWifiOnly,
         autoRotationTarget,
+        isAmoledSaverModeEnabled,
         message,
         errorMessage,
       ];

@@ -29,11 +29,22 @@ class WallpaperRepository {
   static const String _keyAutoRotationTarget = 'auto_rotation_target';
   static const String _keyCustomImportedWallpapers = 'custom_imported_wallpapers';
   static const String _keyCustomCollections = 'custom_user_collections';
+  static const String _keyAmoledSaverMode = 'amoled_saver_mode_enabled';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
     required this.prefs,
   }) : _bridge = bridge ?? WallpaperServiceBridge();
+
+  /// Returns whether AMOLED True-Black battery saver mode is enabled.
+  bool isAmoledSaverModeEnabled() {
+    return prefs.getBool(_keyAmoledSaverMode) ?? false;
+  }
+
+  /// Sets whether AMOLED True-Black battery saver mode is enabled.
+  Future<void> setAmoledSaverMode(bool enabled) async {
+    await prefs.setBool(_keyAmoledSaverMode, enabled);
+  }
 
   /// Returns whether user has completed first-time onboarding.
   bool hasSeenOnboarding() {
