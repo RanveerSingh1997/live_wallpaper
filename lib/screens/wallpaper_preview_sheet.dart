@@ -7,6 +7,7 @@ import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import '../models/motivational_short.dart';
 import '../widgets/video_player_item.dart';
+import 'fullscreen_wallpaper_viewer.dart';
 import 'ipad_wallpaper_dialog.dart';
 import 'quote_studio_sheet.dart';
 
@@ -174,9 +175,25 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.close_rounded, color: Colors.white70),
-                                    onPressed: () => Navigator.of(context).pop(),
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.fullscreen_rounded, color: Colors.white),
+                                        tooltip: 'Interactive Screen Simulator',
+                                        onPressed: () {
+                                          HapticFeedback.mediumImpact();
+                                          FullScreenWallpaperViewer.open(
+                                            context,
+                                            wallpaper: wallpaper,
+                                            playlist: state.allShorts,
+                                          );
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                                        onPressed: () => Navigator.of(context).pop(),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -229,7 +246,73 @@ class WallpaperPreviewSheet extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 14),
+
+                  // Screen Simulator Quick Action Pill
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: GestureDetector(
+                      onTap: () {
+                        HapticFeedback.mediumImpact();
+                        FullScreenWallpaperViewer.open(
+                          context,
+                          wallpaper: wallpaper,
+                          playlist: state.allShorts,
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF18181E),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.white12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(7),
+                                  decoration: BoxDecoration(
+                                    color: wallpaper.accentColor.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(Icons.screenshot_monitor_rounded,
+                                      color: wallpaper.accentColor, size: 18),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Interactive Screen Simulator',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Test behind Lock Screen & Home Screen icons',
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(alpha: 0.5),
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Icon(Icons.arrow_forward_ios_rounded,
+                                color: wallpaper.accentColor, size: 13),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
 
                   // Metadata & Specifications Card
                   Padding(

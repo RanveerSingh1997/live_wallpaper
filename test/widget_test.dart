@@ -11,6 +11,7 @@ import 'package:live_wallpaper/screens/custom_wallpaper_import_sheet.dart';
 import 'package:live_wallpaper/screens/discover_screen.dart';
 import 'package:live_wallpaper/screens/downloads_screen.dart';
 import 'package:live_wallpaper/screens/favorites_screen.dart';
+import 'package:live_wallpaper/screens/fullscreen_wallpaper_viewer.dart';
 import 'package:live_wallpaper/screens/ipad_wallpaper_dialog.dart';
 import 'package:live_wallpaper/screens/main_navigation_shell.dart';
 import 'package:live_wallpaper/screens/onboarding_sheet.dart';
@@ -896,6 +897,77 @@ void main() {
 
       // Verify imported wallpaper is in bloc state
       expect(bloc.state.allShorts.any((s) => s.title.contains('Wallora Obsidian Canvas') || s.title.contains('Custom')), isTrue);
+    });
+
+    testWidgets('FullScreenWallpaperViewer renders and switches simulation modes (Clean, Lock Screen, Home Screen)',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: FullScreenWallpaperViewer(
+              wallpapers: CuratedShortsData.shorts,
+              initialIndex: 0,
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Initially in Clean View mode
+      expect(find.text('Clean View'), findsOneWidget);
+      expect(find.text('APPLY TO DEVICE'), findsOneWidget);
+
+      // Switch to Lock Screen simulation mode
+      await tester.tap(find.byIcon(Icons.lock_outline_rounded));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Lock Screen'), findsOneWidget);
+      expect(find.text('Sunday, October 18'), findsOneWidget);
+      expect(find.text('09:41'), findsWidgets);
+      expect(find.text('Swipe up to unlock'), findsOneWidget);
+      expect(find.byIcon(Icons.flashlight_on_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.camera_alt_rounded), findsOneWidget);
+
+      // Switch to Home Screen simulation mode
+      await tester.tap(find.byIcon(Icons.grid_view_rounded));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home Screen'), findsOneWidget);
+      expect(find.text('Search apps, contacts, web...'), findsOneWidget);
+      expect(find.text('Phone'), findsWidgets);
+      expect(find.text('Messages'), findsWidgets);
+      expect(find.text('Browser'), findsWidgets);
+      expect(find.text('Wallora'), findsOneWidget);
+
+      // Tap on canvas to toggle UI chrome
+      await tester.tap(find.byType(PageView));
+      await tester.pumpAndSettle();
+
+      // Open Apply target selector
+      await tester.tap(find.text('APPLY TO DEVICE'));
+      await tester.pumpAndSettle();
+      expect(find.text('APPLY WALLPAPER DESTINATION'), findsOneWidget);
+      expect(find.text('Home Screen & Lock Screen (Recommended)'), findsOneWidget);
     });
   });
 }
