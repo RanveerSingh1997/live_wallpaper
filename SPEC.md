@@ -1,7 +1,10 @@
-# Project Specification: Live Wallpaper Mobile Application
+# Project Specification: Wallora Mobile Application
+### *Make every screen yours.*
 
 **Version**: 1.0.0  
 **Status**: Implemented & Production-Ready  
+**Brand**: Wallora  
+**Motto**: Make every screen yours.  
 **Architecture**: Intent-Driven Development (IDD) with Flutter BLoC  
 **Platforms**: Android (API 26+), iOS / iPadOS (iOS 15.0+)  
 **Repository**: [https://github.com/RanveerSingh1997/live_wallpaper](https://github.com/RanveerSingh1997/live_wallpaper)  
@@ -11,7 +14,7 @@
 ## 1. Executive Summary & Product Vision
 
 ### 1.1 Overview
-The **Live Wallpaper** application is a high-performance cross-platform mobile product built with Flutter, designed to deliver looping vertical video wallpapers directly to users' **Lock Screens** and **Home Screens**. 
+**Wallora** (*"Make every screen yours."*) is a high-performance cross-platform mobile wallpaper discovery platform built with Flutter. It combines looping vertical video live wallpapers, 4K AMOLED static wallpapers, and kinetic typography in a seamless, unified experience. 
 
 The application balances two complementary user needs:
 1. **Dynamic Aesthetic Wallpaper Catalog**: Providing full-spectrum live wallpapers across diverse genres (Anime & Gaming, Nature & Scenery, Cyberpunk & Tech, Cars & Speed, Minimal & AMOLED, Fitness & Grind, and Motivation & Mindset).

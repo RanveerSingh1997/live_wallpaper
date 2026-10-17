@@ -38,7 +38,7 @@ class LiveWallpaperApp extends StatelessWidget {
         ..add(LoadFeedIntent())
         ..add(CheckWallpaperStatusIntent()),
       child: MaterialApp(
-        title: 'Motivational Live Wallpaper',
+        title: 'Wallora',
         debugShowCheckedModeBanner: false,
         theme: ThemeData.dark().copyWith(
           scaffoldBackgroundColor: Colors.black,

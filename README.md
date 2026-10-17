@@ -1,12 +1,13 @@
-# Live Wallpaper & Motivational Shorts ⚡
+# Wallora ⚡
+### *Make every screen yours.*
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart)](https://dart.dev)
 [![Architecture](https://img.shields.io/badge/Architecture-Intent--Driven%20BLoC-blueviolet)](https://bloclibrary.dev)
 [![Platforms](https://img.shields.io/badge/Platforms-Android%20%7C%20iOS%20%7C%20iPadOS-brightgreen)]()
-[![Tests](https://img.shields.io/badge/Tests-Passing%20(13%2F13)-success)]()
+[![Tests](https://img.shields.io/badge/Tests-Passing%20(25%2F25)-success)]()
 
-A flagship mobile application combining **static wallpapers**, **short video-based live wallpapers**, and **kinetic motivational quote typography** in a single, high-performance experience.
+**Wallora** is a flagship mobile wallpaper discovery platform combining **ultra-high-resolution static wallpapers**, **cinematic looping live video wallpapers**, and **kinetic typography studio** in a unified, high-performance experience. Built around the ethos **"Make every screen yours."**
 
 ---
 

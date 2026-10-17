@@ -107,24 +107,44 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             Container(
                               padding: const EdgeInsets.all(7),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFF5722).withValues(alpha: 0.15),
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFFF5722), Color(0xFFD500F9)],
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(
-                                Icons.bolt_rounded,
-                                color: Color(0xFFFF5722),
-                                size: 22,
+                                Icons.auto_awesome_rounded,
+                                color: Colors.white,
+                                size: 20,
                               ),
                             ),
                             const SizedBox(width: 10),
-                            const Text(
-                              'DISCOVER',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1.2,
-                                color: Colors.white,
-                              ),
+                            const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      'WALLORA',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.5,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  'Make every screen yours.',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.white60,
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

@@ -4,7 +4,7 @@
     <uses-feature android:name="android.software.live_wallpaper" android:required="false" />
 
     <application
-        android:label="Motivational Live Wallpaper"
+        android:label="Wallora"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -1,12 +1,13 @@
-# STATIC + LIVE WALLPAPER APP
+# WALLORA ⚡
+### *Make every screen yours.*
 ## Complete Product Strategy, Technical Architecture & Development Roadmap
 
-**Document Type**: Product Requirements & Technical Planning Document  
-**Platform**: Android first, iOS in a later phase  
-**Primary Technology**: Flutter, Dart, Kotlin  
-**Architecture**: Feature-first, BLoC, Clean Architecture where useful  
-**Project Status**: Planning & Phase 1 Implementation  
-**Version**: 1.0  
+**Product**: Wallora  
+**Tagline**: *Make every screen yours.*  
+**Platform**: Android & iOS / iPadOS  
+**Primary Technology**: Flutter, Dart, Kotlin, Swift  
+**Architecture**: Feature-first, Intent-Driven BLoC  
+**Version**: 1.0.0  
 **Date**: October 2026  
 
 ---
