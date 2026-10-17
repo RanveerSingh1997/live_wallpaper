@@ -11,32 +11,22 @@ import AVFoundation
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    GeneratedPluginRegistrant.register(with: self)
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
 
-    // Register MethodChannel using FlutterPluginRegistrar to guarantee availability under UISceneDelegate
-    let messenger: FlutterBinaryMessenger? = {
-      if let registrar = self.registrar(forPlugin: "LiveWallpaperPlugin") {
-        return registrar.messenger()
-      }
-      return (self.window?.rootViewController as? FlutterViewController)?.binaryMessenger
-    }()
+  func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
 
-    if let binaryMessenger = messenger {
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "LiveWallpaperPlugin") {
       let channel = FlutterMethodChannel(
         name: "com.example.live_wallpaper/wallpaper",
-        binaryMessenger: binaryMessenger
+        binaryMessenger: registrar.messenger()
       )
       channel.setMethodCallHandler { [weak self] (call, result) in
         self?.handleMethodCall(call: call, result: result)
       }
       self.wallpaperChannel = channel
     }
-
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-  }
-
-  func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
-    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
   }
 
   private func handleMethodCall(call: FlutterMethodCall, result: @escaping FlutterResult) {
