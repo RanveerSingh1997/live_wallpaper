@@ -142,17 +142,19 @@ All state mutations follow strict Unidirectional Data Flow (UDF):
 - **Service**: `VideoWallpaperService.kt` (registered in `AndroidManifest.xml` under `android.permission.BIND_WALLPAPER`).
 - **Rendering**: Hardware-accelerated `MediaPlayer` rendering to `SurfaceHolder`.
 - **Scaling**: `MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING` prevents distortion on diverse aspect ratios (18:9, 19.5:9, 20:9, 21:9).
-- **Lifecycle Optimization**:
+- **Lifecycle & Resilience Optimization**:
   - `onVisibilityChanged(true)`: Restarts playback when lock screen or home screen is visible.
   - `onVisibilityChanged(false)`: Pauses decoder immediately when the phone sleeps or an app is active (0% background drain).
+  - *Surface Validation*: Verifies `surface.isValid` prior to attaching `MediaPlayer`, preventing illegal state crashes.
+  - *Automatic File Recovery*: If the active wallpaper video file was wiped by a storage cleaner, the engine automatically checks candidate files or extracts the bundled default asset from `flutter_assets`, ensuring the home screen never renders blank.
 - **Instant Switch**:
   - Listens to internal broadcast `ACTION_UPDATE_WALLPAPER`.
   - When already active, changing wallpapers in the Flutter UI instantly switches the video stream without popping the system chooser dialog.
 
 ### 3.5 iPadOS / iOS Native Wallpaper Workflow
 - **Layout Adaptation**: Responsive tablet constraint (`shortestSide >= 600`) keeps 9:16 vertical videos centered with ambient dark backdrop on iPad screens (4:3, 3:2).
-- **Camera Roll Export**: Swift `PHPhotoLibrary` extracts the looping MP4 and saves it to the user's Photos library.
-- **Anchored Activity View Controller**: Invokes `UIActivityViewController` anchored to `sourceView` and `sourceRect` (preventing iPad popover crashes) providing the native **"Use as Wallpaper"** action for Lock and Home screens.
+- **High-Res Frame Extraction & Photos Export**: Swift extracts full-resolution 4K/Retina `UIImage` frames via `AVAssetImageGenerator` and saves both the image and video loop using PhotoKit `.addOnly` authorization.
+- **Anchored Activity View Controller**: Invokes `UIActivityViewController` passing the `UIImage`, which enables the native iPadOS **"Use as Wallpaper"** action button, anchored to screen center to ensure zero-crash popovers.
 
 ---
 
