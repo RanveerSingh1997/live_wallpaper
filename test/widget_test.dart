@@ -5,8 +5,11 @@ import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
+import 'package:live_wallpaper/models/wallpaper_collection.dart';
+import 'package:live_wallpaper/screens/add_to_collection_sheet.dart';
 import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
 import 'package:live_wallpaper/screens/categories_screen.dart';
+import 'package:live_wallpaper/screens/create_collection_sheet.dart';
 import 'package:live_wallpaper/screens/custom_wallpaper_import_sheet.dart';
 import 'package:live_wallpaper/screens/discover_screen.dart';
 import 'package:live_wallpaper/screens/downloads_screen.dart';
@@ -968,6 +971,186 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('APPLY WALLPAPER DESTINATION'), findsOneWidget);
       expect(find.text('Home Screen & Lock Screen (Recommended)'), findsOneWidget);
+    });
+
+    testWidgets('CreateCollectionSheet renders form, validates inputs, and triggers playlist creation',
+        (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CreateCollectionSheet(initialWallpaperId: 'ippo_hard_work'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Check header, preview and form labels
+      expect(find.text('NEW PLAYLIST'), findsOneWidget);
+      expect(find.text('PLAYLIST NAME'), findsOneWidget);
+      expect(find.text('DESCRIPTION / SUBTITLE'), findsOneWidget);
+      expect(find.text('PLAYLIST ICON'), findsOneWidget);
+
+      // Scroll to CREATE PLAYLIST button
+      await tester.drag(find.text('PLAYLIST NAME'), const Offset(0, -600));
+      await tester.pumpAndSettle();
+      expect(find.text('CREATE PLAYLIST'), findsOneWidget);
+
+      // Attempt submit without title -> triggers validation
+      await tester.tap(find.text('CREATE PLAYLIST'));
+      await tester.pumpAndSettle();
+      expect(find.text('Please enter a playlist name'), findsOneWidget);
+
+      // Enter playlist title
+      await tester.enterText(find.byType(TextFormField).first, 'Neon Retrowave');
+      await tester.pumpAndSettle();
+
+      // Tap submit
+      await tester.drag(find.byType(TextFormField).first, const Offset(0, -600));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('CREATE PLAYLIST'));
+      await tester.pumpAndSettle();
+
+      // Verify playlist is created and stored in state
+      expect(
+        bloc.state.customCollections.any((c) => c.title == 'Neon Retrowave'),
+        isTrue,
+      );
+    });
+
+    testWidgets('AddToCollectionSheet displays existing custom playlists and toggles membership',
+        (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      const existingPlaylist = WallpaperCollection(
+        id: 'custom_col_widget_test',
+        title: 'Cyberpunk Vault',
+        subtitle: 'Night vibe wallpapers',
+        badge: 'PLAYLIST',
+        icon: Icons.electric_bolt_rounded,
+        wallpaperIds: [],
+        gradientColors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+        isUserCreated: true,
+      );
+      await repository.saveCustomCollection(existingPlaylist);
+
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          customCollections: const [existingPlaylist],
+        ),
+      );
+      addTearDown(bloc.close);
+
+      final short = CuratedShortsData.shorts.first;
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: Scaffold(
+              body: AddToCollectionSheet(short: short),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify playlist item and actions
+      expect(find.text('Cyberpunk Vault'), findsOneWidget);
+      expect(find.text('NEW'), findsOneWidget);
+      expect(find.text('DONE'), findsOneWidget);
+
+      // Tap on playlist row to toggle membership
+      await tester.tap(find.text('Cyberpunk Vault'));
+      await tester.pumpAndSettle();
+
+      // Verify short.id was added to playlist
+      final updatedCol = bloc.state.customCollections.firstWhere(
+        (c) => c.id == 'custom_col_widget_test',
+      );
+      expect(updatedCol.wallpaperIds.contains(short.id), isTrue);
+    });
+
+    testWidgets('CategoriesScreen switches to PLAYLISTS tab and renders playlist cards',
+        (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      const customPlaylist = WallpaperCollection(
+        id: 'custom_col_cat_test',
+        title: 'Speed & Drift',
+        subtitle: 'Fast cars only',
+        badge: 'PLAYLIST',
+        icon: Icons.speed_rounded,
+        wallpaperIds: ['gt3_rs_porsche'],
+        gradientColors: [Color(0xFFFF5722), Color(0xFFFF1744)],
+        isUserCreated: true,
+      );
+
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          customCollections: const [customPlaylist],
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: CategoriesScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Initially on GENRES
+      expect(find.text('GENRES'), findsOneWidget);
+      expect(find.text('Anime & Gaming'), findsOneWidget);
+
+      // Switch to PLAYLISTS tab
+      await tester.tap(find.textContaining('PLAYLISTS'));
+      await tester.pumpAndSettle();
+
+      // Verify playlists tab content
+      expect(find.text('Create Custom Playlist'), findsOneWidget);
+      expect(find.text('MY PLAYLISTS'), findsOneWidget);
+      expect(find.text('Speed & Drift'), findsOneWidget);
+
+      await tester.drag(find.text('Create Custom Playlist'), const Offset(0, -500));
+      await tester.pumpAndSettle();
+      expect(find.text('EDITORIAL COLLECTIONS'), findsOneWidget);
     });
   });
 }

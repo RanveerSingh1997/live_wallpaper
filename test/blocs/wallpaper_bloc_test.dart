@@ -4,6 +4,7 @@ import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
 import 'package:live_wallpaper/blocs/wallpaper_intent.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
+import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -375,6 +376,139 @@ void main() {
       // Verify persisted in repository
       final saved = repository.getCustomImportedWallpapers();
       expect(saved.any((w) => w.id == 'custom_test_1'), isTrue);
+    });
+
+    test('CreateCustomCollectionIntent saves playlist to state and repository', () async {
+      const playlist = WallpaperCollection(
+        id: 'custom_col_test_1',
+        title: 'Cyberpunk Night Mode',
+        subtitle: 'Curated high contrast AMOLED',
+        badge: 'PLAYLIST',
+        icon: Icons.electric_bolt_rounded,
+        wallpaperIds: ['ippo_hard_work'],
+        gradientColors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+        isUserCreated: true,
+      );
+
+      bloc.add(const CreateCustomCollectionIntent(playlist));
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) =>
+            s.customCollections.any((c) => c.id == 'custom_col_test_1') &&
+            s.allCollections.any((c) => c.id == 'custom_col_test_1') &&
+            s.message != null &&
+            s.message!.contains('Cyberpunk Night Mode'))),
+      );
+
+      final saved = repository.getCustomCollections();
+      expect(saved.any((c) => c.id == 'custom_col_test_1'), isTrue);
+    });
+
+    test('ToggleWallpaperInCollectionIntent adds and removes wallpaper from playlist', () async {
+      const playlist = WallpaperCollection(
+        id: 'custom_col_toggle_test',
+        title: 'Toggle Test Playlist',
+        subtitle: 'Testing membership toggle',
+        badge: 'PLAYLIST',
+        icon: Icons.palette_rounded,
+        wallpaperIds: [],
+        gradientColors: [Color(0xFFFF5722), Color(0xFFFF1744)],
+        isUserCreated: true,
+      );
+
+      bloc.add(const CreateCustomCollectionIntent(playlist));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      // 1. Toggle add 'ippo_hard_work'
+      bloc.add(const ToggleWallpaperInCollectionIntent(
+        collectionId: 'custom_col_toggle_test',
+        wallpaperId: 'ippo_hard_work',
+      ));
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) {
+          final col = s.customCollections.firstWhere(
+            (c) => c.id == 'custom_col_toggle_test',
+          );
+          return col.wallpaperIds.contains('ippo_hard_work');
+        })),
+      );
+
+      // 2. Toggle remove 'ippo_hard_work'
+      bloc.add(const ToggleWallpaperInCollectionIntent(
+        collectionId: 'custom_col_toggle_test',
+        wallpaperId: 'ippo_hard_work',
+      ));
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) {
+          final col = s.customCollections.firstWhere(
+            (c) => c.id == 'custom_col_toggle_test',
+          );
+          return !col.wallpaperIds.contains('ippo_hard_work');
+        })),
+      );
+    });
+
+    test('DeleteCustomCollectionIntent removes playlist from state and storage', () async {
+      const playlist = WallpaperCollection(
+        id: 'custom_col_delete_test',
+        title: 'To Be Deleted',
+        subtitle: 'Temporary playlist',
+        badge: 'PLAYLIST',
+        icon: Icons.delete_outline_rounded,
+        wallpaperIds: ['ippo_hard_work'],
+        gradientColors: [Color(0xFF00E676), Color(0xFF00B0FF)],
+        isUserCreated: true,
+      );
+
+      bloc.add(const CreateCustomCollectionIntent(playlist));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      bloc.add(const DeleteCustomCollectionIntent('custom_col_delete_test'));
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) =>
+            !s.customCollections.any((c) => c.id == 'custom_col_delete_test'))),
+      );
+
+      final saved = repository.getCustomCollections();
+      expect(saved.any((c) => c.id == 'custom_col_delete_test'), isFalse);
+    });
+
+    test('Custom playlist used as auto-rotation pool correctly returns rotationPoolShorts', () async {
+      bloc.add(LoadFeedIntent());
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      const playlist = WallpaperCollection(
+        id: 'custom_col_rotation_test',
+        title: 'Rotation Pool Test',
+        subtitle: 'Testing rotation pool resolution',
+        badge: 'PLAYLIST',
+        icon: Icons.sync_rounded,
+        wallpaperIds: ['ippo_hard_work'],
+        gradientColors: [Color(0xFFFFD600), Color(0xFFFF6D00)],
+        isUserCreated: true,
+      );
+
+      bloc.add(const CreateCustomCollectionIntent(playlist));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      bloc.add(const UpdateAutoRotationSourceIntent('custom_col_rotation_test'));
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) {
+          final pool = s.rotationPoolShorts;
+          return s.autoRotationSource == 'custom_col_rotation_test' &&
+              pool.length == 1 &&
+              pool.first.id == 'ippo_hard_work';
+        })),
+      );
     });
   });
 }

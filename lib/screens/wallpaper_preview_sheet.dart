@@ -7,6 +7,7 @@ import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import '../models/motivational_short.dart';
 import '../widgets/video_player_item.dart';
+import 'add_to_collection_sheet.dart';
 import 'fullscreen_wallpaper_viewer.dart';
 import 'ipad_wallpaper_dialog.dart';
 import 'quote_studio_sheet.dart';
@@ -503,6 +504,19 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                     currentQuote: effectiveQuote,
                                   ),
                                 );
+                              },
+                            ),
+
+                            const SizedBox(width: 8),
+
+                            // Add to Playlist Button
+                            _buildIconButton(
+                              icon: Icons.playlist_add_rounded,
+                              color: Colors.white70,
+                              tooltip: 'Add to Playlist',
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                AddToCollectionSheet.show(context, wallpaper);
                               },
                             ),
                           ],

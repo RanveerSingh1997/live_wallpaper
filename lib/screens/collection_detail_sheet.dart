@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
+import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
@@ -23,13 +25,62 @@ class CollectionDetailSheet extends StatelessWidget {
     );
   }
 
+  void _confirmDelete(BuildContext context, WallpaperCollection col) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A22),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Delete Playlist?',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Are you sure you want to delete "${col.title}"? Your saved wallpapers will not be deleted.',
+          style: const TextStyle(color: Colors.white70, fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('CANCEL', style: TextStyle(color: Colors.white54)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<WallpaperBloc>().add(DeleteCustomCollectionIntent(col.id));
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF1744),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text(
+              'DELETE',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<WallpaperBloc, WallpaperState>(
       builder: (context, state) {
+        final currentCollection = state.allCollections.firstWhere(
+          (c) => c.id == collection.id,
+          orElse: () => collection,
+        );
+
         final wallpapers = state.allShorts
-            .where((s) => collection.wallpaperIds.contains(s.id))
+            .where((s) => currentCollection.wallpaperIds.contains(s.id))
             .toList();
+
+        final isCurrentRotationPool = state.autoRotationSource == currentCollection.id;
 
         return DraggableScrollableSheet(
           initialChildSize: 0.9,
@@ -66,14 +117,14 @@ class CollectionDetailSheet extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         gradient: LinearGradient(
-                          colors: collection.gradientColors,
+                          colors: currentCollection.gradientColors,
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         border: Border.all(color: Colors.white12),
                         boxShadow: [
                           BoxShadow(
-                            color: collection.gradientColors[1].withValues(alpha: 0.3),
+                            color: currentCollection.gradientColors[1].withValues(alpha: 0.3),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -93,7 +144,7 @@ class CollectionDetailSheet extends StatelessWidget {
                                   border: Border.all(color: Colors.white24, width: 0.8),
                                 ),
                                 child: Text(
-                                  collection.badge,
+                                  currentCollection.badge,
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 10,
@@ -102,16 +153,27 @@ class CollectionDetailSheet extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              Icon(
-                                collection.icon,
-                                color: Colors.white70,
-                                size: 24,
+                              Row(
+                                children: [
+                                  if (currentCollection.isUserCreated)
+                                    IconButton(
+                                      icon: const Icon(Icons.delete_outline_rounded,
+                                          color: Colors.white70, size: 22),
+                                      tooltip: 'Delete Playlist',
+                                      onPressed: () => _confirmDelete(context, currentCollection),
+                                    ),
+                                  Icon(
+                                    currentCollection.icon,
+                                    color: Colors.white70,
+                                    size: 24,
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                           const SizedBox(height: 14),
                           Text(
-                            collection.title,
+                            currentCollection.title,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -121,21 +183,76 @@ class CollectionDetailSheet extends StatelessWidget {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            collection.subtitle,
+                            currentCollection.subtitle,
                             style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 12,
                               height: 1.4,
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          Text(
-                            '${wallpapers.length} Curated Canvases',
-                            style: const TextStyle(
-                              color: Colors.white54,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          const SizedBox(height: 14),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${wallpapers.length} Curated Canvases',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.selectionClick();
+                                  context.read<WallpaperBloc>().add(
+                                        UpdateAutoRotationSourceIntent(currentCollection.id),
+                                      );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: isCurrentRotationPool
+                                        ? const Color(0xFF00E676).withValues(alpha: 0.25)
+                                        : Colors.black.withValues(alpha: 0.5),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isCurrentRotationPool
+                                          ? const Color(0xFF00E676)
+                                          : Colors.white24,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        isCurrentRotationPool
+                                            ? Icons.check_circle_rounded
+                                            : Icons.sync_rounded,
+                                        size: 14,
+                                        color: isCurrentRotationPool
+                                            ? const Color(0xFF00E676)
+                                            : Colors.white70,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        isCurrentRotationPool
+                                            ? 'ACTIVE ROTATION'
+                                            : 'USE FOR ROTATION',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w800,
+                                          color: isCurrentRotationPool
+                                              ? const Color(0xFF00E676)
+                                              : Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -144,8 +261,39 @@ class CollectionDetailSheet extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // Wallpaper Grid
-                  Padding(
+                  // Empty State or Wallpaper Grid
+                  if (wallpapers.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Icon(Icons.collections_bookmark_outlined,
+                                size: 48, color: Colors.white24),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Playlist is Empty',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            const Text(
+                              'Tap the playlist icon on any wallpaper preview to add it to this collection.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white54,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: GridView.builder(
                       shrinkWrap: true,

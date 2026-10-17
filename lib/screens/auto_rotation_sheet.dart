@@ -270,7 +270,47 @@ class AutoRotationSheet extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
 
-                        // Option B: Collections
+                        // Option B: My Custom Playlists (if any)
+                        if (state.customCollections.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          const Text(
+                            'MY PLAYLISTS',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                              color: Color(0xFF00E5FF),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          ...state.customCollections.map((col) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: _buildSourceTile(
+                                context: context,
+                                id: col.id,
+                                title: col.title,
+                                subtitle: '${col.wallpaperIds.length} canvases • ${col.subtitle}',
+                                icon: col.icon,
+                                accentColor: col.gradientColors.first,
+                                isSelected: state.autoRotationSource == col.id,
+                              ),
+                            );
+                          }),
+                        ],
+
+                        // Option C: Curated Collections
+                        const SizedBox(height: 8),
+                        const Text(
+                          'CURATED COLLECTIONS',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                            color: Colors.white54,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
                         ...CuratedShortsData.collections.map((col) {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8),

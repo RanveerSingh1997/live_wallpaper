@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
+import '../models/wallpaper_collection.dart';
 
 enum WallpaperActionStatus {
   idle,
@@ -15,6 +16,7 @@ enum WallpaperActionStatus {
 class WallpaperState extends Equatable {
   final List<MotivationalShort> allShorts;
   final List<MotivationalShort> filteredShorts;
+  final List<WallpaperCollection> customCollections;
   final int activeIndex;
   final String selectedCategory;
   final Set<String> favoriteIds;
@@ -43,6 +45,7 @@ class WallpaperState extends Equatable {
   const WallpaperState({
     this.allShorts = const [],
     this.filteredShorts = const [],
+    this.customCollections = const [],
     this.activeIndex = 0,
     this.selectedCategory = 'For You',
     this.favoriteIds = const {},
@@ -151,17 +154,23 @@ class WallpaperState extends Equatable {
     return '${(totalStorageUsedBytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
 
+  /// All collections (user custom collections merged with curated editorial collections).
+  List<WallpaperCollection> get allCollections =>
+      [...customCollections, ...CuratedShortsData.collections];
+
   /// Returns the pool of wallpapers available for auto-rotation based on the source setting.
   List<MotivationalShort> get rotationPoolShorts {
     if (autoRotationSource == 'favorites') {
       return favoriteShorts.isNotEmpty ? favoriteShorts : allShorts;
-    } else if (autoRotationSource.startsWith('col_')) {
-      final col = CuratedShortsData.collections.firstWhere(
-        (c) => c.id == autoRotationSource,
-        orElse: () => CuratedShortsData.collections.first,
+    } else if (autoRotationSource.startsWith('col_') || autoRotationSource.startsWith('custom_col_')) {
+      final col = allCollections.cast<WallpaperCollection?>().firstWhere(
+        (c) => c?.id == autoRotationSource,
+        orElse: () => null,
       );
-      final list = allShorts.where((s) => col.wallpaperIds.contains(s.id)).toList();
-      return list.isNotEmpty ? list : allShorts;
+      if (col != null) {
+        final list = allShorts.where((s) => col.wallpaperIds.contains(s.id)).toList();
+        if (list.isNotEmpty) return list;
+      }
     }
     return allShorts;
   }
@@ -169,6 +178,7 @@ class WallpaperState extends Equatable {
   WallpaperState copyWith({
     List<MotivationalShort>? allShorts,
     List<MotivationalShort>? filteredShorts,
+    List<WallpaperCollection>? customCollections,
     int? activeIndex,
     String? selectedCategory,
     Set<String>? favoriteIds,
@@ -197,6 +207,7 @@ class WallpaperState extends Equatable {
     return WallpaperState(
       allShorts: allShorts ?? this.allShorts,
       filteredShorts: filteredShorts ?? this.filteredShorts,
+      customCollections: customCollections ?? this.customCollections,
       activeIndex: activeIndex ?? this.activeIndex,
       selectedCategory: selectedCategory ?? this.selectedCategory,
       favoriteIds: favoriteIds ?? this.favoriteIds,
@@ -230,6 +241,7 @@ class WallpaperState extends Equatable {
   List<Object?> get props => [
         allShorts,
         filteredShorts,
+        customCollections,
         activeIndex,
         selectedCategory,
         favoriteIds,

@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
+import '../models/wallpaper_collection.dart';
 import '../services/wallpaper_renderer_service.dart';
 import '../services/wallpaper_service_bridge.dart';
 
@@ -27,6 +28,7 @@ class WallpaperRepository {
   static const String _keyAutoRotationWifiOnly = 'auto_rotation_wifi_only';
   static const String _keyAutoRotationTarget = 'auto_rotation_target';
   static const String _keyCustomImportedWallpapers = 'custom_imported_wallpapers';
+  static const String _keyCustomCollections = 'custom_user_collections';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
@@ -69,6 +71,70 @@ class WallpaperRepository {
     });
     list.insert(0, jsonEncode(short.toJson()));
     await prefs.setStringList(_keyCustomImportedWallpapers, list);
+  }
+
+  /// Returns list of user-created custom wallpaper collections / playlists.
+  List<WallpaperCollection> getCustomCollections() {
+    final list = prefs.getStringList(_keyCustomCollections) ?? [];
+    final List<WallpaperCollection> result = [];
+    for (final item in list) {
+      try {
+        final map = jsonDecode(item) as Map<String, dynamic>;
+        result.add(WallpaperCollection.fromJson(map));
+      } catch (_) {}
+    }
+    return result;
+  }
+
+  /// Saves or updates a user-created custom wallpaper collection.
+  Future<void> saveCustomCollection(WallpaperCollection collection) async {
+    final list = prefs.getStringList(_keyCustomCollections) ?? [];
+    list.removeWhere((item) {
+      try {
+        final map = jsonDecode(item) as Map<String, dynamic>;
+        return map['id'] == collection.id;
+      } catch (_) {
+        return false;
+      }
+    });
+    list.insert(0, jsonEncode(collection.toJson()));
+    await prefs.setStringList(_keyCustomCollections, list);
+  }
+
+  /// Deletes a user-created custom collection.
+  Future<void> deleteCustomCollection(String collectionId) async {
+    final list = prefs.getStringList(_keyCustomCollections) ?? [];
+    list.removeWhere((item) {
+      try {
+        final map = jsonDecode(item) as Map<String, dynamic>;
+        return map['id'] == collectionId;
+      } catch (_) {
+        return false;
+      }
+    });
+    await prefs.setStringList(_keyCustomCollections, list);
+  }
+
+  /// Toggles membership of a wallpaper within a user-created collection.
+  Future<WallpaperCollection?> toggleWallpaperInCollection(
+    String collectionId,
+    String wallpaperId,
+  ) async {
+    final collections = getCustomCollections();
+    final index = collections.indexWhere((c) => c.id == collectionId);
+    if (index < 0) return null;
+
+    final existing = collections[index];
+    final updatedIds = List<String>.from(existing.wallpaperIds);
+    if (updatedIds.contains(wallpaperId)) {
+      updatedIds.remove(wallpaperId);
+    } else {
+      updatedIds.add(wallpaperId);
+    }
+
+    final updated = existing.copyWith(wallpaperIds: updatedIds);
+    await saveCustomCollection(updated);
+    return updated;
   }
 
   /// Returns list of all curated motivational shorts and static wallpapers, including custom imported wallpapers.

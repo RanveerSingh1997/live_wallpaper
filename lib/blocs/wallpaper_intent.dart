@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../models/motivational_short.dart';
+import '../models/wallpaper_collection.dart';
 
 abstract class WallpaperIntent extends Equatable {
   const WallpaperIntent();
@@ -252,4 +253,35 @@ class ImportCustomWallpaperIntent extends WallpaperIntent {
 
   @override
   List<Object?> get props => [wallpaper];
+}
+
+/// Intent to create a new user custom collection / playlist.
+class CreateCustomCollectionIntent extends WallpaperIntent {
+  final WallpaperCollection collection;
+  const CreateCustomCollectionIntent(this.collection);
+
+  @override
+  List<Object?> get props => [collection];
+}
+
+/// Intent to delete a user custom collection.
+class DeleteCustomCollectionIntent extends WallpaperIntent {
+  final String collectionId;
+  const DeleteCustomCollectionIntent(this.collectionId);
+
+  @override
+  List<Object?> get props => [collectionId];
+}
+
+/// Intent to add or remove a wallpaper from a user custom collection.
+class ToggleWallpaperInCollectionIntent extends WallpaperIntent {
+  final String collectionId;
+  final String wallpaperId;
+  const ToggleWallpaperInCollectionIntent({
+    required this.collectionId,
+    required this.wallpaperId,
+  });
+
+  @override
+  List<Object?> get props => [collectionId, wallpaperId];
 }

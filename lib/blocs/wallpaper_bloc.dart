@@ -42,6 +42,9 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<UpdateAutoRotationTargetIntent>(_onUpdateAutoRotationTarget);
     on<RotateWallpaperNowIntent>(_onRotateWallpaperNow);
     on<ImportCustomWallpaperIntent>(_onImportCustomWallpaper);
+    on<CreateCustomCollectionIntent>(_onCreateCustomCollection);
+    on<DeleteCustomCollectionIntent>(_onDeleteCustomCollection);
+    on<ToggleWallpaperInCollectionIntent>(_onToggleWallpaperInCollection);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -63,6 +66,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final shorts = repository.getCuratedShorts();
       final favorites = repository.getFavorites();
       final downloads = repository.getDownloads();
+      final customCollections = repository.getCustomCollections();
       final quotes = repository.getCustomQuotes();
       final activeId = repository.getActiveWallpaperId();
       final preferences = repository.getUserPreferences();
@@ -83,6 +87,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       emit(state.copyWith(
         allShorts: shorts,
         filteredShorts: forYouList,
+        customCollections: customCollections,
         activeIndex: 0,
         selectedCategory: 'For You',
         favoriteIds: favorites,
@@ -643,5 +648,69 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       filteredShorts: updatedFiltered,
       message: 'Imported "${event.wallpaper.title}" into your Wallora catalog.',
     ));
+  }
+
+  Future<void> _onCreateCustomCollection(
+    CreateCustomCollectionIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveCustomCollection(event.collection);
+    final updated = [
+      event.collection,
+      ...state.customCollections.where((c) => c.id != event.collection.id),
+    ];
+    emit(state.copyWith(
+      customCollections: updated,
+      message: 'Created playlist "${event.collection.title}".',
+    ));
+  }
+
+  Future<void> _onDeleteCustomCollection(
+    DeleteCustomCollectionIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.deleteCustomCollection(event.collectionId);
+    final updated =
+        state.customCollections.where((c) => c.id != event.collectionId).toList();
+    emit(state.copyWith(
+      customCollections: updated,
+      autoRotationSource: state.autoRotationSource == event.collectionId
+          ? 'favorites'
+          : state.autoRotationSource,
+      message: 'Playlist deleted.',
+    ));
+  }
+
+  Future<void> _onToggleWallpaperInCollection(
+    ToggleWallpaperInCollectionIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    var updatedCol = await repository.toggleWallpaperInCollection(
+      event.collectionId,
+      event.wallpaperId,
+    );
+    if (updatedCol == null) {
+      final matches = state.customCollections.where((c) => c.id == event.collectionId);
+      if (matches.isNotEmpty) {
+        await repository.saveCustomCollection(matches.first);
+        updatedCol = await repository.toggleWallpaperInCollection(
+          event.collectionId,
+          event.wallpaperId,
+        );
+      }
+    }
+
+    if (updatedCol != null) {
+      final updatedList = state.customCollections
+          .map((c) => c.id == updatedCol!.id ? updatedCol : c)
+          .toList();
+      final isInCol = updatedCol.wallpaperIds.contains(event.wallpaperId);
+      emit(state.copyWith(
+        customCollections: updatedList,
+        message: isInCol
+            ? 'Added to "${updatedCol.title}".'
+            : 'Removed from "${updatedCol.title}".',
+      ));
+    }
   }
 }
