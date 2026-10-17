@@ -12,6 +12,7 @@ import 'package:live_wallpaper/screens/favorites_screen.dart';
 import 'package:live_wallpaper/screens/ipad_wallpaper_dialog.dart';
 import 'package:live_wallpaper/screens/main_navigation_shell.dart';
 import 'package:live_wallpaper/screens/onboarding_sheet.dart';
+import 'package:live_wallpaper/screens/quote_studio_sheet.dart';
 import 'package:live_wallpaper/screens/settings_sheet.dart';
 import 'package:live_wallpaper/screens/splash_screen.dart';
 import 'package:live_wallpaper/screens/wallpaper_preview_sheet.dart';
@@ -477,6 +478,99 @@ void main() {
 
       expect(completed, isTrue);
       expect(find.text('HOME_SCREEN_REACHED'), findsOneWidget);
+    });
+
+    testWidgets('QuoteStudioSheet renders studio title, typography styles, and preview',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      final short = CuratedShortsData.shorts.first;
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: Scaffold(
+              body: QuoteStudioSheet(
+                short: short,
+                currentQuote: short.quote,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('QUOTE STUDIO'), findsOneWidget);
+      expect(find.text('CANVAS WALLPAPER'), findsOneWidget);
+      expect(find.text('TYPOGRAPHIC AESTHETIC'), findsOneWidget);
+      expect(find.text('Modern Sans'), findsOneWidget);
+      expect(find.text('Editorial Serif'), findsOneWidget);
+      expect(find.text('SAVE TYPOGRAPHY'), findsOneWidget);
+      expect(find.text('APPLY TO SCREEN'), findsOneWidget);
+    });
+
+    testWidgets('QuoteStudioSheet randomizes quote when Surprise Me is tapped',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      final short = CuratedShortsData.shorts.first;
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: Scaffold(
+              body: QuoteStudioSheet(
+                short: short,
+                currentQuote: 'Initial Quote Text',
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Surprise Me'), findsOneWidget);
+
+      await tester.tap(find.text('Surprise Me'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Initial Quote Text'), findsNothing);
     });
 
     testWidgets('WallpaperPreviewSheet displays technical specs and report button',

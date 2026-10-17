@@ -9,6 +9,7 @@ import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
 import 'collection_detail_sheet.dart';
 import 'preferences_modal_sheet.dart';
+import 'quote_studio_sheet.dart';
 import 'settings_sheet.dart';
 import 'wallpaper_preview_sheet.dart';
 
@@ -159,6 +160,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               icon: const Icon(Icons.tune_rounded, color: Colors.white70),
                               tooltip: 'Personalize Feed',
                               onPressed: () => _openPreferences(context, state),
+                            ),
+                            // Quote Studio button
+                            IconButton(
+                              icon: const Icon(Icons.format_quote_rounded, color: Color(0xFF00E5FF)),
+                              tooltip: 'Quote Studio',
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                QuoteStudioSheet.show(context);
+                              },
                             ),
                             // Settings & Trust button
                             IconButton(
