@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import '../models/aura_palette_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
+import '../models/gesture_control_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
@@ -476,6 +477,34 @@ class RestoreBackupIntent extends WallpaperIntent {
 /// Intent to wipe user custom data and restore Wallora to factory defaults.
 class ResetFactoryDefaultsIntent extends WallpaperIntent {
   const ResetFactoryDefaultsIntent();
+}
+
+/// Intent to update the Gesture Controls & Dynamic Haptics configuration.
+class UpdateGestureControlIntent extends WallpaperIntent {
+  final GestureControlConfig config;
+  const UpdateGestureControlIntent(this.config);
+
+  @override
+  List<Object?> get props => [config];
+}
+
+/// Intent to reset the Gesture Controls & Dynamic Haptics configuration to defaults.
+class ResetGestureControlIntent extends WallpaperIntent {
+  const ResetGestureControlIntent();
+}
+
+/// Intent to trigger an action from a touch gesture.
+class ExecuteGestureActionIntent extends WallpaperIntent {
+  final GestureAction action;
+  const ExecuteGestureActionIntent(this.action);
+
+  @override
+  List<Object?> get props => [action];
+}
+
+/// Intent to toggle Clean Canvas (Zen Mode) overlay visibility.
+class ToggleCleanCanvasIntent extends WallpaperIntent {
+  const ToggleCleanCanvasIntent();
 }
 
 

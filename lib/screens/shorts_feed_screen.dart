@@ -6,6 +6,7 @@ import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
+import '../widgets/interactive_gesture_canvas.dart';
 import '../widgets/kinetic_quote_overlay.dart';
 import '../widgets/shorts_action_rail.dart';
 import '../widgets/video_player_item.dart';
@@ -195,8 +196,18 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                         },
                       ),
 
+                      // Interactive Touch Ripples, Sparks & Gesture Triggers Layer
+                      InteractiveGestureCanvas(
+                        config: state.gestureConfig,
+                        auraConfig: state.auraConfig,
+                        onActionTriggered: (action) {
+                          context.read<WallpaperBloc>().add(ExecuteGestureActionIntent(action));
+                        },
+                      ),
+
                       // Motivational Typography Overlay (bottom left)
-                      if (state.isTextOverlayVisible &&
+                      if (!state.isCleanCanvasMode &&
+                          state.isTextOverlayVisible &&
                           (short.hasTextByDefault || isCustomized))
                         Positioned(
                           left: 0,
@@ -208,7 +219,7 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                             isCustomized: isCustomized,
                           ),
                         )
-                      else
+                      else if (!state.isCleanCanvasMode)
                         Positioned(
                           left: 20,
                           bottom: 24,
@@ -251,42 +262,85 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                         ),
 
                       // Action Rail (bottom right)
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: ShortsActionRail(
-                          short: short,
-                          isFavorite: isFav,
-                          isMuted: state.isFeedMuted,
-                          isCurrentActive: isActiveOnDevice,
-                          isApplying: state.actionStatus == WallpaperActionStatus.applying &&
-                              isPageActive,
-                          onApplyWallpaper: () {
-                            if (Platform.isIOS) {
-                              IPadWallpaperDialog.show(context, short);
-                            } else {
-                              context.read<WallpaperBloc>().add(
-                                    ApplyLiveWallpaperIntent(
-                                      short: short,
-                                      isMuted: true, // Default muted for battery
-                                    ),
-                                  );
-                            }
-                          },
-                          onCustomizeQuote: () {
-                            _openQuoteStudio(context, short, effectiveQuote);
-                          },
-                          onToggleMute: () {
-                            context.read<WallpaperBloc>().add(ToggleFeedMuteIntent());
-                          },
-                          onToggleFavorite: () {
-                            context.read<WallpaperBloc>().add(ToggleFavoriteIntent(short.id));
-                          },
-                          onShare: () {
-                            context.read<WallpaperBloc>().add(ShareVideoIntent(short));
-                          },
+                      if (!state.isCleanCanvasMode)
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: ShortsActionRail(
+                            short: short,
+                            isFavorite: isFav,
+                            isMuted: state.isFeedMuted,
+                            isCurrentActive: isActiveOnDevice,
+                            isApplying: state.actionStatus == WallpaperActionStatus.applying &&
+                                isPageActive,
+                            onApplyWallpaper: () {
+                              if (Platform.isIOS) {
+                                IPadWallpaperDialog.show(context, short);
+                              } else {
+                                context.read<WallpaperBloc>().add(
+                                      ApplyLiveWallpaperIntent(
+                                        short: short,
+                                        isMuted: true, // Default muted for battery
+                                      ),
+                                    );
+                              }
+                            },
+                            onCustomizeQuote: () {
+                              _openQuoteStudio(context, short, effectiveQuote);
+                            },
+                            onToggleMute: () {
+                              context.read<WallpaperBloc>().add(ToggleFeedMuteIntent());
+                            },
+                            onToggleFavorite: () {
+                              context.read<WallpaperBloc>().add(ToggleFavoriteIntent(short.id));
+                            },
+                            onShare: () {
+                              context.read<WallpaperBloc>().add(ShareVideoIntent(short));
+                            },
+                          ),
                         ),
-                      ),
+
+                      // Zen Mode Exit Hint Pill
+                      if (state.isCleanCanvasMode)
+                        Positioned(
+                          bottom: 24,
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                context
+                                    .read<WallpaperBloc>()
+                                    .add(const ToggleCleanCanvasIntent());
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withAlpha((0.6 * 255).round()),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: Colors.white24),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.visibility_rounded,
+                                        color: Colors.white70, size: 14),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Zen View Active • Tap to exit',
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   );
 
@@ -303,11 +357,12 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
               ),
 
               // Top Bar: Category Filter Chips & Status Header
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: SafeArea(
+              if (!state.isCleanCanvasMode)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: SafeArea(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(

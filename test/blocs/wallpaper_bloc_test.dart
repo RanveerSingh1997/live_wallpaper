@@ -7,6 +7,7 @@ import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/models/aura_palette_config.dart';
 import 'package:live_wallpaper/models/battery_telemetry_config.dart';
 import 'package:live_wallpaper/models/day_night_schedule_config.dart';
+import 'package:live_wallpaper/models/gesture_control_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/parallax_effect_config.dart';
@@ -1286,6 +1287,111 @@ void main() {
 
       expect(repository.getFavorites(), isEmpty);
       expect(repository.isAmoledSaverModeEnabled(), isFalse);
+    });
+
+    test('UpdateGestureControlIntent updates state, persists to repository, and notifies', () async {
+      const customConfig = GestureControlConfig(
+        isGesturesEnabled: true,
+        doubleTapAction: GestureAction.nextWallpaper,
+        tripleTapAction: GestureAction.cycleAuraPalette,
+        twoFingerSwipeDownAction: GestureAction.toggleCleanCanvas,
+        longPressAction: GestureAction.openStudio,
+        hapticProfile: HapticFeedbackProfile.firm,
+        touchVisualEffect: TouchVisualEffect.particleBurst,
+        touchColorMode: TouchColorMode.electricCyan,
+      );
+
+      final updateExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.gestureConfig == customConfig &&
+              s.message == 'Gesture controls updated.';
+        })),
+      );
+
+      bloc.add(const UpdateGestureControlIntent(customConfig));
+      await updateExpectation;
+
+      expect(repository.getGestureControlConfig(), customConfig);
+    });
+
+    test('ResetGestureControlIntent resets gesture config to defaults, cleans persistence, and notifies', () async {
+      const customConfig = GestureControlConfig(
+        hapticProfile: HapticFeedbackProfile.firm,
+      );
+      bloc.add(const UpdateGestureControlIntent(customConfig));
+      await expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.gestureConfig == customConfig)),
+      );
+
+      final resetExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.gestureConfig == GestureControlConfig.defaultConfig &&
+              s.message == 'Gesture controls reset to defaults.';
+        })),
+      );
+
+      bloc.add(const ResetGestureControlIntent());
+      await resetExpectation;
+
+      expect(repository.getGestureControlConfig(), GestureControlConfig.defaultConfig);
+    });
+
+    test('ToggleCleanCanvasIntent toggles zen mode visibility state cleanly', () async {
+      expect(bloc.state.isCleanCanvasMode, isFalse);
+
+      final cleanExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.isCleanCanvasMode == true)),
+      );
+      bloc.add(const ToggleCleanCanvasIntent());
+      await cleanExpectation;
+
+      final restoreExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.isCleanCanvasMode == false)),
+      );
+      bloc.add(const ToggleCleanCanvasIntent());
+      await restoreExpectation;
+    });
+
+    test('ExecuteGestureActionIntent triggers corresponding domain actions', () async {
+      // 1. Load feed first
+      final loadExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.allShorts.isNotEmpty)),
+      );
+      bloc.add(const LoadFeedIntent());
+      await loadExpectation;
+
+      // 2. Next wallpaper action
+      final initialIndex = bloc.state.activeIndex;
+      final nextExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.activeIndex == initialIndex + 1)),
+      );
+      bloc.add(const ExecuteGestureActionIntent(GestureAction.nextWallpaper));
+      await nextExpectation;
+
+      // 3. Toggle favorite action
+      final currentId = bloc.state.currentShort!.id;
+      final favExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.favoriteIds.contains(currentId))),
+      );
+      bloc.add(const ExecuteGestureActionIntent(GestureAction.toggleFavorite));
+      await favExpectation;
+
+      // 4. Cycle Aura palette action
+      final initialAuraPreset = bloc.state.auraConfig.preset;
+      final auraExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.auraConfig.preset != initialAuraPreset)),
+      );
+      bloc.add(const ExecuteGestureActionIntent(GestureAction.cycleAuraPalette));
+      await auraExpectation;
     });
   });
 }

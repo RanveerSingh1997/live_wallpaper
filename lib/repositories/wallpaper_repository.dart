@@ -7,6 +7,7 @@ import '../data/curated_shorts_data.dart';
 import '../models/aura_palette_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
+import '../models/gesture_control_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
@@ -47,6 +48,7 @@ class WallpaperRepository {
   static const String _keySmartFilter = 'smart_filter_config';
   static const String _keyBatteryTelemetry = 'battery_telemetry_config';
   static const String _keyAuraPalette = 'aura_palette_config';
+  static const String _keyGestureControl = 'gesture_control_config';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
@@ -75,6 +77,30 @@ class WallpaperRepository {
   /// Resets the Aura Chromatic Harmonizer & Dynamic Palette settings to default.
   Future<void> resetAuraPaletteConfig() async {
     await prefs.remove(_keyAuraPalette);
+  }
+
+  /// Returns the configured Gesture Controls & Dynamic Haptics settings.
+  GestureControlConfig getGestureControlConfig() {
+    final raw = prefs.getString(_keyGestureControl);
+    if (raw == null || raw.isEmpty) {
+      return GestureControlConfig.defaultConfig;
+    }
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      return GestureControlConfig.fromJson(json);
+    } catch (_) {
+      return GestureControlConfig.defaultConfig;
+    }
+  }
+
+  /// Saves the Gesture Controls & Dynamic Haptics settings.
+  Future<void> saveGestureControlConfig(GestureControlConfig config) async {
+    await prefs.setString(_keyGestureControl, jsonEncode(config.toJson()));
+  }
+
+  /// Resets the Gesture Controls & Dynamic Haptics settings to default.
+  Future<void> resetGestureControlConfig() async {
+    await prefs.remove(_keyGestureControl);
   }
 
   /// Returns the configured Battery & Display Telemetry settings.
@@ -722,6 +748,7 @@ class WallpaperRepository {
       parallaxConfig: getParallaxEffectConfig(),
       particleConfig: getParticleEffectConfig(),
       auraConfig: getAuraPaletteConfig(),
+      gestureConfig: getGestureControlConfig(),
       batteryTelemetry: getBatteryTelemetryConfig(),
       smartFilter: getSmartFilterConfig(),
       userPreferences: getUserPreferences(),
@@ -791,6 +818,7 @@ class WallpaperRepository {
       await saveParallaxEffectConfig(bundle.parallaxConfig);
       await saveParticleEffectConfig(bundle.particleConfig);
       await saveAuraPaletteConfig(bundle.auraConfig);
+      await saveGestureControlConfig(bundle.gestureConfig);
       await saveBatteryTelemetryConfig(bundle.batteryTelemetry);
       await saveSmartFilterConfig(bundle.smartFilter);
 
@@ -829,6 +857,7 @@ class WallpaperRepository {
     await resetParallaxEffectConfig();
     await resetParticleEffectConfig();
     await resetAuraPaletteConfig();
+    await resetGestureControlConfig();
     await resetBatteryTelemetryConfig();
     await resetSmartFilterConfig();
 

@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/aura_palette_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
+import '../models/gesture_control_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
@@ -77,6 +78,10 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<ResetAuraPaletteIntent>(_onResetAuraPalette);
     on<RestoreBackupIntent>(_onRestoreBackup);
     on<ResetFactoryDefaultsIntent>(_onResetFactoryDefaults);
+    on<UpdateGestureControlIntent>(_onUpdateGestureControl);
+    on<ResetGestureControlIntent>(_onResetGestureControl);
+    on<ExecuteGestureActionIntent>(_onExecuteGestureAction);
+    on<ToggleCleanCanvasIntent>(_onToggleCleanCanvas);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -147,6 +152,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final parallaxConfig = repository.getParallaxEffectConfig();
       final particleConfig = repository.getParticleEffectConfig();
       final auraConfig = repository.getAuraPaletteConfig();
+      final gestureConfig = repository.getGestureControlConfig();
       final smartFilter = repository.getSmartFilterConfig();
       final batteryTelemetry = repository.getBatteryTelemetryConfig();
 
@@ -174,6 +180,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         parallaxConfig: parallaxConfig,
         particleConfig: particleConfig,
         auraConfig: auraConfig,
+        gestureConfig: gestureConfig,
         smartFilter: smartFilter,
         batteryTelemetry: batteryTelemetry,
         activeWallpaperId: activeId,
@@ -1173,6 +1180,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final parallax = repository.getParallaxEffectConfig();
       final particle = repository.getParticleEffectConfig();
       final aura = repository.getAuraPaletteConfig();
+      final gesture = repository.getGestureControlConfig();
       final telemetry = repository.getBatteryTelemetryConfig();
       final smartFilter = repository.getSmartFilterConfig();
       final preferences = repository.getUserPreferences();
@@ -1196,6 +1204,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         parallaxConfig: parallax,
         particleConfig: particle,
         auraConfig: aura,
+        gestureConfig: gesture,
         batteryTelemetry: telemetry,
         smartFilter: smartFilter,
         userPreferences: preferences,
@@ -1232,12 +1241,152 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       parallaxConfig: ParallaxEffectConfig.defaultConfig,
       particleConfig: ParticleEffectConfig.defaultConfig,
       auraConfig: AuraPaletteConfig.defaultConfig,
+      gestureConfig: GestureControlConfig.defaultConfig,
       batteryTelemetry: BatteryTelemetryConfig.defaultConfig,
       smartFilter: SmartFilterConfig.defaultConfig,
       userPreferences: {},
       isAmoledSaverModeEnabled: false,
+      isCleanCanvasMode: false,
       message: 'Wallora reset to factory defaults.',
     ));
+  }
+
+  Future<void> _onUpdateGestureControl(
+    UpdateGestureControlIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveGestureControlConfig(event.config);
+    emit(state.copyWith(
+      gestureConfig: event.config,
+      message: 'Gesture controls updated.',
+    ));
+  }
+
+  Future<void> _onResetGestureControl(
+    ResetGestureControlIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.resetGestureControlConfig();
+    emit(state.copyWith(
+      gestureConfig: GestureControlConfig.defaultConfig,
+      message: 'Gesture controls reset to defaults.',
+    ));
+  }
+
+  void _onToggleCleanCanvas(
+    ToggleCleanCanvasIntent event,
+    Emitter<WallpaperState> emit,
+  ) {
+    final nextClean = !state.isCleanCanvasMode;
+    emit(state.copyWith(
+      isCleanCanvasMode: nextClean,
+      message: nextClean
+          ? 'Clean Canvas (Zen View) activated.'
+          : 'Standard view restored.',
+    ));
+  }
+
+  Future<void> _onExecuteGestureAction(
+    ExecuteGestureActionIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    if (!state.gestureConfig.isGesturesEnabled) return;
+
+    switch (event.action) {
+      case GestureAction.nextWallpaper:
+        if (state.filteredShorts.isNotEmpty) {
+          final nextIndex =
+              (state.activeIndex + 1) % state.filteredShorts.length;
+          emit(state.copyWith(
+            activeIndex: nextIndex,
+            message: 'Switched to next wallpaper.',
+          ));
+        }
+        break;
+
+      case GestureAction.toggleFavorite:
+        final current = state.currentShort;
+        if (current != null) {
+          final updated = await repository.toggleFavorite(current.id);
+          final isFav = updated.contains(current.id);
+          emit(state.copyWith(
+            favoriteIds: updated,
+            message: isFav ? 'Added to Favorites ❤️' : 'Removed from Favorites',
+          ));
+        }
+        break;
+
+      case GestureAction.toggleQuote:
+        final nextVis = !state.isTextOverlayVisible;
+        await repository.setTextOverlayEnabled(nextVis);
+        emit(state.copyWith(
+          isTextOverlayVisible: nextVis,
+          message:
+              nextVis ? 'Quote overlay enabled.' : 'Quote overlay hidden.',
+        ));
+        break;
+
+      case GestureAction.toggleEffects:
+        final current = state.currentShort;
+        if (current != null) {
+          final currentFx = state.getEffectiveEffects(current.id);
+          final isNoir = currentFx.colorFilterPreset == 'noir';
+          final newFx = isNoir
+              ? WallpaperEffectConfig.defaultPreset
+              : WallpaperEffectConfig.noirPreset;
+          await repository.saveCustomEffect(current.id, newFx);
+          final updatedMap =
+              Map<String, WallpaperEffectConfig>.from(state.customEffects)
+                ..[current.id] = newFx;
+          emit(state.copyWith(
+            customEffects: updatedMap,
+            message: isNoir
+                ? 'Standard colors restored.'
+                : 'Noir monochrome effect enabled.',
+          ));
+        }
+        break;
+
+      case GestureAction.cycleAuraPalette:
+        final allPresets = AuraThemePreset.values;
+        final curIndex = allPresets.indexOf(state.auraConfig.preset);
+        final nextPreset = allPresets[(curIndex + 1) % allPresets.length];
+        final newAura = state.auraConfig.copyWith(preset: nextPreset);
+        await repository.saveAuraPaletteConfig(newAura);
+        emit(state.copyWith(
+          auraConfig: newAura,
+          message: 'Aura Palette: ${nextPreset.displayName}',
+        ));
+        break;
+
+      case GestureAction.toggleCleanCanvas:
+        final nextClean = !state.isCleanCanvasMode;
+        emit(state.copyWith(
+          isCleanCanvasMode: nextClean,
+          message: nextClean
+              ? 'Clean Canvas (Zen View) activated.'
+              : 'Standard view restored.',
+        ));
+        break;
+
+      case GestureAction.pauseResume:
+        final nextMute = !state.isFeedMuted;
+        emit(state.copyWith(
+          isFeedMuted: nextMute,
+          message:
+              nextMute ? 'Live audio muted.' : 'Live audio unmuted.',
+        ));
+        break;
+
+      case GestureAction.openStudio:
+        emit(state.copyWith(
+          message: 'Open Wallora Studio from settings to customize.',
+        ));
+        break;
+
+      case GestureAction.none:
+        break;
+    }
   }
 }
 

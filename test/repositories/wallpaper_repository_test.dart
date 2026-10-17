@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:live_wallpaper/models/aura_palette_config.dart';
 import 'package:live_wallpaper/models/battery_telemetry_config.dart';
 import 'package:live_wallpaper/models/day_night_schedule_config.dart';
+import 'package:live_wallpaper/models/gesture_control_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/parallax_effect_config.dart';
@@ -426,6 +427,42 @@ void main() {
       await repository.resetAuraPaletteConfig();
       final reset = repository.getAuraPaletteConfig();
       expect(reset, equals(AuraPaletteConfig.defaultConfig));
+    });
+
+    test('GestureControlConfig CRUD and reset persistence', () async {
+      // Default fallback
+      final initial = repository.getGestureControlConfig();
+      expect(initial, equals(GestureControlConfig.defaultConfig));
+
+      // Save custom config
+      const custom = GestureControlConfig(
+        isGesturesEnabled: true,
+        doubleTapAction: GestureAction.nextWallpaper,
+        tripleTapAction: GestureAction.toggleEffects,
+        twoFingerSwipeDownAction: GestureAction.none,
+        longPressAction: GestureAction.openStudio,
+        hapticProfile: HapticFeedbackProfile.firm,
+        touchVisualEffect: TouchVisualEffect.particleBurst,
+        touchColorMode: TouchColorMode.electricCyan,
+        rippleDurationMs: 500,
+      );
+      await repository.saveGestureControlConfig(custom);
+
+      final loaded = repository.getGestureControlConfig();
+      expect(loaded, equals(custom));
+      expect(loaded.doubleTapAction, equals(GestureAction.nextWallpaper));
+      expect(loaded.tripleTapAction, equals(GestureAction.toggleEffects));
+      expect(loaded.twoFingerSwipeDownAction, equals(GestureAction.none));
+      expect(loaded.longPressAction, equals(GestureAction.openStudio));
+      expect(loaded.hapticProfile, equals(HapticFeedbackProfile.firm));
+      expect(loaded.touchVisualEffect, equals(TouchVisualEffect.particleBurst));
+      expect(loaded.touchColorMode, equals(TouchColorMode.electricCyan));
+      expect(loaded.rippleDurationMs, equals(500));
+
+      // Reset
+      await repository.resetGestureControlConfig();
+      final reset = repository.getGestureControlConfig();
+      expect(reset, equals(GestureControlConfig.defaultConfig));
     });
 
     test('createBackupBundle and restoreBackupBundle (replace and merge)', () async {

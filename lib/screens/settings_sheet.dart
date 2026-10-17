@@ -9,6 +9,7 @@ import 'auto_rotation_sheet.dart';
 import 'battery_telemetry_sheet.dart';
 import 'data_portability_sheet.dart';
 import 'day_night_schedule_sheet.dart';
+import 'gesture_control_sheet.dart';
 import 'lock_screen_studio_sheet.dart';
 import 'onboarding_sheet.dart';
 import 'parallax_studio_sheet.dart';
@@ -285,6 +286,18 @@ class SettingsSheet extends StatelessWidget {
                         '${state.auraConfig.preset.displayName} • Dynamic color sync',
                     onTap: () {
                       AuraPaletteSheet.show(context);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSettingTile(
+                    icon: Icons.touch_app_rounded,
+                    iconColor: const Color(0xFF00E5FF),
+                    title: 'Interactive Gesture Controls',
+                    subtitle: state.gestureConfig.isGesturesEnabled
+                        ? '${state.gestureConfig.doubleTapAction.displayName} • ${state.gestureConfig.hapticProfile.displayName} Haptics'
+                        : 'Disabled / Touch Pass-Through',
+                    onTap: () {
+                      GestureControlSheet.show(context);
                     },
                   ),
                   const SizedBox(height: 8),

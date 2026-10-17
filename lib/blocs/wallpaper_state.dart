@@ -3,6 +3,7 @@ import '../data/curated_shorts_data.dart';
 import '../models/aura_palette_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
+import '../models/gesture_control_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
@@ -38,6 +39,7 @@ class WallpaperState extends Equatable {
   final ParallaxEffectConfig parallaxConfig;
   final ParticleEffectConfig particleConfig;
   final AuraPaletteConfig auraConfig;
+  final GestureControlConfig gestureConfig;
   final SmartFilterConfig smartFilter;
   final BatteryTelemetryConfig batteryTelemetry;
   final bool isFeedMuted;
@@ -46,6 +48,7 @@ class WallpaperState extends Equatable {
   final WallpaperActionStatus actionStatus;
   final Set<String> userPreferences;
   final bool isTextOverlayVisible;
+  final bool isCleanCanvasMode;
   final int currentNavigationTab;
   final String searchQuery;
   final int totalStorageUsedBytes;
@@ -76,6 +79,7 @@ class WallpaperState extends Equatable {
     this.parallaxConfig = ParallaxEffectConfig.defaultConfig,
     this.particleConfig = ParticleEffectConfig.defaultConfig,
     this.auraConfig = AuraPaletteConfig.defaultConfig,
+    this.gestureConfig = GestureControlConfig.defaultConfig,
     this.smartFilter = SmartFilterConfig.defaultConfig,
     this.batteryTelemetry = BatteryTelemetryConfig.defaultConfig,
     this.isFeedMuted = true,
@@ -84,6 +88,7 @@ class WallpaperState extends Equatable {
     this.actionStatus = WallpaperActionStatus.idle,
     this.userPreferences = const {},
     this.isTextOverlayVisible = true,
+    this.isCleanCanvasMode = false,
     this.currentNavigationTab = 0,
     this.searchQuery = '',
     this.totalStorageUsedBytes = 0,
@@ -243,6 +248,7 @@ class WallpaperState extends Equatable {
     ParallaxEffectConfig? parallaxConfig,
     ParticleEffectConfig? particleConfig,
     AuraPaletteConfig? auraConfig,
+    GestureControlConfig? gestureConfig,
     SmartFilterConfig? smartFilter,
     BatteryTelemetryConfig? batteryTelemetry,
     bool? isFeedMuted,
@@ -251,6 +257,7 @@ class WallpaperState extends Equatable {
     WallpaperActionStatus? actionStatus,
     Set<String>? userPreferences,
     bool? isTextOverlayVisible,
+    bool? isCleanCanvasMode,
     int? currentNavigationTab,
     String? searchQuery,
     int? totalStorageUsedBytes,
@@ -281,6 +288,7 @@ class WallpaperState extends Equatable {
       parallaxConfig: parallaxConfig ?? this.parallaxConfig,
       particleConfig: particleConfig ?? this.particleConfig,
       auraConfig: auraConfig ?? this.auraConfig,
+      gestureConfig: gestureConfig ?? this.gestureConfig,
       smartFilter: smartFilter ?? this.smartFilter,
       batteryTelemetry: batteryTelemetry ?? this.batteryTelemetry,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
@@ -290,6 +298,7 @@ class WallpaperState extends Equatable {
       actionStatus: actionStatus ?? this.actionStatus,
       userPreferences: userPreferences ?? this.userPreferences,
       isTextOverlayVisible: isTextOverlayVisible ?? this.isTextOverlayVisible,
+      isCleanCanvasMode: isCleanCanvasMode ?? this.isCleanCanvasMode,
       currentNavigationTab: currentNavigationTab ?? this.currentNavigationTab,
       searchQuery: searchQuery ?? this.searchQuery,
       totalStorageUsedBytes: totalStorageUsedBytes ?? this.totalStorageUsedBytes,
@@ -325,6 +334,7 @@ class WallpaperState extends Equatable {
         parallaxConfig,
         particleConfig,
         auraConfig,
+        gestureConfig,
         smartFilter,
         batteryTelemetry,
         isFeedMuted,
@@ -333,6 +343,7 @@ class WallpaperState extends Equatable {
         actionStatus,
         userPreferences,
         isTextOverlayVisible,
+        isCleanCanvasMode,
         currentNavigationTab,
         searchQuery,
         totalStorageUsedBytes,

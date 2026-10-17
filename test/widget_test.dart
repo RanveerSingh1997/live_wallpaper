@@ -18,6 +18,7 @@ import 'package:live_wallpaper/screens/aura_palette_sheet.dart';
 import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
 import 'package:live_wallpaper/screens/battery_telemetry_sheet.dart';
 import 'package:live_wallpaper/screens/data_portability_sheet.dart';
+import 'package:live_wallpaper/screens/gesture_control_sheet.dart';
 import 'package:live_wallpaper/screens/particle_effect_sheet.dart';
 import 'package:live_wallpaper/screens/categories_screen.dart';
 import 'package:live_wallpaper/screens/create_collection_sheet.dart';
@@ -2474,6 +2475,123 @@ void main() {
       // Verify DataPortabilitySheet is opened
       expect(find.text('WALLORA ACTIVE SETUP SNAPSHOT'), findsOneWidget);
       expect(find.text('Copy Backup Archive (JSON)'), findsOneWidget);
+    });
+
+    testWidgets('GestureControlSheet renders playground, master toggle, action tiles, and chips', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: GestureControlSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Header and sections
+      expect(find.text('Interactive Gesture Studio'), findsOneWidget);
+      expect(find.text('TACTILE TOUCH PLAYGROUND'), findsOneWidget);
+      expect(find.text('Enable Gesture Triggers'), findsOneWidget);
+      expect(find.text('GESTURE ACTION MAPPINGS'), findsOneWidget);
+      expect(find.text('Double-Tap Action'), findsOneWidget);
+      expect(find.text('Triple-Tap Action'), findsOneWidget);
+      expect(find.text('Long-Press Action'), findsOneWidget);
+      expect(find.text('Two-Finger Swipe Down'), findsOneWidget);
+      expect(find.text('SENSORY HAPTIC INTENSITY'), findsOneWidget);
+      expect(find.text('TOUCH CONTACT VISUAL FX'), findsOneWidget);
+      expect(find.text('CONTACT COLOR HARMONY'), findsOneWidget);
+
+      // Verify playground interaction
+      await tester.tap(find.text('Double-tap, triple-tap, or hold to feel tactile response'));
+      await tester.pumpAndSettle();
+
+      // Tap reset button and verify confirmation dialog
+      await tester.scrollUntilVisible(
+        find.text('Reset to Default Gestures'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text('Reset to Default Gestures'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Reset Gesture Controls'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
+      expect(find.text('Reset to Defaults'), findsOneWidget);
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(find.text('Reset Gesture Controls'), findsNothing);
+    });
+
+    testWidgets('SettingsSheet navigation opens GestureControlSheet via Interactive Gesture Controls tile', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SettingsSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Scroll to Interactive Gesture Controls tile
+      await tester.scrollUntilVisible(
+        find.text('Interactive Gesture Controls'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('Interactive Gesture Controls'), findsOneWidget);
+
+      // Tap to open sheet
+      await tester.tap(find.text('Interactive Gesture Controls'));
+      await tester.pumpAndSettle();
+
+      // Verify GestureControlSheet is opened
+      expect(find.text('Interactive Gesture Studio'), findsOneWidget);
+      expect(find.text('TACTILE TOUCH PLAYGROUND'), findsOneWidget);
     });
   });
 }
