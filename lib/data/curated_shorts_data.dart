@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/motivational_short.dart';
+import '../models/wallpaper_collection.dart';
 
 class CuratedShortsData {
   static const List<String> availablePreferences = [
@@ -281,4 +282,43 @@ class CuratedShortsData {
     }
     return set.toList();
   }
+
+  static const List<WallpaperCollection> collections = [
+    WallpaperCollection(
+      id: 'col_oled',
+      title: 'OLED Obsidian Abyss',
+      subtitle: 'Pure blacks & luminous geometry optimized for battery saving on AMOLED displays',
+      badge: 'BATTERY SAVER',
+      icon: Icons.dark_mode_rounded,
+      wallpaperIds: ['minimal_amoled', 'static_amoled_nebula', 'silent_ambition'],
+      gradientColors: [Color(0xFF0F0020), Color(0xFF7C4DFF), Color(0xFF000000)],
+    ),
+    WallpaperCollection(
+      id: 'col_velocity',
+      title: 'Midnight Apex & Velocity',
+      subtitle: 'High-octane supercars and adrenaline-fueled nocturnal speedways',
+      badge: 'HIGH SPEED',
+      icon: Icons.speed_rounded,
+      wallpaperIds: ['supercar_night', 'static_speed_apex'],
+      gradientColors: [Color(0xFF280004), Color(0xFFFF1744), Color(0xFF050505)],
+    ),
+    WallpaperCollection(
+      id: 'col_grit',
+      title: 'The Relentless Grind',
+      subtitle: 'Coach Kamogawa creed, 5:00 AM protocol & unbreakable discipline',
+      badge: 'MOTIVATION',
+      icon: Icons.sports_mma_rounded,
+      wallpaperIds: ['ippo_hard_work', 'discipline_grind', 'static_stoic_citadel', 'stoic_wisdom'],
+      gradientColors: [Color(0xFF2A0D00), Color(0xFFFF5722), Color(0xFF000000)],
+    ),
+    WallpaperCollection(
+      id: 'col_zen',
+      title: 'Celestial Lights & Solitude',
+      subtitle: 'Ethereal northern auroras, misty mountain ridges & quiet solace',
+      badge: '4K & ZEN',
+      icon: Icons.landscape_rounded,
+      wallpaperIds: ['nature_aurora', 'static_nature_solitude'],
+      gradientColors: [Color(0xFF002213), Color(0xFF00E676), Color(0xFF020E09)],
+    ),
+  ];
 }

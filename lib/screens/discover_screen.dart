@@ -6,6 +6,8 @@ import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
+import '../models/wallpaper_collection.dart';
+import 'collection_detail_sheet.dart';
 import 'preferences_modal_sheet.dart';
 import 'settings_sheet.dart';
 import 'wallpaper_preview_sheet.dart';
@@ -281,25 +283,77 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 ),
 
                 if (isSearching) ...[
-                  // Search Results Header & Grid
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        'FOUND ${searchResults.length} WALLPAPERS',
-                        style: const TextStyle(
-                          color: Colors.white54,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.0,
+                  if (searchResults.isEmpty) ...[
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.05),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.search_off_rounded, size: 40, color: Colors.white38),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No wallpapers match "${state.searchQuery}"',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Try one of these popular aesthetics:',
+                              style: TextStyle(color: Colors.white54, fontSize: 12),
+                            ),
+                            const SizedBox(height: 16),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              alignment: WrapAlignment.center,
+                              children: ['Anime', 'AMOLED', 'Cars', 'Nature', 'Stoic', 'Live'].map((term) {
+                                return ActionChip(
+                                  label: Text(term),
+                                  backgroundColor: const Color(0xFF1E1E22),
+                                  labelStyle: const TextStyle(color: Color(0xFFFF5722), fontSize: 12, fontWeight: FontWeight.w700),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    side: const BorderSide(color: Colors.white12),
+                                  ),
+                                  onPressed: () {
+                                    _searchController.text = term;
+                                    context.read<WallpaperBloc>().add(SearchWallpapersIntent(term));
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    sliver: _buildWallpaperGrid(searchResults),
-                  ),
+                  ] else ...[
+                    // Search Results Header & Grid
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          'FOUND ${searchResults.length} WALLPAPERS',
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      sliver: _buildWallpaperGrid(searchResults),
+                    ),
+                  ],
                 ] else if (state.selectedCategory != 'For You' && state.selectedCategory != 'All') ...[
                   // Filtered Category Grid
                   SliverToBoxAdapter(
@@ -419,6 +473,57 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         itemBuilder: (ctx, idx) {
                           final item = liveWallpapers[idx];
                           return _buildHorizontalLiveCard(item);
+                        },
+                      ),
+                    ),
+                  ),
+
+                  // Section: Curated Editorial Collections
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 26, 16, 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.collections_bookmark_rounded,
+                                  color: Color(0xFFD500F9), size: 18),
+                              SizedBox(width: 6),
+                              Text(
+                                'CURATED COLLECTIONS',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            '${CuratedShortsData.collections.length} COLLECTIONS',
+                            style: const TextStyle(
+                              color: Colors.white38,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: 130,
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: CuratedShortsData.collections.length,
+                        separatorBuilder: (context, index) => const SizedBox(width: 12),
+                        itemBuilder: (ctx, idx) {
+                          final col = CuratedShortsData.collections[idx];
+                          return _buildCollectionCard(col);
                         },
                       ),
                     ),
@@ -914,6 +1019,87 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ),
                 ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCollectionCard(WallpaperCollection col) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        CollectionDetailSheet.show(context, col);
+      },
+      child: Container(
+        width: 210,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          gradient: LinearGradient(
+            colors: col.gradientColors,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(color: Colors.white12),
+          boxShadow: [
+            BoxShadow(
+              color: col.gradientColors[1].withValues(alpha: 0.25),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.white24, width: 0.8),
+                  ),
+                  child: Text(
+                    col.badge,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 8,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                Icon(col.icon, color: Colors.white70, size: 18),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  col.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${col.wallpaperIds.length} Canvases',
+                  style: const TextStyle(
+                    color: Colors.white60,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

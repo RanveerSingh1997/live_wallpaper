@@ -350,6 +350,88 @@ void main() {
       expect(find.widgetWithText(ChoiceChip, 'Anime & Gaming'), findsOneWidget);
     });
 
+    testWidgets('DiscoverScreen displays Curated Editorial Collections and opens detail sheet',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: DiscoverScreen(onOpenLiveFeed: () {}),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      expect(find.text('CURATED COLLECTIONS'), findsOneWidget);
+      expect(find.text('OLED Obsidian Abyss'), findsOneWidget);
+
+      // Tap on the first collection
+      await tester.tap(find.text('OLED Obsidian Abyss'));
+      await tester.pumpAndSettle();
+
+      // Verify CollectionDetailSheet opened
+      expect(find.text('Pure blacks & luminous geometry optimized for battery saving on AMOLED displays'), findsOneWidget);
+    });
+
+    testWidgets('DiscoverScreen displays search suggestions when no results match',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          searchQuery: 'nonexistentquery123xyz',
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: DiscoverScreen(onOpenLiveFeed: () {}),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      expect(find.text('No wallpapers match "nonexistentquery123xyz"'), findsOneWidget);
+      expect(find.text('Try one of these popular aesthetics:'), findsOneWidget);
+      expect(find.byType(ActionChip), findsWidgets);
+      expect(find.widgetWithText(ActionChip, 'Anime'), findsOneWidget);
+    });
+
     testWidgets('WallpaperPreviewSheet displays technical specs and report button',
         (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
