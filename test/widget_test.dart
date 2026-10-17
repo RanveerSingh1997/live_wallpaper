@@ -11,6 +11,8 @@ import 'package:live_wallpaper/screens/downloads_screen.dart';
 import 'package:live_wallpaper/screens/favorites_screen.dart';
 import 'package:live_wallpaper/screens/ipad_wallpaper_dialog.dart';
 import 'package:live_wallpaper/screens/main_navigation_shell.dart';
+import 'package:live_wallpaper/screens/onboarding_sheet.dart';
+import 'package:live_wallpaper/screens/settings_sheet.dart';
 import 'package:live_wallpaper/screens/wallpaper_preview_sheet.dart';
 import 'package:live_wallpaper/widgets/kinetic_quote_overlay.dart';
 import 'package:live_wallpaper/widgets/shorts_action_rail.dart';
@@ -349,6 +351,89 @@ void main() {
       expect(find.text('File Size'), findsOneWidget);
       expect(find.byIcon(Icons.flag_outlined), findsOneWidget);
       expect(find.text('APPLY WALLPAPER'), findsOneWidget);
+    });
+
+    testWidgets('OnboardingSheet displays Wallora branding and advances pages',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: const WallpaperState(hasSeenOnboarding: false),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: OnboardingSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('WALLORA'), findsOneWidget);
+      expect(find.text('Make every screen yours.'), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
+
+      // Tap Continue to advance to preferences slide
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('What is your aesthetic?'), findsOneWidget);
+    });
+
+    testWidgets('SettingsSheet displays storage cache and integrity metrics',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: const WallpaperState(
+          totalStorageUsedBytes: 5242880,
+          downloadedIds: {'ippo_hard_work'},
+          userPreferences: {'Anime & Gaming'},
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SettingsSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('STORAGE & OFFLINE CACHE'), findsOneWidget);
+      expect(find.text('BATTERY & HARDWARE INTEGRITY'), findsOneWidget);
+      expect(find.text('5.0 MB'), findsOneWidget);
+      expect(find.text('Replay Onboarding Tour'), findsOneWidget);
     });
   });
 }

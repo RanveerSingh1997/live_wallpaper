@@ -33,6 +33,8 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<OpenPhotosIntent>(_onOpenPhotos);
     on<CheckWallpaperStatusIntent>(_onCheckWallpaperStatus);
     on<ClearStatusMessageIntent>(_onClearStatusMessage);
+    on<CompleteOnboardingIntent>(_onCompleteOnboarding);
+    on<ResetOnboardingIntent>(_onResetOnboarding);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -62,6 +64,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final totalStorage = await repository.getTotalDownloadSizeBytes();
       final recentlyViewed = repository.getRecentlyViewed();
       final reported = repository.getReportedIds();
+      final hasSeenOnboarding = repository.hasSeenOnboarding();
 
       final forYouList = _buildForYouList(shorts, preferences);
 
@@ -80,6 +83,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         isTextOverlayVisible: isTextOverlayVisible,
         isLiveWallpaperActiveOnDevice: isActiveOnDevice,
         totalStorageUsedBytes: totalStorage,
+        hasSeenOnboarding: hasSeenOnboarding,
         actionStatus: WallpaperActionStatus.idle,
       ));
     } catch (e) {
@@ -454,5 +458,28 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       message: null,
       errorMessage: null,
     ));
+  }
+
+  Future<void> _onCompleteOnboarding(
+    CompleteOnboardingIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveUserPreferences(event.selectedPreferences);
+    await repository.setHasSeenOnboarding(true);
+    final forYouList = _buildForYouList(state.allShorts, event.selectedPreferences);
+    emit(state.copyWith(
+      hasSeenOnboarding: true,
+      userPreferences: event.selectedPreferences,
+      filteredShorts: forYouList,
+      message: 'Welcome to Wallora! Your feed is personalized.',
+    ));
+  }
+
+  Future<void> _onResetOnboarding(
+    ResetOnboardingIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.setHasSeenOnboarding(false);
+    emit(state.copyWith(hasSeenOnboarding: false));
   }
 }

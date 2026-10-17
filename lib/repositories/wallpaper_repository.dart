@@ -19,11 +19,22 @@ class WallpaperRepository {
   static const String _keyTextOverlayEnabled = 'text_overlay_enabled_by_default';
   static const String _keyRecentlyViewed = 'recently_viewed_wallpaper_ids';
   static const String _keyReported = 'reported_wallpaper_ids';
+  static const String _keyHasSeenOnboarding = 'has_seen_onboarding';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
     required this.prefs,
   }) : _bridge = bridge ?? WallpaperServiceBridge();
+
+  /// Returns whether user has completed first-time onboarding.
+  bool hasSeenOnboarding() {
+    return prefs.getBool(_keyHasSeenOnboarding) ?? false;
+  }
+
+  /// Sets whether user has completed first-time onboarding.
+  Future<void> setHasSeenOnboarding(bool seen) async {
+    await prefs.setBool(_keyHasSeenOnboarding, seen);
+  }
 
   /// Returns list of all curated motivational shorts and static wallpapers.
   List<MotivationalShort> getCuratedShorts() {

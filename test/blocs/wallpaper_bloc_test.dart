@@ -294,5 +294,26 @@ void main() {
             s.message != null)),
       );
     });
+
+    test('CompleteOnboardingIntent sets hasSeenOnboarding and updates preferences', () async {
+      bloc.add(const CompleteOnboardingIntent({'Minimal & AMOLED', 'Cars & Speed'}));
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) =>
+            s.hasSeenOnboarding == true &&
+            s.userPreferences.contains('Minimal & AMOLED') &&
+            s.userPreferences.contains('Cars & Speed'))),
+      );
+    });
+
+    test('ResetOnboardingIntent sets hasSeenOnboarding to false', () async {
+      bloc.add(ResetOnboardingIntent());
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) => s.hasSeenOnboarding == false)),
+      );
+    });
   });
 }

@@ -6,6 +6,7 @@ import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import '../models/motivational_short.dart';
 import 'preferences_modal_sheet.dart';
+import 'settings_sheet.dart';
 import 'wallpaper_preview_sheet.dart';
 
 class DiscoverScreen extends StatefulWidget {
@@ -156,6 +157,16 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               tooltip: 'Personalize Feed',
                               onPressed: () => _openPreferences(context, state),
                             ),
+                            // Settings & Trust button
+                            IconButton(
+                              icon: const Icon(Icons.info_outline_rounded, color: Colors.white70),
+                              tooltip: 'Settings & Trust',
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                SettingsSheet.show(context);
+                              },
+                            ),
+                            const SizedBox(width: 4),
                             // Quick Jump to Vertical Live Feed button
                             ElevatedButton.icon(
                               onPressed: () {

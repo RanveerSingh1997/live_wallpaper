@@ -8,6 +8,7 @@ import 'categories_screen.dart';
 import 'discover_screen.dart';
 import 'downloads_screen.dart';
 import 'favorites_screen.dart';
+import 'onboarding_sheet.dart';
 import 'shorts_feed_screen.dart';
 
 class MainNavigationShell extends StatefulWidget {
@@ -18,6 +19,8 @@ class MainNavigationShell extends StatefulWidget {
 }
 
 class _MainNavigationShellState extends State<MainNavigationShell> {
+  bool _isOnboardingShown = false;
+
   void _navigateToTab(int index) {
     HapticFeedback.selectionClick();
     context.read<WallpaperBloc>().add(ChangeNavigationTabIntent(index));
@@ -31,10 +34,30 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     );
   }
 
+  void _checkAndShowOnboarding(WallpaperState state) {
+    if (!state.hasSeenOnboarding && !_isOnboardingShown && state.allShorts.isNotEmpty) {
+      _isOnboardingShown = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !context.read<WallpaperBloc>().state.hasSeenOnboarding) {
+          OnboardingSheet.show(context).then((_) {
+            _isOnboardingShown = false;
+          });
+        } else {
+          _isOnboardingShown = false;
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<WallpaperBloc, WallpaperState>(
+    return BlocConsumer<WallpaperBloc, WallpaperState>(
+      listenWhen: (prev, curr) => !curr.hasSeenOnboarding && prev.hasSeenOnboarding != curr.hasSeenOnboarding,
+      listener: (context, state) {
+        _checkAndShowOnboarding(state);
+      },
       builder: (context, state) {
+        _checkAndShowOnboarding(state);
         final currentIndex = state.currentNavigationTab;
 
         final screens = [

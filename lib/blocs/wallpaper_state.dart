@@ -30,6 +30,7 @@ class WallpaperState extends Equatable {
   final int currentNavigationTab;
   final String searchQuery;
   final int totalStorageUsedBytes;
+  final bool hasSeenOnboarding;
   final String? message;
   final String? errorMessage;
 
@@ -52,6 +53,7 @@ class WallpaperState extends Equatable {
     this.currentNavigationTab = 0,
     this.searchQuery = '',
     this.totalStorageUsedBytes = 0,
+    this.hasSeenOnboarding = true,
     this.message,
     this.errorMessage,
   });
@@ -157,6 +159,7 @@ class WallpaperState extends Equatable {
     int? currentNavigationTab,
     String? searchQuery,
     int? totalStorageUsedBytes,
+    bool? hasSeenOnboarding,
     String? message,
     String? errorMessage,
   }) {
@@ -180,6 +183,7 @@ class WallpaperState extends Equatable {
       currentNavigationTab: currentNavigationTab ?? this.currentNavigationTab,
       searchQuery: searchQuery ?? this.searchQuery,
       totalStorageUsedBytes: totalStorageUsedBytes ?? this.totalStorageUsedBytes,
+      hasSeenOnboarding: hasSeenOnboarding ?? this.hasSeenOnboarding,
       message: message,
       errorMessage: errorMessage,
     );
@@ -205,6 +209,7 @@ class WallpaperState extends Equatable {
         currentNavigationTab,
         searchQuery,
         totalStorageUsedBytes,
+        hasSeenOnboarding,
         message,
         errorMessage,
       ];

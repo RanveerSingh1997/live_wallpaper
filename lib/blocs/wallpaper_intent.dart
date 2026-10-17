@@ -184,3 +184,15 @@ class ReportWallpaperIntent extends WallpaperIntent {
   @override
   List<Object?> get props => [wallpaperId, reason];
 }
+
+/// Intent to complete the onboarding process and persist preferences.
+class CompleteOnboardingIntent extends WallpaperIntent {
+  final Set<String> selectedPreferences;
+  const CompleteOnboardingIntent(this.selectedPreferences);
+
+  @override
+  List<Object?> get props => [selectedPreferences];
+}
+
+/// Intent to reset onboarding status so user can experience setup again.
+class ResetOnboardingIntent extends WallpaperIntent {}
