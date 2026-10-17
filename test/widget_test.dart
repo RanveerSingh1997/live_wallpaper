@@ -5,6 +5,7 @@ import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
+import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/screens/add_to_collection_sheet.dart';
 import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
@@ -17,6 +18,7 @@ import 'package:live_wallpaper/screens/downloads_screen.dart';
 import 'package:live_wallpaper/screens/favorites_screen.dart';
 import 'package:live_wallpaper/screens/fullscreen_wallpaper_viewer.dart';
 import 'package:live_wallpaper/screens/ipad_wallpaper_dialog.dart';
+import 'package:live_wallpaper/screens/lock_screen_studio_sheet.dart';
 import 'package:live_wallpaper/screens/main_navigation_shell.dart';
 import 'package:live_wallpaper/screens/onboarding_sheet.dart';
 import 'package:live_wallpaper/screens/quote_studio_sheet.dart';
@@ -1443,6 +1445,80 @@ void main() {
 
       // Verify picker dismissed
       expect(find.text('Choose for Morning / Dawn'), findsNothing);
+    });
+
+    testWidgets('LockScreenStudioSheet renders preview, presets, typography, and saves aesthetic',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      final short = CuratedShortsData.shorts.first;
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: Scaffold(
+              body: LockScreenStudioSheet(wallpaper: short),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // 1. Verify Header
+      expect(find.text('LOCK SCREEN STUDIO'), findsOneWidget);
+      expect(find.text('Clock Typography & Glanceable Widgets'), findsOneWidget);
+
+      // 2. Verify Presets and Fonts
+      expect(find.text('Pixel Stacked'), findsOneWidget);
+      expect(find.text('Cyber Matrix'), findsOneWidget);
+      expect(find.text('Editorial Serif'), findsNWidgets(2)); // Preset chip + Font chip
+      expect(find.text('Aurora Neon'), findsNWidgets(2)); // Preset chip + Font chip
+
+      // 3. Verify Typography Font Options
+      expect(find.text('Modern Sans'), findsOneWidget);
+      expect(find.text('Cyber Mono'), findsOneWidget);
+      expect(find.text('Bold Stencil'), findsOneWidget);
+
+      // 4. Verify Layout Options
+      expect(find.text('Classic Inline'), findsOneWidget);
+      expect(find.text('Stacked Modern'), findsOneWidget);
+      expect(find.text('Minimalist Badge'), findsOneWidget);
+
+      // 5. Verify Buttons
+      expect(find.text('Reset'), findsOneWidget);
+      expect(find.text('SAVE LOCK SCREEN AESTHETIC'), findsOneWidget);
+
+      // 6. Tap Preset 'Cyber Matrix'
+      await tester.tap(find.text('Cyber Matrix'));
+      await tester.pumpAndSettle();
+
+      // 7. Tap 'SAVE LOCK SCREEN AESTHETIC'
+      await tester.tap(find.text('SAVE LOCK SCREEN AESTHETIC'));
+      await tester.pumpAndSettle();
+
+      // Verify BLoC state updated with Cyber Matrix values
+      expect(bloc.state.lockScreenStyle.clockFont, LockScreenClockFont.cyber);
+      expect(bloc.state.lockScreenStyle.clockLayout, LockScreenClockLayout.stacked);
+      expect(bloc.state.lockScreenStyle.widgetType, LockScreenWidgetType.batteryGlance);
     });
   });
 }

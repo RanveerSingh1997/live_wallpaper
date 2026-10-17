@@ -5,9 +5,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../widgets/video_player_item.dart';
 import 'ipad_wallpaper_dialog.dart';
+import 'lock_screen_studio_sheet.dart';
 import 'wallpaper_effects_sheet.dart';
 import 'wallpaper_export_sheet.dart';
 
@@ -596,6 +598,16 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                           WallpaperExportSheet.show(context, short);
                         },
                       ),
+                      const SizedBox(width: 4),
+                      // Lock Screen Studio Button
+                      IconButton(
+                        icon: const Icon(Icons.lock_clock_rounded, color: Color(0xFFD500F9)),
+                        tooltip: 'Lock Screen Studio',
+                        onPressed: () {
+                          HapticFeedback.mediumImpact();
+                          LockScreenStudioSheet.show(context, wallpaper: short);
+                        },
+                      ),
                     ],
                   ),
                 ],
@@ -639,168 +651,291 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
   Widget _buildLockScreenOverlay(MotivationalShort short) {
     final topPadding = MediaQuery.of(context).padding.top;
 
-    return IgnorePointer(
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.15),
-        padding: EdgeInsets.fromLTRB(24, topPadding + 16, 24, 24),
-        child: Column(
-          children: [
-            // Status bar
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return BlocBuilder<WallpaperBloc, WallpaperState>(
+      builder: (context, state) {
+        final style = state.lockScreenStyle;
+        final effectiveColor = style.resolveClockColor(short.accentColor);
+        final clockTextStyle = style.resolveClockTextStyle(effectiveColor);
+
+        return IgnorePointer(
+          child: Container(
+            color: Colors.black.withValues(alpha: 0.15),
+            padding: EdgeInsets.fromLTRB(24, topPadding + 16, 24, 24),
+            child: Column(
               children: [
-                const Text(
-                  '09:41',
+                // Status bar
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '09:41',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Row(
+                      children: const [
+                        Icon(Icons.wifi_rounded, color: Colors.white, size: 14),
+                        SizedBox(width: 6),
+                        Icon(Icons.battery_full_rounded, color: Colors.white, size: 14),
+                      ],
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 36),
+
+                // Date
+                if (style.showDate) ...[
+                  const Text(
+                    'Sunday, October 18',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
+                      shadows: [
+                        Shadow(color: Colors.black87, blurRadius: 10),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                ],
+
+                // Dynamic Clock Typography
+                if (style.clockLayout == LockScreenClockLayout.stacked)
+                  Column(
+                    children: [
+                      Text('09', style: clockTextStyle),
+                      Text('41', style: clockTextStyle),
+                    ],
+                  )
+                else if (style.clockLayout == LockScreenClockLayout.compact)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.45),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                          color: effectiveColor.withValues(alpha: 0.4),
+                          width: 1.0),
+                    ),
+                    child: Text(
+                      '09:41 AM',
+                      style: clockTextStyle.copyWith(
+                          fontSize: 32, fontWeight: FontWeight.bold),
+                    ),
+                  )
+                else
+                  Text('09:41', style: clockTextStyle),
+
+                const Spacer(),
+
+                // Dynamic Glanceable Widget Capsule
+                _buildLockScreenWidgetCapsule(style, short, state),
+
+                // Bottom Shortcuts (Torch & Camera)
+                if (style.showShortcuts)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.45),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        child: const Icon(Icons.flashlight_on_rounded,
+                            color: Colors.white, size: 22),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Text(
+                          'Swipe up to unlock',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.45),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        child: const Icon(Icons.camera_alt_rounded,
+                            color: Colors.white, size: 22),
+                      ),
+                    ],
+                  ),
+
+                const SizedBox(height: 12),
+
+                // Home Indicator Bar
+                Center(
+                  child: Container(
+                    width: 120,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.white70,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLockScreenWidgetCapsule(
+    LockScreenStyleConfig style,
+    MotivationalShort short,
+    WallpaperState state,
+  ) {
+    switch (style.widgetType) {
+      case LockScreenWidgetType.circadianSlot:
+        final slot = state.activeScheduleSlot;
+        return Container(
+          margin: const EdgeInsets.only(bottom: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.45),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: slot.accentColor.withValues(alpha: 0.4)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(slot.icon, color: slot.accentColor, size: 16),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  'Solar Slot: ${slot.label}',
                   style: TextStyle(
+                    color: slot.accentColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      case LockScreenWidgetType.quotePill:
+        final quote = state.getEffectiveQuote(short);
+        return Container(
+          margin: const EdgeInsets.only(bottom: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.45),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white24),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: short.accentColor.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.auto_awesome_rounded,
+                    color: short.accentColor, size: 16),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  quote,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                Row(
-                  children: const [
-                    Icon(Icons.wifi_rounded, color: Colors.white, size: 14),
-                    SizedBox(width: 6),
-                    Icon(Icons.battery_full_rounded, color: Colors.white, size: 14),
-                  ],
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 40),
-
-            // Date
-            const Text(
-              'Sunday, October 18',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.2,
-                shadows: [
-                  Shadow(color: Colors.black87, blurRadius: 10),
-                ],
               ),
-            ),
-
-            const SizedBox(height: 4),
-
-            // Large Lock Screen Clock
-            const Text(
-              '09:41',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 84,
-                fontWeight: FontWeight.w200,
-                letterSpacing: -2.0,
-                height: 1.0,
-                shadows: [
-                  Shadow(color: Colors.black87, blurRadius: 16),
-                ],
-              ),
-            ),
-
-            const Spacer(),
-
-            // Motivational Widget Capsule
-            if (short.hasTextByDefault)
-              Container(
-                margin: const EdgeInsets.only(bottom: 24),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.45),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white24),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: short.accentColor.withValues(alpha: 0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.auto_awesome_rounded,
-                          color: short.accentColor, size: 16),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        short.quote,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-            // Bottom Shortcuts (Torch & Camera)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.45),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white24),
-                  ),
-                  child: const Icon(Icons.flashlight_on_rounded,
-                      color: Colors.white, size: 22),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: const Text(
-                    'Swipe up to unlock',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                    ),
+            ],
+          ),
+        );
+      case LockScreenWidgetType.batteryGlance:
+        return Container(
+          margin: const EdgeInsets.only(bottom: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.45),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+                color: const Color(0xFF00E676).withValues(alpha: 0.4)),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.bolt_rounded, color: Color(0xFF00E676), size: 16),
+              SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  '98% • Ultra-Fast Charging • AMOLED Saver Active',
+                  style: TextStyle(
+                    color: Color(0xFF00E676),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.45),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white24),
+              ),
+            ],
+          ),
+        );
+      case LockScreenWidgetType.weatherMinimal:
+        return Container(
+          margin: const EdgeInsets.only(bottom: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.45),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+                color: const Color(0xFFFFD600).withValues(alpha: 0.4)),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.wb_sunny_rounded, color: Color(0xFFFFD600), size: 16),
+              SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  '72°F • Luminous Clear Sky',
+                  style: TextStyle(
+                    color: Color(0xFFFFD600),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  child: const Icon(Icons.camera_alt_rounded,
-                      color: Colors.white, size: 22),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            // Home Indicator Bar
-            Center(
-              child: Container(
-                width: 120,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.white70,
-                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
+            ],
+          ),
+        );
+      case LockScreenWidgetType.none:
+        return const SizedBox.shrink();
+    }
   }
 
   Widget _buildHomeScreenOverlay(MotivationalShort short) {

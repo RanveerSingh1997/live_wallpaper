@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/day_night_schedule_config.dart';
+import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
@@ -34,11 +35,36 @@ class WallpaperRepository {
   static const String _keyCustomCollections = 'custom_user_collections';
   static const String _keyAmoledSaverMode = 'amoled_saver_mode_enabled';
   static const String _keyDayNightSchedule = 'day_night_schedule_config';
+  static const String _keyLockScreenStyle = 'lock_screen_style_config';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
     required this.prefs,
   }) : _bridge = bridge ?? WallpaperServiceBridge();
+
+  /// Returns the configured Lock Screen clock & widget simulation style.
+  LockScreenStyleConfig getLockScreenStyleConfig() {
+    final raw = prefs.getString(_keyLockScreenStyle);
+    if (raw == null || raw.isEmpty) {
+      return LockScreenStyleConfig.defaultConfig;
+    }
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      return LockScreenStyleConfig.fromJson(json);
+    } catch (_) {
+      return LockScreenStyleConfig.defaultConfig;
+    }
+  }
+
+  /// Saves the Lock Screen clock & widget simulation style.
+  Future<void> saveLockScreenStyleConfig(LockScreenStyleConfig config) async {
+    await prefs.setString(_keyLockScreenStyle, jsonEncode(config.toJson()));
+  }
+
+  /// Resets the Lock Screen clock & widget simulation style to default.
+  Future<void> resetLockScreenStyleConfig() async {
+    await prefs.remove(_keyLockScreenStyle);
+  }
 
   /// Returns the configured Day & Night solar schedule settings.
   DayNightScheduleConfig getDayNightScheduleConfig() {

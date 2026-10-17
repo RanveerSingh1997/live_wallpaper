@@ -5,6 +5,7 @@ import 'package:live_wallpaper/blocs/wallpaper_intent.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/models/day_night_schedule_config.dart';
+import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
@@ -775,6 +776,50 @@ void main() {
       await nightExpectation;
 
       expect(repository.isAmoledSaverModeEnabled(), isTrue);
+    });
+
+    test('UpdateLockScreenStyleIntent updates state, persists, and emits notification', () async {
+      const customConfig = LockScreenStyleConfig(
+        clockFont: LockScreenClockFont.neon,
+        clockLayout: LockScreenClockLayout.stacked,
+        widgetType: LockScreenWidgetType.batteryGlance,
+        useWallpaperAccentColor: false,
+        customColor: Color(0xFF00E5FF),
+        clockSize: 94.0,
+      );
+
+      final updateExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.lockScreenStyle == customConfig &&
+              s.message == 'Lock screen simulation aesthetic updated.';
+        })),
+      );
+
+      bloc.add(const UpdateLockScreenStyleIntent(customConfig));
+      await updateExpectation;
+
+      final persisted = repository.getLockScreenStyleConfig();
+      expect(persisted, customConfig);
+    });
+
+    test('ResetLockScreenStyleIntent resets style to default and cleans persistence', () async {
+      // First save custom config
+      await repository.saveLockScreenStyleConfig(LockScreenStyleConfig.cyberMatrixPreset);
+
+      final resetExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.lockScreenStyle == LockScreenStyleConfig.defaultConfig &&
+              s.message == 'Lock screen aesthetic reset to default.';
+        })),
+      );
+
+      bloc.add(const ResetLockScreenStyleIntent());
+      await resetExpectation;
+
+      final persisted = repository.getLockScreenStyleConfig();
+      expect(persisted, LockScreenStyleConfig.defaultConfig);
     });
   });
 }

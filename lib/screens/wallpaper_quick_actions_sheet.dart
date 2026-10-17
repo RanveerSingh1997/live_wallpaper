@@ -9,6 +9,7 @@ import '../models/motivational_short.dart';
 import 'add_to_collection_sheet.dart';
 import 'fullscreen_wallpaper_viewer.dart';
 import 'ipad_wallpaper_dialog.dart';
+import 'lock_screen_studio_sheet.dart';
 import 'quote_studio_sheet.dart';
 import 'wallpaper_effects_sheet.dart';
 import 'wallpaper_export_sheet.dart';
@@ -327,6 +328,23 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
                     Navigator.of(context).pop();
                   }
                   WallpaperEffectsSheet.show(context, wallpaper);
+                },
+              ),
+
+              const SizedBox(height: 8),
+
+              // Action 4: Lock Screen Style & Widgets
+              _buildActionTile(
+                context: context,
+                icon: Icons.lock_clock_rounded,
+                iconColor: const Color(0xFFD500F9),
+                title: 'Lock Screen Style & Widgets',
+                subtitle: 'Customize clock font, stacked layouts & glanceable widgets',
+                onTap: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
+                  LockScreenStudioSheet.show(context, wallpaper: wallpaper);
                 },
               ),
 

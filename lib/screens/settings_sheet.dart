@@ -6,6 +6,7 @@ import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import 'auto_rotation_sheet.dart';
 import 'day_night_schedule_sheet.dart';
+import 'lock_screen_studio_sheet.dart';
 import 'onboarding_sheet.dart';
 import 'preferences_modal_sheet.dart';
 
@@ -229,6 +230,16 @@ class SettingsSheet extends StatelessWidget {
                         : 'Off • Dynamic circadian wallpaper shifts',
                     onTap: () {
                       DayNightScheduleSheet.show(context);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSettingTile(
+                    icon: Icons.lock_clock_rounded,
+                    iconColor: const Color(0xFFD500F9),
+                    title: 'Lock Screen Clock & Widgets',
+                    subtitle: '${state.lockScreenStyle.clockFont.label} • ${state.lockScreenStyle.clockLayout.label}',
+                    onTap: () {
+                      LockScreenStudioSheet.show(context);
                     },
                   ),
                   const SizedBox(height: 8),

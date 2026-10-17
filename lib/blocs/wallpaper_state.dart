@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/day_night_schedule_config.dart';
+import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
@@ -28,6 +29,7 @@ class WallpaperState extends Equatable {
   final Map<String, String> customizedQuotes;
   final Map<String, WallpaperEffectConfig> customEffects;
   final DayNightScheduleConfig dayNightSchedule;
+  final LockScreenStyleConfig lockScreenStyle;
   final bool isFeedMuted;
   final bool isLiveWallpaperActiveOnDevice;
   final String? activeWallpaperId;
@@ -60,6 +62,7 @@ class WallpaperState extends Equatable {
     this.customizedQuotes = const {},
     this.customEffects = const {},
     this.dayNightSchedule = DayNightScheduleConfig.defaultConfig,
+    this.lockScreenStyle = LockScreenStyleConfig.defaultConfig,
     this.isFeedMuted = true,
     this.isLiveWallpaperActiveOnDevice = false,
     this.activeWallpaperId,
@@ -214,6 +217,7 @@ class WallpaperState extends Equatable {
     Map<String, String>? customizedQuotes,
     Map<String, WallpaperEffectConfig>? customEffects,
     DayNightScheduleConfig? dayNightSchedule,
+    LockScreenStyleConfig? lockScreenStyle,
     bool? isFeedMuted,
     bool? isLiveWallpaperActiveOnDevice,
     String? activeWallpaperId,
@@ -246,6 +250,7 @@ class WallpaperState extends Equatable {
       customizedQuotes: customizedQuotes ?? this.customizedQuotes,
       customEffects: customEffects ?? this.customEffects,
       dayNightSchedule: dayNightSchedule ?? this.dayNightSchedule,
+      lockScreenStyle: lockScreenStyle ?? this.lockScreenStyle,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
       isLiveWallpaperActiveOnDevice:
           isLiveWallpaperActiveOnDevice ?? this.isLiveWallpaperActiveOnDevice,
@@ -284,6 +289,7 @@ class WallpaperState extends Equatable {
         customizedQuotes,
         customEffects,
         dayNightSchedule,
+        lockScreenStyle,
         isFeedMuted,
         isLiveWallpaperActiveOnDevice,
         activeWallpaperId,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:live_wallpaper/models/day_night_schedule_config.dart';
+import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
@@ -232,6 +233,37 @@ void main() {
       expect(loaded.morningHour, 7);
       expect(loaded.morningWallpaperId, 'custom_dawn_wall');
       expect(loaded.autoAmoledAtNight, isTrue);
+    });
+
+    test('Lock screen style config CRUD and reset', () async {
+      // Default fallback
+      final defaultConfig = repository.getLockScreenStyleConfig();
+      expect(defaultConfig.clockFont, LockScreenClockFont.modern);
+      expect(defaultConfig.clockLayout, LockScreenClockLayout.horizontal);
+
+      // Save custom config
+      const customConfig = LockScreenStyleConfig(
+        clockFont: LockScreenClockFont.cyber,
+        clockLayout: LockScreenClockLayout.stacked,
+        widgetType: LockScreenWidgetType.batteryGlance,
+        useWallpaperAccentColor: false,
+        customColor: Color(0xFF00E676),
+        clockSize: 90.0,
+      );
+      await repository.saveLockScreenStyleConfig(customConfig);
+
+      final loaded = repository.getLockScreenStyleConfig();
+      expect(loaded.clockFont, LockScreenClockFont.cyber);
+      expect(loaded.clockLayout, LockScreenClockLayout.stacked);
+      expect(loaded.widgetType, LockScreenWidgetType.batteryGlance);
+      expect(loaded.useWallpaperAccentColor, isFalse);
+      expect(loaded.customColor.toARGB32(), const Color(0xFF00E676).toARGB32());
+      expect(loaded.clockSize, 90.0);
+
+      // Reset
+      await repository.resetLockScreenStyleConfig();
+      final resetConfig = repository.getLockScreenStyleConfig();
+      expect(resetConfig, LockScreenStyleConfig.defaultConfig);
     });
   });
 }

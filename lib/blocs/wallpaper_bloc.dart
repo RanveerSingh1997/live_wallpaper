@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/day_night_schedule_config.dart';
+import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../repositories/wallpaper_repository.dart';
@@ -53,6 +54,8 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<UpdateDayNightScheduleIntent>(_onUpdateDayNightSchedule);
     on<ToggleDayNightScheduleIntent>(_onToggleDayNightSchedule);
     on<CheckDayNightTransitionIntent>(_onCheckDayNightTransition);
+    on<UpdateLockScreenStyleIntent>(_onUpdateLockScreenStyle);
+    on<ResetLockScreenStyleIntent>(_onResetLockScreenStyle);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -92,6 +95,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final isAmoledSaver = repository.isAmoledSaverModeEnabled();
       final effects = repository.getCustomEffects();
       final dayNightSchedule = repository.getDayNightScheduleConfig();
+      final lockScreenStyle = repository.getLockScreenStyleConfig();
 
       final forYouList = _buildForYouList(shorts, preferences);
 
@@ -108,6 +112,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         customizedQuotes: quotes,
         customEffects: effects,
         dayNightSchedule: dayNightSchedule,
+        lockScreenStyle: lockScreenStyle,
         activeWallpaperId: activeId,
         userPreferences: preferences,
         isTextOverlayVisible: isTextOverlayVisible,
@@ -874,5 +879,28 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       ));
     }
   }
+
+  Future<void> _onUpdateLockScreenStyle(
+    UpdateLockScreenStyleIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveLockScreenStyleConfig(event.config);
+    emit(state.copyWith(
+      lockScreenStyle: event.config,
+      message: 'Lock screen simulation aesthetic updated.',
+    ));
+  }
+
+  Future<void> _onResetLockScreenStyle(
+    ResetLockScreenStyleIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.resetLockScreenStyleConfig();
+    emit(state.copyWith(
+      lockScreenStyle: LockScreenStyleConfig.defaultConfig,
+      message: 'Lock screen aesthetic reset to default.',
+    ));
+  }
 }
+
 

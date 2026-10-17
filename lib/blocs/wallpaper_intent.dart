@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../models/day_night_schedule_config.dart';
+import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
@@ -339,5 +340,20 @@ class CheckDayNightTransitionIntent extends WallpaperIntent {
   @override
   List<Object?> get props => [currentTime];
 }
+
+/// Intent to update the Lock Screen clock & widget simulation style.
+class UpdateLockScreenStyleIntent extends WallpaperIntent {
+  final LockScreenStyleConfig config;
+  const UpdateLockScreenStyleIntent(this.config);
+
+  @override
+  List<Object?> get props => [config];
+}
+
+/// Intent to reset the Lock Screen clock & widget simulation style to default.
+class ResetLockScreenStyleIntent extends WallpaperIntent {
+  const ResetLockScreenStyleIntent();
+}
+
 
 

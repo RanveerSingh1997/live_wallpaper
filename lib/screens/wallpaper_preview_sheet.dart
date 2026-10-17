@@ -10,6 +10,7 @@ import '../widgets/video_player_item.dart';
 import 'add_to_collection_sheet.dart';
 import 'fullscreen_wallpaper_viewer.dart';
 import 'ipad_wallpaper_dialog.dart';
+import 'lock_screen_studio_sheet.dart';
 import 'quote_studio_sheet.dart';
 import 'wallpaper_effects_sheet.dart';
 import 'wallpaper_export_sheet.dart';
@@ -460,6 +461,62 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                           style: TextStyle(
                                             color: Colors.white54,
                                             fontSize: 9,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              HapticFeedback.mediumImpact();
+                              LockScreenStudioSheet.show(context, wallpaper: wallpaper);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF18181E),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: Colors.white12),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFD500F9).withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(Icons.lock_clock_rounded, color: Color(0xFFD500F9), size: 16),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Lock Screen',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 10,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          'Clock & Widgets',
+                                          style: TextStyle(
+                                            color: Colors.white54,
+                                            fontSize: 8.5,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
