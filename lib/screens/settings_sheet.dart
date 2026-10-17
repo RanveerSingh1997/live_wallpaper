@@ -5,6 +5,7 @@ import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import 'auto_rotation_sheet.dart';
+import 'battery_telemetry_sheet.dart';
 import 'day_night_schedule_sheet.dart';
 import 'lock_screen_studio_sheet.dart';
 import 'onboarding_sheet.dart';
@@ -277,6 +278,17 @@ class SettingsSheet extends StatelessWidget {
                   // SECTION: Device Engine & Trust
                   _buildSectionHeader('BATTERY & HARDWARE INTEGRITY'),
                   const SizedBox(height: 10),
+                  _buildSettingTile(
+                    icon: Icons.bolt_rounded,
+                    iconColor: const Color(0xFF00E676),
+                    title: 'Battery & Display Hub',
+                    subtitle:
+                        '${state.batteryTelemetry.targetFps.displayName} • ${state.batteryTelemetry.isEcoModeEnabled ? "Adaptive Eco Active" : "Full Performance"}',
+                    onTap: () {
+                      BatteryTelemetrySheet.show(context);
+                    },
+                  ),
+                  const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(

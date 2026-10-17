@@ -5,12 +5,14 @@ import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
+import 'package:live_wallpaper/models/battery_telemetry_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/parallax_effect_config.dart';
 import 'package:live_wallpaper/models/smart_filter_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/screens/add_to_collection_sheet.dart';
 import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
+import 'package:live_wallpaper/screens/battery_telemetry_sheet.dart';
 import 'package:live_wallpaper/screens/categories_screen.dart';
 import 'package:live_wallpaper/screens/create_collection_sheet.dart';
 import 'package:live_wallpaper/screens/custom_wallpaper_import_sheet.dart';
@@ -1720,6 +1722,187 @@ void main() {
 
       // Verify BLoC received ResetSmartFilterIntent
       expect(bloc.state.smartFilter, equals(SmartFilterConfig.defaultConfig));
+    });
+
+    testWidgets('BatteryTelemetrySheet renders telemetry cards, target fps options, switches, and saves settings',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: BatteryTelemetrySheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // 1. Verify Header
+      expect(find.text('Battery & Display Hub'), findsOneWidget);
+      expect(find.text('OLED telemetry, frame rate & hardware governor'), findsOneWidget);
+
+      // 2. Verify Metrics Card
+      expect(find.text('LIVE OLED & POWER TELEMETRY'), findsOneWidget);
+      expect(find.text('Hourly Drain'), findsOneWidget);
+      expect(find.text('Energy Conserved'), findsOneWidget);
+
+      // 3. Verify Target Frame-Rate Governor options
+      expect(find.text('TARGET FRAME-RATE GOVERNOR'), findsOneWidget);
+      expect(find.text('60 FPS Ultra-Smooth'), findsOneWidget);
+      expect(find.text('30 FPS Balanced Eco'), findsOneWidget);
+      expect(find.text('Adaptive Eco-Scaling'), findsOneWidget);
+
+      // 4. Select 30 FPS mode
+      await tester.tap(find.text('30 FPS Balanced Eco'));
+      await tester.pumpAndSettle();
+
+      // 5. Scroll down to see Hardware & Display options
+      await tester.scrollUntilVisible(
+        find.text('Zero Sleep Overhead Verified'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('HARDWARE & DISPLAY OPTIMIZATION'), findsOneWidget);
+      expect(find.text('Micro-Pixel Shift Drift'), findsOneWidget);
+      expect(find.text('Hardware Surface Acceleration'), findsOneWidget);
+      expect(find.text('Adaptive Eco Throttle (<20%)'), findsOneWidget);
+      expect(find.text('Zero Sleep Overhead Verified'), findsOneWidget);
+
+      // 6. Verify and tap Save Settings button
+      expect(find.text('Save Settings'), findsOneWidget);
+      await tester.tap(find.text('Save Settings'));
+      await tester.pumpAndSettle();
+
+      // 7. Verify BLoC state was updated with 30 FPS
+      expect(bloc.state.batteryTelemetry.targetFps, equals(TargetFpsMode.fps30));
+    });
+
+    testWidgets('BatteryTelemetrySheet Reset Defaults button restores factory defaults',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+
+      const customConfig = BatteryTelemetryConfig(
+        targetFps: TargetFpsMode.fps30,
+        isEcoModeEnabled: true,
+        isPixelShiftEnabled: false,
+      );
+
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          batteryTelemetry: customConfig,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: BatteryTelemetrySheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Tap Reset Defaults
+      expect(find.text('Reset Defaults'), findsOneWidget);
+      await tester.tap(find.text('Reset Defaults'));
+      await tester.pumpAndSettle();
+
+      // Tap Save Settings
+      await tester.tap(find.text('Save Settings'));
+      await tester.pumpAndSettle();
+
+      // Verify BLoC received default config
+      expect(bloc.state.batteryTelemetry, equals(BatteryTelemetryConfig.defaultConfig));
+    });
+
+    testWidgets('SettingsSheet opens BatteryTelemetrySheet when tapping Battery & Display Hub tile',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SettingsSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Scroll to Battery & Display Hub tile
+      await tester.scrollUntilVisible(
+        find.text('Battery & Display Hub'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('Battery & Display Hub'), findsOneWidget);
+
+      // Tap to open sheet
+      await tester.tap(find.text('Battery & Display Hub'));
+      await tester.pumpAndSettle();
+
+      // Verify BatteryTelemetrySheet is opened
+      expect(find.text('LIVE OLED & POWER TELEMETRY'), findsOneWidget);
+      expect(find.text('Zero Sleep Overhead Verified'), findsOneWidget);
     });
   });
 }

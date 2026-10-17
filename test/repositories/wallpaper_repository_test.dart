@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:live_wallpaper/models/battery_telemetry_config.dart';
 import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
@@ -328,6 +329,34 @@ void main() {
       await repository.resetSmartFilterConfig();
       final reset = repository.getSmartFilterConfig();
       expect(reset, equals(SmartFilterConfig.defaultConfig));
+    });
+
+    test('BatteryTelemetryConfig CRUD and reset persistence', () async {
+      // Default fallback
+      final initial = repository.getBatteryTelemetryConfig();
+      expect(initial, equals(BatteryTelemetryConfig.defaultConfig));
+
+      // Save custom config
+      const custom = BatteryTelemetryConfig(
+        targetFps: TargetFpsMode.fps30,
+        isEcoModeEnabled: true,
+        isPixelShiftEnabled: false,
+        isHardwareDecodingPreferred: false,
+        isBackgroundZeroSleepVerified: true,
+      );
+      await repository.saveBatteryTelemetryConfig(custom);
+
+      final loaded = repository.getBatteryTelemetryConfig();
+      expect(loaded, equals(custom));
+      expect(loaded.targetFps, equals(TargetFpsMode.fps30));
+      expect(loaded.isEcoModeEnabled, isTrue);
+      expect(loaded.isPixelShiftEnabled, isFalse);
+      expect(loaded.isHardwareDecodingPreferred, isFalse);
+
+      // Reset
+      await repository.resetBatteryTelemetryConfig();
+      final reset = repository.getBatteryTelemetryConfig();
+      expect(reset, equals(BatteryTelemetryConfig.defaultConfig));
     });
   });
 }

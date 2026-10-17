@@ -4,6 +4,7 @@ import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
 import 'package:live_wallpaper/blocs/wallpaper_intent.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
+import 'package:live_wallpaper/models/battery_telemetry_config.dart';
 import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/motivational_short.dart';
@@ -961,6 +962,106 @@ void main() {
 
       final persisted = repository.getSmartFilterConfig();
       expect(persisted, equals(SmartFilterConfig.defaultConfig));
+    });
+
+    test('LoadFeedIntent loads persisted battery telemetry from repository', () async {
+      const savedConfig = BatteryTelemetryConfig(
+        targetFps: TargetFpsMode.fps30,
+        isEcoModeEnabled: true,
+      );
+      await repository.saveBatteryTelemetryConfig(savedConfig);
+
+      final loadExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.batteryTelemetry == savedConfig)),
+      );
+
+      bloc.add(const LoadFeedIntent());
+      await loadExpectation;
+
+      expect(bloc.state.batteryTelemetry.targetFps, TargetFpsMode.fps30);
+      expect(bloc.state.batteryTelemetry.isEcoModeEnabled, isTrue);
+    });
+
+    test('UpdateBatteryTelemetryIntent updates state, persists, and notifies', () async {
+      const config = BatteryTelemetryConfig(
+        targetFps: TargetFpsMode.fpsAuto,
+        isEcoModeEnabled: true,
+        isPixelShiftEnabled: false,
+      );
+
+      final updateExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.batteryTelemetry == config &&
+              s.message == 'Battery & display telemetry updated.';
+        })),
+      );
+
+      bloc.add(const UpdateBatteryTelemetryIntent(config));
+      await updateExpectation;
+
+      final persisted = repository.getBatteryTelemetryConfig();
+      expect(persisted, equals(config));
+    });
+
+    test('ToggleEcoModeIntent toggles isEcoModeEnabled, persists, and notifies', () async {
+      expect(bloc.state.batteryTelemetry.isEcoModeEnabled, isFalse);
+
+      // Toggle ON
+      final toggleOnExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.batteryTelemetry.isEcoModeEnabled == true &&
+              s.message != null &&
+              s.message!.contains('Adaptive Eco Scaling enabled');
+        })),
+      );
+
+      bloc.add(const ToggleEcoModeIntent());
+      await toggleOnExpectation;
+
+      expect(repository.getBatteryTelemetryConfig().isEcoModeEnabled, isTrue);
+
+      // Toggle OFF
+      final toggleOffExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.batteryTelemetry.isEcoModeEnabled == false &&
+              s.message != null &&
+              s.message!.contains('Adaptive Eco Scaling disabled');
+        })),
+      );
+
+      bloc.add(const ToggleEcoModeIntent());
+      await toggleOffExpectation;
+
+      expect(repository.getBatteryTelemetryConfig().isEcoModeEnabled, isFalse);
+    });
+
+    test('ResetBatteryTelemetryIntent restores defaults, cleans persistence, and notifies', () async {
+      const customConfig = BatteryTelemetryConfig(
+        targetFps: TargetFpsMode.fps30,
+        isPixelShiftEnabled: false,
+      );
+      bloc.add(const UpdateBatteryTelemetryIntent(customConfig));
+      await expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.batteryTelemetry == customConfig)),
+      );
+
+      final resetExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.batteryTelemetry == BatteryTelemetryConfig.defaultConfig &&
+              s.message == 'Battery & display telemetry reset to defaults.';
+        })),
+      );
+
+      bloc.add(const ResetBatteryTelemetryIntent());
+      await resetExpectation;
+
+      expect(repository.getBatteryTelemetryConfig(), BatteryTelemetryConfig.defaultConfig);
     });
   });
 }

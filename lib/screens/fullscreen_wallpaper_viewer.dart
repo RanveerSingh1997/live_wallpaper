@@ -8,6 +8,7 @@ import '../blocs/wallpaper_state.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../widgets/video_player_item.dart';
+import 'battery_telemetry_sheet.dart';
 import 'ipad_wallpaper_dialog.dart';
 import 'lock_screen_studio_sheet.dart';
 import 'parallax_studio_sheet.dart';
@@ -537,6 +538,43 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.6),
                             fontSize: 11,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        GestureDetector(
+                          onTap: () {
+                            HapticFeedback.mediumImpact();
+                            BatteryTelemetrySheet.show(context);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF00E676)
+                                  .withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                color: const Color(0xFF00E676)
+                                    .withValues(alpha: 0.3),
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.bolt_rounded,
+                                    size: 11, color: Color(0xFF00E676)),
+                                const SizedBox(width: 3),
+                                Text(
+                                  '${state.batteryTelemetry.calculateHourlyDrainPercent(short)}%/hr • ${state.batteryTelemetry.targetFps.fps > 0 ? "${state.batteryTelemetry.targetFps.fps} FPS" : "Auto FPS"}',
+                                  style: const TextStyle(
+                                    color: Color(0xFF00E676),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],

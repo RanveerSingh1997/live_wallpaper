@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
@@ -63,6 +64,9 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<ResetParallaxConfigIntent>(_onResetParallaxConfig);
     on<UpdateSmartFilterIntent>(_onUpdateSmartFilter);
     on<ResetSmartFilterIntent>(_onResetSmartFilter);
+    on<UpdateBatteryTelemetryIntent>(_onUpdateBatteryTelemetry);
+    on<ToggleEcoModeIntent>(_onToggleEcoMode);
+    on<ResetBatteryTelemetryIntent>(_onResetBatteryTelemetry);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -132,6 +136,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final lockScreenStyle = repository.getLockScreenStyleConfig();
       final parallaxConfig = repository.getParallaxEffectConfig();
       final smartFilter = repository.getSmartFilterConfig();
+      final batteryTelemetry = repository.getBatteryTelemetryConfig();
 
       final forYouList = _filterShorts(
         allShorts: shorts,
@@ -156,6 +161,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         lockScreenStyle: lockScreenStyle,
         parallaxConfig: parallaxConfig,
         smartFilter: smartFilter,
+        batteryTelemetry: batteryTelemetry,
         activeWallpaperId: activeId,
         userPreferences: preferences,
         isTextOverlayVisible: isTextOverlayVisible,
@@ -1018,6 +1024,45 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       filteredShorts: filtered,
       activeIndex: 0,
       message: 'Smart discovery filters reset.',
+    ));
+  }
+
+  Future<void> _onUpdateBatteryTelemetry(
+    UpdateBatteryTelemetryIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveBatteryTelemetryConfig(event.config);
+    emit(state.copyWith(
+      batteryTelemetry: event.config,
+      message: 'Battery & display telemetry updated.',
+    ));
+  }
+
+  Future<void> _onToggleEcoMode(
+    ToggleEcoModeIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final updated = state.batteryTelemetry.copyWith(
+      isEcoModeEnabled: !state.batteryTelemetry.isEcoModeEnabled,
+    );
+    await repository.saveBatteryTelemetryConfig(updated);
+    emit(state.copyWith(
+      batteryTelemetry: updated,
+      message: updated.isEcoModeEnabled
+          ? 'Adaptive Eco Scaling enabled (<20% battery throttle).'
+          : 'Adaptive Eco Scaling disabled.',
+    ));
+  }
+
+  Future<void> _onResetBatteryTelemetry(
+    ResetBatteryTelemetryIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.resetBatteryTelemetryConfig();
+    final defaultConfig = BatteryTelemetryConfig.defaultConfig;
+    emit(state.copyWith(
+      batteryTelemetry: defaultConfig,
+      message: 'Battery & display telemetry reset to defaults.',
     ));
   }
 }

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
@@ -392,6 +393,25 @@ class UpdateSmartFilterIntent extends WallpaperIntent {
 /// Intent to reset the Smart Semantic Discovery & Mood Filter configuration.
 class ResetSmartFilterIntent extends WallpaperIntent {
   const ResetSmartFilterIntent();
+}
+
+/// Intent to update the Battery & Display Telemetry configuration.
+class UpdateBatteryTelemetryIntent extends WallpaperIntent {
+  final BatteryTelemetryConfig config;
+  const UpdateBatteryTelemetryIntent(this.config);
+
+  @override
+  List<Object?> get props => [config];
+}
+
+/// Intent to toggle Adaptive Eco Mode on or off.
+class ToggleEcoModeIntent extends WallpaperIntent {
+  const ToggleEcoModeIntent();
+}
+
+/// Intent to reset the Battery & Display Telemetry configuration to defaults.
+class ResetBatteryTelemetryIntent extends WallpaperIntent {
+  const ResetBatteryTelemetryIntent();
 }
 
 

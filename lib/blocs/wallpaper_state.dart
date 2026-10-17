@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../data/curated_shorts_data.dart';
+import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
@@ -34,6 +35,7 @@ class WallpaperState extends Equatable {
   final LockScreenStyleConfig lockScreenStyle;
   final ParallaxEffectConfig parallaxConfig;
   final SmartFilterConfig smartFilter;
+  final BatteryTelemetryConfig batteryTelemetry;
   final bool isFeedMuted;
   final bool isLiveWallpaperActiveOnDevice;
   final String? activeWallpaperId;
@@ -69,6 +71,7 @@ class WallpaperState extends Equatable {
     this.lockScreenStyle = LockScreenStyleConfig.defaultConfig,
     this.parallaxConfig = ParallaxEffectConfig.defaultConfig,
     this.smartFilter = SmartFilterConfig.defaultConfig,
+    this.batteryTelemetry = BatteryTelemetryConfig.defaultConfig,
     this.isFeedMuted = true,
     this.isLiveWallpaperActiveOnDevice = false,
     this.activeWallpaperId,
@@ -233,6 +236,7 @@ class WallpaperState extends Equatable {
     LockScreenStyleConfig? lockScreenStyle,
     ParallaxEffectConfig? parallaxConfig,
     SmartFilterConfig? smartFilter,
+    BatteryTelemetryConfig? batteryTelemetry,
     bool? isFeedMuted,
     bool? isLiveWallpaperActiveOnDevice,
     String? activeWallpaperId,
@@ -268,6 +272,7 @@ class WallpaperState extends Equatable {
       lockScreenStyle: lockScreenStyle ?? this.lockScreenStyle,
       parallaxConfig: parallaxConfig ?? this.parallaxConfig,
       smartFilter: smartFilter ?? this.smartFilter,
+      batteryTelemetry: batteryTelemetry ?? this.batteryTelemetry,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
       isLiveWallpaperActiveOnDevice:
           isLiveWallpaperActiveOnDevice ?? this.isLiveWallpaperActiveOnDevice,
@@ -309,6 +314,7 @@ class WallpaperState extends Equatable {
         lockScreenStyle,
         parallaxConfig,
         smartFilter,
+        batteryTelemetry,
         isFeedMuted,
         isLiveWallpaperActiveOnDevice,
         activeWallpaperId,

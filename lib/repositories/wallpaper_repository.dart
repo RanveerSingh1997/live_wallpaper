@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/curated_shorts_data.dart';
+import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
@@ -40,11 +41,36 @@ class WallpaperRepository {
   static const String _keyLockScreenStyle = 'lock_screen_style_config';
   static const String _keyParallaxConfig = 'parallax_effect_config';
   static const String _keySmartFilter = 'smart_filter_config';
+  static const String _keyBatteryTelemetry = 'battery_telemetry_config';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
     required this.prefs,
   }) : _bridge = bridge ?? WallpaperServiceBridge();
+
+  /// Returns the configured Battery & Display Telemetry settings.
+  BatteryTelemetryConfig getBatteryTelemetryConfig() {
+    final raw = prefs.getString(_keyBatteryTelemetry);
+    if (raw == null || raw.isEmpty) {
+      return BatteryTelemetryConfig.defaultConfig;
+    }
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      return BatteryTelemetryConfig.fromJson(json);
+    } catch (_) {
+      return BatteryTelemetryConfig.defaultConfig;
+    }
+  }
+
+  /// Saves the Battery & Display Telemetry settings.
+  Future<void> saveBatteryTelemetryConfig(BatteryTelemetryConfig config) async {
+    await prefs.setString(_keyBatteryTelemetry, jsonEncode(config.toJson()));
+  }
+
+  /// Resets the Battery & Display Telemetry settings to default.
+  Future<void> resetBatteryTelemetryConfig() async {
+    await prefs.remove(_keyBatteryTelemetry);
+  }
 
   /// Returns the configured Smart Semantic Discovery filter settings.
   SmartFilterConfig getSmartFilterConfig() {
