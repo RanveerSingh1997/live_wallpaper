@@ -9,6 +9,7 @@ import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../widgets/interactive_particle_overlay.dart';
 import '../widgets/video_player_item.dart';
+import 'aura_palette_sheet.dart';
 import 'battery_telemetry_sheet.dart';
 import 'ipad_wallpaper_dialog.dart';
 import 'lock_screen_studio_sheet.dart';
@@ -679,6 +680,16 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                         onPressed: () {
                           HapticFeedback.mediumImpact();
                           ParticleEffectSheet.show(context, wallpaper: short);
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      // Aura Chromatic Harmonizer Button
+                      IconButton(
+                        icon: const Icon(Icons.palette_rounded, color: Color(0xFFD500F9)),
+                        tooltip: 'Aura Chromatic Harmonizer',
+                        onPressed: () {
+                          HapticFeedback.mediumImpact();
+                          AuraPaletteSheet.show(context);
                         },
                       ),
                     ],

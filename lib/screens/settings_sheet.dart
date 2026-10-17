@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import 'aura_palette_sheet.dart';
 import 'auto_rotation_sheet.dart';
 import 'battery_telemetry_sheet.dart';
 import 'day_night_schedule_sheet.dart';
@@ -272,6 +273,17 @@ class SettingsSheet extends StatelessWidget {
                         : 'Paused / Clean Canvas',
                     onTap: () {
                       ParticleEffectSheet.show(context);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSettingTile(
+                    icon: Icons.palette_rounded,
+                    iconColor: const Color(0xFFD500F9),
+                    title: 'Aura Chromatic Harmonizer',
+                    subtitle:
+                        '${state.auraConfig.preset.displayName} • Dynamic color sync',
+                    onTap: () {
+                      AuraPaletteSheet.show(context);
                     },
                   ),
                   const SizedBox(height: 8),

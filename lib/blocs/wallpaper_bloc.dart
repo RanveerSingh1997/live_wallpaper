@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../models/aura_palette_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
@@ -71,6 +72,9 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<UpdateParticleConfigIntent>(_onUpdateParticleConfig);
     on<ToggleParticleEffectIntent>(_onToggleParticleEffect);
     on<ResetParticleConfigIntent>(_onResetParticleConfig);
+    on<UpdateAuraPaletteIntent>(_onUpdateAuraPalette);
+    on<SetAuraThemePresetIntent>(_onSetAuraThemePreset);
+    on<ResetAuraPaletteIntent>(_onResetAuraPalette);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -140,6 +144,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final lockScreenStyle = repository.getLockScreenStyleConfig();
       final parallaxConfig = repository.getParallaxEffectConfig();
       final particleConfig = repository.getParticleEffectConfig();
+      final auraConfig = repository.getAuraPaletteConfig();
       final smartFilter = repository.getSmartFilterConfig();
       final batteryTelemetry = repository.getBatteryTelemetryConfig();
 
@@ -166,6 +171,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         lockScreenStyle: lockScreenStyle,
         parallaxConfig: parallaxConfig,
         particleConfig: particleConfig,
+        auraConfig: auraConfig,
         smartFilter: smartFilter,
         batteryTelemetry: batteryTelemetry,
         activeWallpaperId: activeId,
@@ -1109,6 +1115,41 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     emit(state.copyWith(
       particleConfig: defaultConfig,
       message: 'Interactive Particle FX reset to defaults.',
+    ));
+  }
+
+  Future<void> _onUpdateAuraPalette(
+    UpdateAuraPaletteIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveAuraPaletteConfig(event.config);
+    emit(state.copyWith(
+      auraConfig: event.config,
+      message: 'Aura theme updated (${event.config.preset.displayName}).',
+    ));
+  }
+
+  Future<void> _onSetAuraThemePreset(
+    SetAuraThemePresetIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final updated = state.auraConfig.copyWith(preset: event.preset);
+    await repository.saveAuraPaletteConfig(updated);
+    emit(state.copyWith(
+      auraConfig: updated,
+      message: 'Aura preset switched to ${event.preset.displayName}.',
+    ));
+  }
+
+  Future<void> _onResetAuraPalette(
+    ResetAuraPaletteIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.resetAuraPaletteConfig();
+    final defaultConfig = AuraPaletteConfig.defaultConfig;
+    emit(state.copyWith(
+      auraConfig: defaultConfig,
+      message: 'Aura Chromatic Harmonizer reset to defaults.',
     ));
   }
 }

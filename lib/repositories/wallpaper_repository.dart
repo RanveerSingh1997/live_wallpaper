@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/curated_shorts_data.dart';
+import '../models/aura_palette_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
@@ -44,11 +45,36 @@ class WallpaperRepository {
   static const String _keyParticleConfig = 'particle_effect_config';
   static const String _keySmartFilter = 'smart_filter_config';
   static const String _keyBatteryTelemetry = 'battery_telemetry_config';
+  static const String _keyAuraPalette = 'aura_palette_config';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
     required this.prefs,
   }) : _bridge = bridge ?? WallpaperServiceBridge();
+
+  /// Returns the configured Aura Chromatic Harmonizer & Dynamic Palette settings.
+  AuraPaletteConfig getAuraPaletteConfig() {
+    final raw = prefs.getString(_keyAuraPalette);
+    if (raw == null || raw.isEmpty) {
+      return AuraPaletteConfig.defaultConfig;
+    }
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      return AuraPaletteConfig.fromJson(json);
+    } catch (_) {
+      return AuraPaletteConfig.defaultConfig;
+    }
+  }
+
+  /// Saves the Aura Chromatic Harmonizer & Dynamic Palette settings.
+  Future<void> saveAuraPaletteConfig(AuraPaletteConfig config) async {
+    await prefs.setString(_keyAuraPalette, jsonEncode(config.toJson()));
+  }
+
+  /// Resets the Aura Chromatic Harmonizer & Dynamic Palette settings to default.
+  Future<void> resetAuraPaletteConfig() async {
+    await prefs.remove(_keyAuraPalette);
+  }
 
   /// Returns the configured Battery & Display Telemetry settings.
   BatteryTelemetryConfig getBatteryTelemetryConfig() {

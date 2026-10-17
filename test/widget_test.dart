@@ -5,6 +5,7 @@ import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
+import 'package:live_wallpaper/models/aura_palette_config.dart';
 import 'package:live_wallpaper/models/battery_telemetry_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/parallax_effect_config.dart';
@@ -12,6 +13,7 @@ import 'package:live_wallpaper/models/particle_effect_config.dart';
 import 'package:live_wallpaper/models/smart_filter_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/screens/add_to_collection_sheet.dart';
+import 'package:live_wallpaper/screens/aura_palette_sheet.dart';
 import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
 import 'package:live_wallpaper/screens/battery_telemetry_sheet.dart';
 import 'package:live_wallpaper/screens/particle_effect_sheet.dart';
@@ -2099,6 +2101,200 @@ void main() {
       // Verify ParticleEffectSheet is opened
       expect(find.text('Interactive Particle FX'), findsOneWidget);
       expect(find.text('PARTICLE PRESETS'), findsOneWidget);
+    });
+
+    testWidgets('AuraPaletteSheet renders 5-point swatches, presets, tuning sliders, and saves settings',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: AuraPaletteSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // 1. Verify Header
+      expect(find.text('Aura Chromatic Harmonizer'), findsOneWidget);
+      expect(find.text('Dynamic palette extraction & UI color sync'), findsOneWidget);
+
+      // 2. Verify Swatches
+      expect(find.text('EXTRACTED 5-POINT AURA PALETTE'), findsOneWidget);
+      expect(find.text('Dominant'), findsOneWidget);
+      expect(find.text('Vibrant'), findsOneWidget);
+      expect(find.text('Harmonic'), findsOneWidget);
+      expect(find.text('OLED Shadow'), findsOneWidget);
+      expect(find.text('Glow'), findsOneWidget);
+
+      // 3. Verify Preset Tiles
+      expect(find.text('AURA THEME PRESETS'), findsOneWidget);
+      expect(find.text('Wallpaper Reactive (Auto)'), findsOneWidget);
+      expect(find.text('Cyber Aurora'), findsOneWidget);
+      expect(find.text('Solar Eclipse'), findsOneWidget);
+      expect(find.text('Emerald Matrix'), findsOneWidget);
+      expect(find.text('Velvet Twilight'), findsOneWidget);
+      expect(find.text('Obsidian Monochrome'), findsOneWidget);
+
+      // 4. Tap 'Cyber Aurora' preset
+      await tester.tap(find.text('Cyber Aurora'));
+      await tester.pumpAndSettle();
+
+      // 5. Scroll down to sliders
+      await tester.scrollUntilVisible(
+        find.text('Saturation Multiplier'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('CHROMATIC TUNING & SHIFT'), findsOneWidget);
+      expect(find.text('Hue Shift'), findsOneWidget);
+      expect(find.text('Saturation Multiplier'), findsOneWidget);
+
+      // 6. Scroll down to synchronization targets & save button
+      await tester.scrollUntilVisible(
+        find.text('Sync Interactive Particle FX'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('HARMONIZATION TARGETS'), findsOneWidget);
+      expect(find.text('Sync Interactive Particle FX'), findsOneWidget);
+      expect(find.text('Sync Kinetic Quote Typography'), findsOneWidget);
+      expect(find.text('Sync Lock Screen Clock & Accents'), findsOneWidget);
+
+      // 7. Verify Save Button and tap it
+      expect(find.text('Save Aura Theme'), findsOneWidget);
+      await tester.tap(find.text('Save Aura Theme'));
+      await tester.pumpAndSettle();
+
+      // 8. Verify BLoC state was updated with Cyber Aurora preset
+      expect(bloc.state.auraConfig.preset, equals(AuraThemePreset.cyberAurora));
+    });
+
+    testWidgets('AuraPaletteSheet Reset Defaults restores default configuration',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          auraConfig: const AuraPaletteConfig(
+            preset: AuraThemePreset.solarEclipse,
+            hueShiftDegrees: 50.0,
+          ),
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: AuraPaletteSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Tap Reset Defaults
+      expect(find.text('Reset Defaults'), findsOneWidget);
+      await tester.tap(find.text('Reset Defaults'));
+      await tester.pumpAndSettle();
+
+      // Tap Save Aura Theme
+      await tester.tap(find.text('Save Aura Theme'));
+      await tester.pumpAndSettle();
+
+      // Verify restored to default
+      expect(bloc.state.auraConfig, equals(AuraPaletteConfig.defaultConfig));
+    });
+
+    testWidgets('SettingsSheet opens AuraPaletteSheet when tapping Aura Chromatic Harmonizer tile',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SettingsSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Scroll to Aura Chromatic Harmonizer tile
+      await tester.scrollUntilVisible(
+        find.text('Aura Chromatic Harmonizer'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('Aura Chromatic Harmonizer'), findsOneWidget);
+
+      // Tap to open sheet
+      await tester.tap(find.text('Aura Chromatic Harmonizer'));
+      await tester.pumpAndSettle();
+
+      // Verify AuraPaletteSheet is opened
+      expect(find.text('Aura Chromatic Harmonizer'), findsWidgets);
+      expect(find.text('EXTRACTED 5-POINT AURA PALETTE'), findsOneWidget);
     });
   });
 }

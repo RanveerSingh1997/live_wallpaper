@@ -4,6 +4,7 @@ import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
 import 'package:live_wallpaper/blocs/wallpaper_intent.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
+import 'package:live_wallpaper/models/aura_palette_config.dart';
 import 'package:live_wallpaper/models/battery_telemetry_config.dart';
 import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
@@ -1163,6 +1164,74 @@ void main() {
       await resetExpectation;
 
       expect(repository.getParticleEffectConfig(), ParticleEffectConfig.defaultConfig);
+    });
+
+    test('UpdateAuraPaletteIntent updates state, persists, and notifies', () async {
+      const config = AuraPaletteConfig(
+        preset: AuraThemePreset.cyberAurora,
+        isDynamicThemingEnabled: false,
+        syncParticles: false,
+        syncKineticQuotes: true,
+        syncLockScreen: true,
+        hueShiftDegrees: 45.0,
+        saturationMultiplier: 1.2,
+      );
+
+      final updateExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.auraConfig == config &&
+              s.message != null &&
+              s.message!.contains('Cyber Aurora');
+        })),
+      );
+
+      bloc.add(const UpdateAuraPaletteIntent(config));
+      await updateExpectation;
+
+      final persisted = repository.getAuraPaletteConfig();
+      expect(persisted, equals(config));
+    });
+
+    test('SetAuraThemePresetIntent switches preset, persists, and notifies', () async {
+      final presetExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.auraConfig.preset == AuraThemePreset.solarEclipse &&
+              s.message != null &&
+              s.message!.contains('Solar Eclipse');
+        })),
+      );
+
+      bloc.add(const SetAuraThemePresetIntent(AuraThemePreset.solarEclipse));
+      await presetExpectation;
+
+      expect(repository.getAuraPaletteConfig().preset, AuraThemePreset.solarEclipse);
+    });
+
+    test('ResetAuraPaletteIntent restores default Aura config, cleans persistence, and notifies', () async {
+      const customConfig = AuraPaletteConfig(
+        preset: AuraThemePreset.emeraldMatrix,
+        hueShiftDegrees: -90.0,
+      );
+      bloc.add(const UpdateAuraPaletteIntent(customConfig));
+      await expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.auraConfig == customConfig)),
+      );
+
+      final resetExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.auraConfig == AuraPaletteConfig.defaultConfig &&
+              s.message == 'Aura Chromatic Harmonizer reset to defaults.';
+        })),
+      );
+
+      bloc.add(const ResetAuraPaletteIntent());
+      await resetExpectation;
+
+      expect(repository.getAuraPaletteConfig(), AuraPaletteConfig.defaultConfig);
     });
   });
 }

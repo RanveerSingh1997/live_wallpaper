@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../models/aura_palette_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
@@ -432,6 +433,29 @@ class ToggleParticleEffectIntent extends WallpaperIntent {
 /// Intent to reset Interactive Particle FX configuration to defaults.
 class ResetParticleConfigIntent extends WallpaperIntent {
   const ResetParticleConfigIntent();
+}
+
+/// Intent to update the Aura Chromatic Harmonizer & Dynamic Palette configuration.
+class UpdateAuraPaletteIntent extends WallpaperIntent {
+  final AuraPaletteConfig config;
+  const UpdateAuraPaletteIntent(this.config);
+
+  @override
+  List<Object?> get props => [config];
+}
+
+/// Intent to switch to a predefined Aura Theme Preset.
+class SetAuraThemePresetIntent extends WallpaperIntent {
+  final AuraThemePreset preset;
+  const SetAuraThemePresetIntent(this.preset);
+
+  @override
+  List<Object?> get props => [preset];
+}
+
+/// Intent to reset the Aura Chromatic Harmonizer configuration to defaults.
+class ResetAuraPaletteIntent extends WallpaperIntent {
+  const ResetAuraPaletteIntent();
 }
 
 

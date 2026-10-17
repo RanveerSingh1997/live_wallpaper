@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../data/curated_shorts_data.dart';
+import '../models/aura_palette_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/lock_screen_style_config.dart';
@@ -36,6 +37,7 @@ class WallpaperState extends Equatable {
   final LockScreenStyleConfig lockScreenStyle;
   final ParallaxEffectConfig parallaxConfig;
   final ParticleEffectConfig particleConfig;
+  final AuraPaletteConfig auraConfig;
   final SmartFilterConfig smartFilter;
   final BatteryTelemetryConfig batteryTelemetry;
   final bool isFeedMuted;
@@ -73,6 +75,7 @@ class WallpaperState extends Equatable {
     this.lockScreenStyle = LockScreenStyleConfig.defaultConfig,
     this.parallaxConfig = ParallaxEffectConfig.defaultConfig,
     this.particleConfig = ParticleEffectConfig.defaultConfig,
+    this.auraConfig = AuraPaletteConfig.defaultConfig,
     this.smartFilter = SmartFilterConfig.defaultConfig,
     this.batteryTelemetry = BatteryTelemetryConfig.defaultConfig,
     this.isFeedMuted = true,
@@ -239,6 +242,7 @@ class WallpaperState extends Equatable {
     LockScreenStyleConfig? lockScreenStyle,
     ParallaxEffectConfig? parallaxConfig,
     ParticleEffectConfig? particleConfig,
+    AuraPaletteConfig? auraConfig,
     SmartFilterConfig? smartFilter,
     BatteryTelemetryConfig? batteryTelemetry,
     bool? isFeedMuted,
@@ -276,6 +280,7 @@ class WallpaperState extends Equatable {
       lockScreenStyle: lockScreenStyle ?? this.lockScreenStyle,
       parallaxConfig: parallaxConfig ?? this.parallaxConfig,
       particleConfig: particleConfig ?? this.particleConfig,
+      auraConfig: auraConfig ?? this.auraConfig,
       smartFilter: smartFilter ?? this.smartFilter,
       batteryTelemetry: batteryTelemetry ?? this.batteryTelemetry,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
@@ -319,6 +324,7 @@ class WallpaperState extends Equatable {
         lockScreenStyle,
         parallaxConfig,
         particleConfig,
+        auraConfig,
         smartFilter,
         batteryTelemetry,
         isFeedMuted,

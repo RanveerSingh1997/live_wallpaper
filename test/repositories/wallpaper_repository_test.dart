@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:live_wallpaper/models/aura_palette_config.dart';
 import 'package:live_wallpaper/models/battery_telemetry_config.dart';
 import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
@@ -391,6 +392,39 @@ void main() {
       await repository.resetParticleEffectConfig();
       final reset = repository.getParticleEffectConfig();
       expect(reset, equals(ParticleEffectConfig.defaultConfig));
+    });
+
+    test('AuraPaletteConfig CRUD and reset persistence', () async {
+      // Default fallback
+      final initial = repository.getAuraPaletteConfig();
+      expect(initial, equals(AuraPaletteConfig.defaultConfig));
+
+      // Save custom config
+      const custom = AuraPaletteConfig(
+        preset: AuraThemePreset.cyberAurora,
+        isDynamicThemingEnabled: false,
+        syncParticles: false,
+        syncKineticQuotes: false,
+        syncLockScreen: true,
+        hueShiftDegrees: 60.0,
+        saturationMultiplier: 1.3,
+      );
+      await repository.saveAuraPaletteConfig(custom);
+
+      final loaded = repository.getAuraPaletteConfig();
+      expect(loaded, equals(custom));
+      expect(loaded.preset, equals(AuraThemePreset.cyberAurora));
+      expect(loaded.isDynamicThemingEnabled, isFalse);
+      expect(loaded.syncParticles, isFalse);
+      expect(loaded.syncKineticQuotes, isFalse);
+      expect(loaded.syncLockScreen, isTrue);
+      expect(loaded.hueShiftDegrees, equals(60.0));
+      expect(loaded.saturationMultiplier, equals(1.3));
+
+      // Reset
+      await repository.resetAuraPaletteConfig();
+      final reset = repository.getAuraPaletteConfig();
+      expect(reset, equals(AuraPaletteConfig.defaultConfig));
     });
   });
 }
