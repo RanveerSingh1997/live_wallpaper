@@ -92,13 +92,13 @@ void main() {
       bloc.add(LoadFeedIntent());
       await bloc.stream.firstWhere((s) => s.allShorts.isNotEmpty);
 
-      bloc.add(const FilterByCategoryIntent('Fighter Spirit'));
+      bloc.add(const FilterByCategoryIntent('Anime & Gaming'));
 
       await expectLater(
         bloc.stream,
         emits(predicate<WallpaperState>((s) {
-          return s.selectedCategory == 'Fighter Spirit' &&
-              s.filteredShorts.every((x) => x.category == 'Fighter Spirit') &&
+          return s.selectedCategory == 'Anime & Gaming' &&
+              s.filteredShorts.every((x) => x.category == 'Anime & Gaming') &&
               s.filteredShorts.isNotEmpty;
         })),
       );
@@ -111,6 +111,46 @@ void main() {
           return s.selectedCategory == 'All' &&
               s.filteredShorts.length == s.allShorts.length;
         })),
+      );
+    });
+
+    test('UpdateUserPreferencesIntent personalizes For You feed', () async {
+      bloc.add(LoadFeedIntent());
+      await bloc.stream.firstWhere((s) => s.allShorts.isNotEmpty);
+
+      // Set preferences to Cars & Speed and Nature & Scenery
+      bloc.add(const UpdateUserPreferencesIntent({'Cars & Speed', 'Nature & Scenery'}));
+
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>((s) {
+          final firstCategories = s.filteredShorts.take(2).map((x) => x.category).toSet();
+          return s.userPreferences.contains('Cars & Speed') &&
+              s.userPreferences.contains('Nature & Scenery') &&
+              firstCategories.contains('Cars & Speed') &&
+              firstCategories.contains('Nature & Scenery');
+        })),
+      );
+    });
+
+    test('ToggleTextOverlayVisibilityIntent toggles overlay state', () async {
+      bloc.add(LoadFeedIntent());
+      await bloc.stream.firstWhere((s) => s.allShorts.isNotEmpty);
+
+      final initialVisibility = bloc.state.isTextOverlayVisible;
+
+      bloc.add(ToggleTextOverlayVisibilityIntent());
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>(
+            (s) => s.isTextOverlayVisible == !initialVisibility)),
+      );
+
+      bloc.add(ToggleTextOverlayVisibilityIntent());
+      await expectLater(
+        bloc.stream,
+        emits(predicate<WallpaperState>(
+            (s) => s.isTextOverlayVisible == initialVisibility)),
       );
     });
 

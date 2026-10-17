@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-/// Represents a vertical motivational short designed for live wallpaper looping.
+/// Represents a vertical live wallpaper short designed for continuous looping.
+/// Can be a motivational quote short or a pure visual aesthetic/nature/car wallpaper.
 class MotivationalShort extends Equatable {
   final String id;
   final String title;
@@ -12,6 +13,8 @@ class MotivationalShort extends Equatable {
   final Color accentColor;
   final List<String> alternativeQuotes;
   final String tags;
+  final bool hasTextByDefault;
+  final String mood;
 
   const MotivationalShort({
     required this.id,
@@ -23,6 +26,8 @@ class MotivationalShort extends Equatable {
     required this.accentColor,
     this.alternativeQuotes = const [],
     required this.tags,
+    this.hasTextByDefault = true,
+    this.mood = 'Inspiring',
   });
 
   MotivationalShort copyWith({
@@ -35,6 +40,8 @@ class MotivationalShort extends Equatable {
     Color? accentColor,
     List<String>? alternativeQuotes,
     String? tags,
+    bool? hasTextByDefault,
+    String? mood,
   }) {
     return MotivationalShort(
       id: id ?? this.id,
@@ -46,6 +53,8 @@ class MotivationalShort extends Equatable {
       accentColor: accentColor ?? this.accentColor,
       alternativeQuotes: alternativeQuotes ?? this.alternativeQuotes,
       tags: tags ?? this.tags,
+      hasTextByDefault: hasTextByDefault ?? this.hasTextByDefault,
+      mood: mood ?? this.mood,
     );
   }
 
@@ -60,5 +69,10 @@ class MotivationalShort extends Equatable {
         accentColor,
         alternativeQuotes,
         tags,
+        hasTextByDefault,
+        mood,
       ];
 }
+
+/// Type alias for broader live wallpaper taxonomy
+typedef LiveWallpaperItem = MotivationalShort;

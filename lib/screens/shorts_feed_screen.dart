@@ -9,6 +9,7 @@ import '../models/motivational_short.dart';
 import '../widgets/kinetic_quote_overlay.dart';
 import '../widgets/shorts_action_rail.dart';
 import '../widgets/video_player_item.dart';
+import 'preferences_modal_sheet.dart';
 import 'quote_studio_sheet.dart';
 
 class ShortsFeedScreen extends StatefulWidget {
@@ -41,6 +42,22 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
       builder: (ctx) => QuoteStudioSheet(
         short: short,
         currentQuote: quote,
+      ),
+    );
+  }
+
+  void _openPreferencesModal(
+    BuildContext context,
+    Set<String> currentPrefs,
+    bool textOverlayEnabled,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => PreferencesModalSheet(
+        initialPreferences: currentPrefs,
+        initialTextOverlayEnabled: textOverlayEnabled,
       ),
     );
   }
@@ -178,16 +195,59 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                       ),
 
                       // Motivational Typography Overlay (bottom left)
-                      Positioned(
-                        left: 0,
-                        right: 80,
-                        bottom: 0,
-                        child: KineticQuoteOverlay(
-                          short: short,
-                          effectiveQuote: effectiveQuote,
-                          isCustomized: isCustomized,
+                      if (state.isTextOverlayVisible &&
+                          (short.hasTextByDefault || isCustomized))
+                        Positioned(
+                          left: 0,
+                          right: 80,
+                          bottom: 0,
+                          child: KineticQuoteOverlay(
+                            short: short,
+                            effectiveQuote: effectiveQuote,
+                            isCustomized: isCustomized,
+                          ),
+                        )
+                      else
+                        Positioned(
+                          left: 20,
+                          bottom: 24,
+                          right: 90,
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.6),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: short.accentColor.withValues(alpha: 0.6),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.auto_awesome_rounded,
+                                      size: 13,
+                                      color: short.accentColor,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      short.title,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
 
                       // Action Rail (bottom right)
                       Positioned(
@@ -266,7 +326,7 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                                 Icon(Icons.bolt_rounded, color: Color(0xFFFFD600), size: 22),
                                 SizedBox(width: 6),
                                 Text(
-                                  'MOTIVATION LIVE',
+                                  'LIVE WALLPAPER',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w900,
@@ -276,36 +336,83 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                                 ),
                               ],
                             ),
-                            if (state.isLiveWallpaperActiveOnDevice)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF00E676).withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: const Color(0xFF00E676),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: const Row(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 3,
-                                      backgroundColor: Color(0xFF00E676),
-                                    ),
-                                    SizedBox(width: 5),
-                                    Text(
-                                      'WALLPAPER ACTIVE',
-                                      style: TextStyle(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w800,
-                                        color: Color(0xFF00E676),
-                                        letterSpacing: 0.8,
+                            Row(
+                              children: [
+                                if (state.isLiveWallpaperActiveOnDevice) ...[
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF00E676).withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: const Color(0xFF00E676),
+                                        width: 1,
                                       ),
                                     ),
-                                  ],
+                                    child: const Row(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 3,
+                                          backgroundColor: Color(0xFF00E676),
+                                        ),
+                                        SizedBox(width: 5),
+                                        Text(
+                                          'ACTIVE',
+                                          style: TextStyle(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xFF00E676),
+                                            letterSpacing: 0.8,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                ],
+                                // Quick toggle text overlay
+                                IconButton(
+                                  constraints: const BoxConstraints(),
+                                  padding: const EdgeInsets.all(6),
+                                  tooltip: state.isTextOverlayVisible
+                                      ? 'Hide Text Overlay'
+                                      : 'Show Text Overlay',
+                                  icon: Icon(
+                                    state.isTextOverlayVisible
+                                        ? Icons.subtitles_rounded
+                                        : Icons.subtitles_off_rounded,
+                                    color: state.isTextOverlayVisible
+                                        ? const Color(0xFF00E676)
+                                        : Colors.white38,
+                                    size: 22,
+                                  ),
+                                  onPressed: () {
+                                    context
+                                        .read<WallpaperBloc>()
+                                        .add(ToggleTextOverlayVisibilityIntent());
+                                  },
                                 ),
-                              ),
+                                const SizedBox(width: 4),
+                                // Preferences tuning button
+                                IconButton(
+                                  constraints: const BoxConstraints(),
+                                  padding: const EdgeInsets.all(6),
+                                  tooltip: 'Wallpaper Preferences',
+                                  icon: const Icon(
+                                    Icons.tune_rounded,
+                                    color: Colors.white,
+                                    size: 22,
+                                  ),
+                                  onPressed: () {
+                                    _openPreferencesModal(
+                                      context,
+                                      state.userPreferences,
+                                      state.isTextOverlayVisible,
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                         const SizedBox(height: 8),

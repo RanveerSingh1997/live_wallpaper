@@ -2,89 +2,158 @@ import 'package:flutter/material.dart';
 import '../models/motivational_short.dart';
 
 class CuratedShortsData {
+  static const List<String> availablePreferences = [
+    'Anime & Gaming',
+    'Nature & Scenery',
+    'Cyberpunk & Tech',
+    'Cars & Speed',
+    'Minimal & AMOLED',
+    'Motivation & Mindset',
+    'Fitness & Grind',
+  ];
+
   static const List<MotivationalShort> shorts = [
+    // 1. Anime & Gaming (Flagship: Hajime no Ippo)
     MotivationalShort(
       id: 'ippo_hard_work',
       title: 'Hajime no Ippo: Makunouchi Creed',
       quote: 'Not everyone who works hard is rewarded, but everyone who succeeds has worked hard.',
       author: 'Coach Kamogawa to Ippo Makunouchi',
-      category: 'Fighter Spirit',
+      category: 'Anime & Gaming',
       videoAssetPath: 'assets/videos/ippo_motivation.mp4',
       accentColor: Color(0xFFFF5722),
-      tags: 'hippo maiko ippo makunouchi boxing hard work anime fighter coach kamogawa discipline',
+      mood: 'Fighter Spirit',
+      hasTextByDefault: true,
+      tags: 'anime ippo makunouchi boxing fighter gaming fight kamogawa punch knockout',
       alternativeQuotes: [
         'Hard work betrays none. Step into the ring and conquer yourself.',
         'A single punch thrown with all your soul can shatter limitations.',
         'Stand up! The fight is never over until you surrender.',
       ],
     ),
+
+    // 2. Nature & Scenery (Aesthetic Nature Live Wallpaper)
     MotivationalShort(
-      id: 'discipline_grind',
-      title: 'Discipline Over Motivation',
-      quote: 'Motivation gets you started. Discipline keeps you alive.',
-      author: '05:00 AM Protocol',
-      category: 'Discipline',
-      videoAssetPath: 'assets/videos/discipline_grind.mp4',
-      accentColor: Color(0xFFFFC107),
-      tags: 'discipline motivation morning habits grind workout consistency focus',
-      alternativeQuotes: [
-        'Small daily habits repeated consistently build unbreakable empires.',
-        'Suffer the pain of discipline, or suffer the lifelong pain of regret.',
-        'Do what must be done, especially when your mind makes excuses.',
-      ],
-    ),
-    MotivationalShort(
-      id: 'iron_mind',
-      title: 'The Stoic Forge',
-      quote: 'You have power over your mind, not outside events. Realize this, and find strength.',
-      author: 'Marcus Aurelius',
-      category: 'Stoic Wisdom',
+      id: 'nature_aurora',
+      title: 'Cosmic Aurora & Mountain Peak',
+      quote: 'Nature does not hurry, yet everything is accomplished.',
+      author: 'Lao Tzu',
+      category: 'Nature & Scenery',
       videoAssetPath: 'assets/videos/iron_mind.mp4',
-      accentColor: Color(0xFF00E5FF),
-      tags: 'stoic marcus aurelius philosophy power mind calm focus meditation strength',
+      accentColor: Color(0xFF00E676),
+      mood: 'Serenity & Calm',
+      hasTextByDefault: false,
+      tags: 'nature aurora mountains stars night landscape peaceful calm ocean water',
       alternativeQuotes: [
-        'The obstacle in your path becomes the path forward.',
-        'Waste no more time arguing what a good person should be. Be one.',
-        'He who fears difficulty will never do anything worthy of greatness.',
+        'Adopt the pace of nature: her secret is patience.',
+        'The earth has music for those who listen.',
+        'In the midst of movement, keep stillness inside you.',
       ],
     ),
+
+    // 3. Cyberpunk & Tech
     MotivationalShort(
       id: 'silent_ambition',
-      title: 'Silent Ambition',
+      title: 'Silent Ambition: Neon Rain',
       quote: 'Work in absolute silence. Let your unstoppable execution make the thunder.',
       author: 'Night Protocol',
-      category: 'Deep Grind',
+      category: 'Cyberpunk & Tech',
       videoAssetPath: 'assets/videos/silent_ambition.mp4',
       accentColor: Color(0xFFD500F9),
-      tags: 'coding build startup hacker developer night hustle focus stealth',
+      mood: 'Deep Focus',
+      hasTextByDefault: true,
+      tags: 'cyberpunk tech coding developer neon matrix hacker midnight futuristic',
       alternativeQuotes: [
         'Never announce moves before they trigger checkmate.',
         'While they sleep, you architect. While they celebrate, you execute.',
         'Genius is relentless focus on what truly matters.',
       ],
     ),
+
+    // 4. Cars & Speed (Supercar / Hypercar aesthetic)
     MotivationalShort(
-      id: 'comeback_spirit',
-      title: 'Never Stay Down',
-      quote: 'It is not about how hard you hit. It is about how hard you can get hit and keep moving forward.',
-      author: 'Championship Mindset',
-      category: 'Resilience',
+      id: 'supercar_night',
+      title: 'Midnight Highway & Twin Turbo',
+      quote: 'Speed is nothing without direction.',
+      author: 'Apex Velocity',
+      category: 'Cars & Speed',
       videoAssetPath: 'assets/videos/comeback_spirit.mp4',
       accentColor: Color(0xFFFF1744),
-      tags: 'boxing rocky fight comeback resilience never give up grit heart warrior',
+      mood: 'Adrenaline',
+      hasTextByDefault: false,
+      tags: 'cars speed supercar hypercar drift highway racing neon asphalt engine turbo',
       alternativeQuotes: [
-        'Every true champion was once a contender who refused to stay down.',
-        'Fall seven times. Rise eight times with fire in your eyes.',
-        'Scars are simply undeniable proof that you survived the war.',
+        'Drive your ambition harder than your fears.',
+        'The road to mastery has no speed limits.',
+        'Built for the track, born to conquer the night.',
+      ],
+    ),
+
+    // 5. Minimal & AMOLED (Dark Aesthetic)
+    MotivationalShort(
+      id: 'minimal_amoled',
+      title: 'Obsidian Void & Liquid Motion',
+      quote: 'Simplicity is the ultimate sophistication.',
+      author: 'Leonardo da Vinci',
+      category: 'Minimal & AMOLED',
+      videoAssetPath: 'assets/videos/iron_mind.mp4',
+      accentColor: Color(0xFF7C4DFF),
+      mood: 'Minimalist',
+      hasTextByDefault: false,
+      tags: 'minimal amoled dark black liquid geometry abstract clean elegance luxury',
+      alternativeQuotes: [
+        'Silence is where power accumulates.',
+        'Less noise, more signal.',
+        'Pure form, uncompromised essence.',
+      ],
+    ),
+
+    // 6. Fitness & Grind
+    MotivationalShort(
+      id: 'discipline_grind',
+      title: '05:00 AM Protocol: Iron Discipline',
+      quote: 'Motivation gets you started. Discipline keeps you alive.',
+      author: 'Iron Mindset',
+      category: 'Fitness & Grind',
+      videoAssetPath: 'assets/videos/discipline_grind.mp4',
+      accentColor: Color(0xFFFFC107),
+      mood: 'Relentless Grind',
+      hasTextByDefault: true,
+      tags: 'fitness gym workout morning grind discipline sweat bodybuilding cardio',
+      alternativeQuotes: [
+        'Small daily habits repeated consistently build unbreakable empires.',
+        'Suffer the pain of discipline, or suffer the lifelong pain of regret.',
+        'Do what must be done, especially when your mind makes excuses.',
+      ],
+    ),
+
+    // 7. Motivation & Mindset
+    MotivationalShort(
+      id: 'stoic_wisdom',
+      title: 'The Stoic Fortress',
+      quote: 'You have power over your mind, not outside events. Realize this, and find strength.',
+      author: 'Marcus Aurelius',
+      category: 'Motivation & Mindset',
+      videoAssetPath: 'assets/videos/discipline_grind.mp4',
+      accentColor: Color(0xFF00E5FF),
+      mood: 'Stoic Wisdom',
+      hasTextByDefault: true,
+      tags: 'motivation stoic philosophy wisdom marcus aurelius strength resilience mind focus',
+      alternativeQuotes: [
+        'The obstacle in your path becomes the path forward.',
+        'Waste no more time arguing what a good person should be. Be one.',
+        'He who fears difficulty will never do anything worthy of greatness.',
       ],
     ),
   ];
 
   static List<String> get categories {
-    final Set<String> unique = {'All'};
-    for (final short in shorts) {
-      unique.add(short.category);
+    final List<String> list = ['For You', 'All'];
+    for (final pref in availablePreferences) {
+      if (!list.contains(pref)) {
+        list.add(pref);
+      }
     }
-    return unique.toList();
+    return list;
   }
 }

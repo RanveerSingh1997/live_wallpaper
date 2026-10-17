@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../models/motivational_short.dart';
 import '../repositories/wallpaper_repository.dart';
 import 'wallpaper_intent.dart';
 import 'wallpaper_state.dart';
@@ -13,6 +14,8 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<ToggleFeedMuteIntent>(_onToggleFeedMute);
     on<ToggleFavoriteIntent>(_onToggleFavorite);
     on<FilterByCategoryIntent>(_onFilterByCategory);
+    on<UpdateUserPreferencesIntent>(_onUpdateUserPreferences);
+    on<ToggleTextOverlayVisibilityIntent>(_onToggleTextOverlayVisibility);
     on<UpdateCustomQuoteIntent>(_onUpdateCustomQuote);
     on<ResetCustomQuoteIntent>(_onResetCustomQuote);
     on<ApplyLiveWallpaperIntent>(_onApplyLiveWallpaper);
@@ -20,6 +23,16 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<OpenPhotosIntent>(_onOpenPhotos);
     on<CheckWallpaperStatusIntent>(_onCheckWallpaperStatus);
     on<ClearStatusMessageIntent>(_onClearStatusMessage);
+  }
+
+  List<MotivationalShort> _buildForYouList(
+    List<MotivationalShort> all,
+    Set<String> preferences,
+  ) {
+    if (preferences.isEmpty) return all;
+    final preferred = all.where((s) => preferences.contains(s.category)).toList();
+    final others = all.where((s) => !preferences.contains(s.category)).toList();
+    return [...preferred, ...others];
   }
 
   Future<void> _onLoadFeed(
@@ -32,23 +45,29 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final favorites = repository.getFavorites();
       final quotes = repository.getCustomQuotes();
       final activeId = repository.getActiveWallpaperId();
+      final preferences = repository.getUserPreferences();
+      final isTextOverlayVisible = repository.isTextOverlayEnabledByDefault();
       final isActiveOnDevice = await repository.isWallpaperActiveOnDevice();
+
+      final forYouList = _buildForYouList(shorts, preferences);
 
       emit(state.copyWith(
         allShorts: shorts,
-        filteredShorts: shorts,
+        filteredShorts: forYouList,
         activeIndex: 0,
-        selectedCategory: 'All',
+        selectedCategory: 'For You',
         favoriteIds: favorites,
         customizedQuotes: quotes,
         activeWallpaperId: activeId,
+        userPreferences: preferences,
+        isTextOverlayVisible: isTextOverlayVisible,
         isLiveWallpaperActiveOnDevice: isActiveOnDevice,
         actionStatus: WallpaperActionStatus.idle,
       ));
     } catch (e) {
       emit(state.copyWith(
         actionStatus: WallpaperActionStatus.error,
-        errorMessage: 'Failed to load motivational feed: $e',
+        errorMessage: 'Failed to load live wallpaper feed: $e',
       ));
     }
   }
@@ -83,14 +102,52 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     FilterByCategoryIntent event,
     Emitter<WallpaperState> emit,
   ) {
-    final filtered = event.category == 'All'
-        ? state.allShorts
-        : state.allShorts.where((s) => s.category == event.category).toList();
+    List<MotivationalShort> filtered;
+    if (event.category == 'All') {
+      filtered = state.allShorts;
+    } else if (event.category == 'For You') {
+      filtered = _buildForYouList(state.allShorts, state.userPreferences);
+    } else {
+      filtered = state.allShorts.where((s) => s.category == event.category).toList();
+    }
 
     emit(state.copyWith(
       selectedCategory: event.category,
       filteredShorts: filtered,
       activeIndex: 0,
+    ));
+  }
+
+  Future<void> _onUpdateUserPreferences(
+    UpdateUserPreferencesIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    try {
+      await repository.saveUserPreferences(event.preferences);
+      final forYouList = _buildForYouList(state.allShorts, event.preferences);
+
+      emit(state.copyWith(
+        userPreferences: event.preferences,
+        filteredShorts: state.selectedCategory == 'For You' ? forYouList : state.filteredShorts,
+        message: 'Wallpaper preferences updated! Feed personalized.',
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        actionStatus: WallpaperActionStatus.error,
+        errorMessage: 'Failed to update preferences: $e',
+      ));
+    }
+  }
+
+  Future<void> _onToggleTextOverlayVisibility(
+    ToggleTextOverlayVisibilityIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final nextState = !state.isTextOverlayVisible;
+    await repository.setTextOverlayEnabled(nextState);
+    emit(state.copyWith(
+      isTextOverlayVisible: nextState,
+      message: nextState ? 'Text overlay visible' : 'Pure video mode (text hidden)',
     ));
   }
 
@@ -106,12 +163,12 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       emit(state.copyWith(
         customizedQuotes: updatedQuotes,
         actionStatus: WallpaperActionStatus.idle,
-        message: 'Motivational quote updated!',
+        message: 'Wallpaper text updated!',
       ));
     } catch (e) {
       emit(state.copyWith(
         actionStatus: WallpaperActionStatus.error,
-        errorMessage: 'Failed to save customized quote: $e',
+        errorMessage: 'Failed to save customized text: $e',
       ));
     }
   }
@@ -128,12 +185,12 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       emit(state.copyWith(
         customizedQuotes: updatedQuotes,
         actionStatus: WallpaperActionStatus.idle,
-        message: 'Quote reset to original creed',
+        message: 'Text reset to original default',
       ));
     } catch (e) {
       emit(state.copyWith(
         actionStatus: WallpaperActionStatus.error,
-        errorMessage: 'Failed to reset quote: $e',
+        errorMessage: 'Failed to reset text: $e',
       ));
     }
   }

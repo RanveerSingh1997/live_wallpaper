@@ -13,6 +13,8 @@ class WallpaperRepository {
   static const String _keyFavorites = 'favorite_short_ids';
   static const String _keyActiveId = 'active_wallpaper_id';
   static const String _keyCustomQuotesPrefix = 'custom_quote_';
+  static const String _keyUserPreferences = 'user_preferred_categories';
+  static const String _keyTextOverlayEnabled = 'text_overlay_enabled_by_default';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
@@ -22,6 +24,31 @@ class WallpaperRepository {
   /// Returns list of all curated motivational shorts.
   List<MotivationalShort> getCuratedShorts() {
     return CuratedShortsData.shorts;
+  }
+
+  /// Returns set of user preferred wallpaper categories.
+  Set<String> getUserPreferences() {
+    final list = prefs.getStringList(_keyUserPreferences);
+    if (list != null && list.isNotEmpty) {
+      return list.toSet();
+    }
+    // Default preferences: Anime, Nature, Motivation
+    return {'Anime & Gaming', 'Nature & Scenery', 'Motivation & Mindset'};
+  }
+
+  /// Saves user preferred categories.
+  Future<void> saveUserPreferences(Set<String> preferences) async {
+    await prefs.setStringList(_keyUserPreferences, preferences.toList());
+  }
+
+  /// Checks if text overlays should be shown by default.
+  bool isTextOverlayEnabledByDefault() {
+    return prefs.getBool(_keyTextOverlayEnabled) ?? true;
+  }
+
+  /// Toggles global text overlay preference.
+  Future<void> setTextOverlayEnabled(bool enabled) async {
+    await prefs.setBool(_keyTextOverlayEnabled, enabled);
   }
 
   /// Returns set of favorite IDs.

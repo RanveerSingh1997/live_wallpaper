@@ -20,6 +20,8 @@ class WallpaperState extends Equatable {
   final bool isLiveWallpaperActiveOnDevice;
   final String? activeWallpaperId;
   final WallpaperActionStatus actionStatus;
+  final Set<String> userPreferences;
+  final bool isTextOverlayVisible;
   final String? message;
   final String? errorMessage;
 
@@ -27,13 +29,15 @@ class WallpaperState extends Equatable {
     this.allShorts = const [],
     this.filteredShorts = const [],
     this.activeIndex = 0,
-    this.selectedCategory = 'All',
+    this.selectedCategory = 'For You',
     this.favoriteIds = const {},
     this.customizedQuotes = const {},
     this.isFeedMuted = true,
     this.isLiveWallpaperActiveOnDevice = false,
     this.activeWallpaperId,
     this.actionStatus = WallpaperActionStatus.idle,
+    this.userPreferences = const {},
+    this.isTextOverlayVisible = true,
     this.message,
     this.errorMessage,
   });
@@ -74,6 +78,8 @@ class WallpaperState extends Equatable {
     bool? isLiveWallpaperActiveOnDevice,
     String? activeWallpaperId,
     WallpaperActionStatus? actionStatus,
+    Set<String>? userPreferences,
+    bool? isTextOverlayVisible,
     String? message,
     String? errorMessage,
   }) {
@@ -89,6 +95,8 @@ class WallpaperState extends Equatable {
           isLiveWallpaperActiveOnDevice ?? this.isLiveWallpaperActiveOnDevice,
       activeWallpaperId: activeWallpaperId ?? this.activeWallpaperId,
       actionStatus: actionStatus ?? this.actionStatus,
+      userPreferences: userPreferences ?? this.userPreferences,
+      isTextOverlayVisible: isTextOverlayVisible ?? this.isTextOverlayVisible,
       message: message,
       errorMessage: errorMessage,
     );
@@ -106,6 +114,8 @@ class WallpaperState extends Equatable {
         isLiveWallpaperActiveOnDevice,
         activeWallpaperId,
         actionStatus,
+        userPreferences,
+        isTextOverlayVisible,
         message,
         errorMessage,
       ];

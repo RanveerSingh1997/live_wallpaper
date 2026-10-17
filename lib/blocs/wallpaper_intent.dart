@@ -41,6 +41,18 @@ class FilterByCategoryIntent extends WallpaperIntent {
   List<Object?> get props => [category];
 }
 
+/// Intent to update user preferred categories.
+class UpdateUserPreferencesIntent extends WallpaperIntent {
+  final Set<String> preferences;
+  const UpdateUserPreferencesIntent(this.preferences);
+
+  @override
+  List<Object?> get props => [preferences];
+}
+
+/// Intent to toggle kinetic text overlay visibility on screen.
+class ToggleTextOverlayVisibilityIntent extends WallpaperIntent {}
+
 /// Intent to update or customize the quote on a specific short.
 class UpdateCustomQuoteIntent extends WallpaperIntent {
   final String shortId;
