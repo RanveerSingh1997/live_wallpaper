@@ -5,7 +5,7 @@
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart)](https://dart.dev)
 [![Architecture](https://img.shields.io/badge/Architecture-Intent--Driven%20BLoC-blueviolet)](https://bloclibrary.dev)
 [![Platforms](https://img.shields.io/badge/Platforms-Android%20%7C%20iOS%20%7C%20iPadOS-brightgreen)]()
-[![Tests](https://img.shields.io/badge/Tests-Passing%20(25%2F25)-success)]()
+[![Tests](https://img.shields.io/badge/Tests-Passing%20(32%2F32)-success)]()
 
 **Wallora** is a flagship mobile wallpaper discovery platform combining **ultra-high-resolution static wallpapers**, **cinematic looping live video wallpapers**, and **kinetic typography studio** in a unified, high-performance experience. Built around the ethos **"Make every screen yours."**
 
@@ -13,6 +13,14 @@
 
 ## 📱 Features
 
+- **First-Run Onboarding Experience**:
+  - Interactive 3-step introductory flow with brand ethos, 7-genre aesthetic customization, and battery integrity guarantee.
+- **Discover Screen with Category Filter Pills**:
+  - Instant horizontal category filtering (`All`, `For You`, `Live Wallpapers`, `Static Wallpapers`, `Anime & Gaming`, `Nature & Scenery`, `Cars & Speed`, `Minimal & AMOLED`, `Cyberpunk & Tech`, `Fitness & Grind`, `Motivation & Mindset`) with dynamic grid re-rendering.
+- **Segmented Personal Library**:
+  - Segmented `All`, `Live`, and `Static` filter chips on both `Downloads` and `Favorites` screens.
+- **Settings & Offline Storage Cache Manager**:
+  - Real-time disk storage calculation with one-tap offline cache clearing, privacy policy, and onboarding replay.
 - **Multi-Genre Live Wallpaper Feed**:
   - Full-screen 9:16 vertical swiping feed (*PageView* with *video_player*).
   - High-impact genres: Anime & Gaming (*Hajime no Ippo: Makunouchi Creed*), Nature & Scenery, Cyberpunk & Tech, Cars & Speed, Minimal & AMOLED, Fitness & Grind, Motivation & Mindset.

@@ -170,7 +170,7 @@ The initial release does not need:
 
 ## 9. Testing & Quality Assurance
 
-- **Unit & BLoC Tests**: Intent handling, category filtering, favorites, custom quotes, user preferences.
-- **Widget Tests**: `KineticQuoteOverlay`, `ShortsActionRail`, `IPadWallpaperDialog`.
+- **Unit & BLoC Tests**: Intent handling, category filtering, favorites, custom quotes, user preferences, onboarding status (17/17 tests).
+- **Widget Tests**: `KineticQuoteOverlay`, `ShortsActionRail`, `IPadWallpaperDialog`, `OnboardingSheet`, `SettingsSheet`, `DownloadsScreen`, `FavoritesScreen` (15/15 tests).
 - **Analyzer**: 0 lint warnings (`flutter analyze`).
 - **Device Builds**: Validated on real Android devices & connected iPad (`ZMX iPad 8th Gen`).
