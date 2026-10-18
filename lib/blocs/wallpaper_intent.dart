@@ -13,6 +13,7 @@ import '../models/standby_dock_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../models/wallora_backup_bundle.dart';
+import '../models/wallora_screen_blueprint.dart';
 
 abstract class WallpaperIntent extends Equatable {
   const WallpaperIntent();
@@ -545,6 +546,51 @@ class ResetAuroraSynthesizerIntent extends WallpaperIntent {
 /// Intent to toggle the Wallora Procedural Aurora Wave Synthesizer on or off.
 class ToggleAuroraSynthesizerIntent extends WallpaperIntent {
   const ToggleAuroraSynthesizerIntent();
+}
+
+/// Intent to apply a complete community screen blueprint atomically across all aesthetic dimensions.
+class ApplyScreenBlueprintIntent extends WallpaperIntent {
+  final WalloraScreenBlueprint blueprint;
+  const ApplyScreenBlueprintIntent(this.blueprint);
+
+  @override
+  List<Object?> get props => [blueprint];
+}
+
+/// Intent to package and publish the user's active screen aesthetic as a community blueprint.
+class PublishCurrentSetupIntent extends WallpaperIntent {
+  final String title;
+  final String creatorName;
+  final String description;
+  final List<String> tags;
+
+  const PublishCurrentSetupIntent({
+    required this.title,
+    required this.creatorName,
+    required this.description,
+    required this.tags,
+  });
+
+  @override
+  List<Object?> get props => [title, creatorName, description, tags];
+}
+
+/// Intent to toggle like status on a community screen blueprint.
+class ToggleBlueprintLikeIntent extends WallpaperIntent {
+  final String blueprintId;
+  const ToggleBlueprintLikeIntent(this.blueprintId);
+
+  @override
+  List<Object?> get props => [blueprintId];
+}
+
+/// Intent to filter community screen blueprints by tag or search term.
+class FilterCommunityBlueprintsIntent extends WallpaperIntent {
+  final String tagQuery;
+  const FilterCommunityBlueprintsIntent(this.tagQuery);
+
+  @override
+  List<Object?> get props => [tagQuery];
 }
 
 

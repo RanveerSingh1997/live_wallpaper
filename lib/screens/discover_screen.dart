@@ -9,6 +9,7 @@ import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
 import 'aurora_synthesizer_sheet.dart';
 import 'collection_detail_sheet.dart';
+import 'community_exchange_sheet.dart';
 import 'custom_wallpaper_import_sheet.dart';
 import 'preferences_modal_sheet.dart';
 import 'quote_studio_sheet.dart';
@@ -114,6 +115,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
                               padding: const EdgeInsets.all(7),
@@ -159,8 +161,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             ),
                           ],
                         ),
-                        Row(
-                          children: [
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            reverse: true,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
                             // Preferences filter button
                             IconButton(
                               icon: const Icon(Icons.tune_rounded, color: Colors.white70),
@@ -207,6 +215,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                 AuroraSynthesizerSheet.show(context);
                               },
                             ),
+                            // Community Aesthetic Exchange Studio button
+                            IconButton(
+                              icon: const Icon(Icons.hub_rounded, color: Color(0xFF00E5FF)),
+                              tooltip: 'Blueprint Exchange',
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                CommunityExchangeSheet.show(context);
+                              },
+                            ),
                             // Settings & Trust button
                             IconButton(
                               icon: const Icon(Icons.info_outline_rounded, color: Colors.white70),
@@ -243,10 +260,12 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
+              ),
+            ),
 
                 // Search Bar with Smart Discovery Button
                 SliverToBoxAdapter(
@@ -879,6 +898,110 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               ),
                               child: const Text(
                                 'IMPORT',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 11,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Section: Aesthetic Blueprint Exchange Banner
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+                      child: Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF101935), Color(0xFF1A0E2A)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                              blurRadius: 18,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Icon(
+                                Icons.hub_rounded,
+                                color: Colors.black,
+                                size: 28,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'COMMUNITY EXCHANGE',
+                                    style: TextStyle(
+                                      color: Color(0xFF00E5FF),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 1.0,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  const Text(
+                                    'Screen Blueprint Studio',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Explore, like & 1-tap apply complete screen aesthetics crafted by creators.',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: 0.6),
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: () {
+                                HapticFeedback.mediumImpact();
+                                CommunityExchangeSheet.show(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF00E5FF),
+                                foregroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 10),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'EXPLORE',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 11,

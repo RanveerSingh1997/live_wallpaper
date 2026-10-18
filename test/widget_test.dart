@@ -17,9 +17,11 @@ import 'package:live_wallpaper/models/standby_dock_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/models/wallora_backup_bundle.dart';
+import 'package:live_wallpaper/models/wallora_screen_blueprint.dart';
 import 'package:live_wallpaper/screens/add_to_collection_sheet.dart';
 import 'package:live_wallpaper/screens/aura_palette_sheet.dart';
 import 'package:live_wallpaper/screens/aurora_synthesizer_sheet.dart';
+import 'package:live_wallpaper/screens/community_exchange_sheet.dart';
 import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
 import 'package:live_wallpaper/widgets/aurora_synthesizer_canvas.dart';
 import 'package:live_wallpaper/screens/battery_telemetry_sheet.dart';
@@ -1718,6 +1720,13 @@ void main() {
 
     testWidgets('DiscoverScreen displays Smart Discovery button and active filter banner',
         (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
       final prefs = await SharedPreferences.getInstance();
       final repo = FakeWallpaperRepository(prefs: prefs);
       const activeFilter = SmartFilterConfig(
@@ -1735,6 +1744,8 @@ void main() {
         ),
       );
 
+      addTearDown(bloc.close);
+
       await tester.pumpWidget(
         BlocProvider.value(
           value: bloc,
@@ -1744,7 +1755,8 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // 1. Verify Smart Discovery active count badge
       expect(find.text('3'), findsOneWidget); // 3 active filters
@@ -1755,7 +1767,8 @@ void main() {
 
       // 3. Tap cancel icon to reset filters
       await tester.tap(find.byIcon(Icons.cancel_rounded));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Verify BLoC received ResetSmartFilterIntent
       expect(bloc.state.smartFilter, equals(SmartFilterConfig.defaultConfig));
@@ -2953,6 +2966,335 @@ void main() {
       // Verify sheet opens
       expect(find.text('Aurora Wave Synthesizer'), findsOneWidget);
       expect(find.text('PROCEDURAL WAVE STYLE'), findsOneWidget);
+    });
+
+    testWidgets('CommunityExchangeSheet renders header, active setup banner, tag chips, and curated blueprints',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          communityBlueprints: WalloraScreenBlueprint.curatedBlueprints,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CommunityExchangeSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify Header
+      expect(find.text('AESTHETIC BLUEPRINT EXCHANGE'), findsOneWidget);
+      expect(find.text('Wallora • "Make every screen yours."'), findsOneWidget);
+
+      // Verify Active Setup Banner
+      expect(find.text('YOUR ACTIVE SETUP'), findsOneWidget);
+      expect(find.text('Publish'), findsOneWidget);
+
+      // Verify Tag Filters
+      expect(find.text('All'), findsOneWidget);
+      expect(find.text('Cyberpunk'), findsOneWidget);
+      expect(find.text('AMOLED'), findsOneWidget);
+
+      // Verify Curated Blueprint Cards
+      expect(find.text('Cyberpunk Neon Ronin'), findsOneWidget);
+      expect(find.text('Shadow Monarch Dominion'), findsOneWidget);
+    });
+
+    testWidgets('CommunityExchangeSheet filters blueprints when tag chip is tapped',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          communityBlueprints: WalloraScreenBlueprint.curatedBlueprints,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CommunityExchangeSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Tap Cyberpunk tag
+      await tester.tap(find.text('Cyberpunk'));
+      await tester.pumpAndSettle();
+
+      // Cyberpunk blueprint should be visible
+      expect(find.text('Cyberpunk Neon Ronin'), findsOneWidget);
+      // Celestial Aurora should be filtered out
+      expect(find.text('Celestial Aurora Borealis'), findsNothing);
+    });
+
+    testWidgets('CommunityExchangeSheet tapping blueprint card opens details sheet with specifications',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          communityBlueprints: WalloraScreenBlueprint.curatedBlueprints,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CommunityExchangeSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Tap Cyberpunk Neon Ronin card
+      await tester.tap(find.text('Cyberpunk Neon Ronin'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Verify Details Modal
+      expect(find.text('AESTHETIC DIMENSIONS SPECIFICATION'), findsOneWidget);
+      expect(find.text('Wallpaper Asset'), findsOneWidget);
+      expect(find.text('Chromatic Aura Palette'), findsOneWidget);
+      expect(find.text('Interactive Particle Physics'), findsOneWidget);
+      expect(find.text('3D Parallax Gyro Depth'), findsOneWidget);
+      expect(find.text('Procedural Aurora Synthesizer'), findsOneWidget);
+      expect(find.text('1-Tap Apply Complete Blueprint'), findsOneWidget);
+    });
+
+    testWidgets('CommunityExchangeSheet liking a blueprint updates like heart icon and persists',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          communityBlueprints: WalloraScreenBlueprint.curatedBlueprints,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CommunityExchangeSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Tap first favorite border icon
+      final favoriteButton = find.byIcon(Icons.favorite_border_rounded).first;
+      await tester.tap(favoriteButton);
+      await tester.pumpAndSettle();
+
+      // Verify favorite icon changed to filled red heart
+      expect(find.byIcon(Icons.favorite_rounded), findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('CommunityExchangeSheet applying blueprint emits intent and displays SnackBar',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          communityBlueprints: WalloraScreenBlueprint.curatedBlueprints,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: CommunityExchangeSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Tap Apply on the first blueprint card
+      final applyButton = find.widgetWithText(ElevatedButton, 'Apply').first;
+      await tester.tap(applyButton);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Verify confirmation SnackBar
+      expect(find.textContaining('Applied'), findsOneWidget);
+      expect(find.textContaining('Aesthetic Blueprint!'), findsOneWidget);
+    });
+
+    testWidgets('SettingsSheet renders Community Blueprint Showcase tile and opens CommunityExchangeSheet on tap',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          communityBlueprints: WalloraScreenBlueprint.curatedBlueprints,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SettingsSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify tile presence
+      final tile = find.text('Community Blueprint Showcase & Exchange');
+      expect(tile, findsOneWidget);
+
+      // Tap tile
+      await tester.tap(tile);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Verify CommunityExchangeSheet opened
+      expect(find.text('AESTHETIC BLUEPRINT EXCHANGE'), findsOneWidget);
+      expect(find.text('YOUR ACTIVE SETUP'), findsOneWidget);
+    });
+
+    testWidgets('DiscoverScreen renders Blueprint Exchange IconButton and opens CommunityExchangeSheet on tap',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          communityBlueprints: WalloraScreenBlueprint.curatedBlueprints,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: DiscoverScreen(
+              onOpenLiveFeed: () {},
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify Blueprint Exchange IconButton
+      final exchangeButton = find.byTooltip('Blueprint Exchange');
+      expect(exchangeButton, findsOneWidget);
+
+      // Tap to open
+      await tester.tap(exchangeButton);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Verify sheet opens
+      expect(find.text('AESTHETIC BLUEPRINT EXCHANGE'), findsOneWidget);
+      expect(find.text('YOUR ACTIVE SETUP'), findsOneWidget);
     });
   });
 }

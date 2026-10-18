@@ -18,6 +18,7 @@ import '../models/standby_dock_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../models/wallora_backup_bundle.dart';
+import '../models/wallora_screen_blueprint.dart';
 import '../services/wallpaper_renderer_service.dart';
 import '../services/wallpaper_service_bridge.dart';
 
@@ -53,6 +54,8 @@ class WallpaperRepository {
   static const String _keyGestureControl = 'gesture_control_config';
   static const String _keyStandbyDock = 'standby_dock_config';
   static const String _keyAuroraSynthesizer = 'aurora_synthesizer_config';
+  static const String _keyPublishedBlueprints = 'wallora_published_blueprints';
+  static const String _keyLikedBlueprintIds = 'wallora_liked_blueprint_ids';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
@@ -415,6 +418,61 @@ class WallpaperRepository {
   List<MotivationalShort> getCuratedShorts() {
     final custom = getCustomImportedWallpapers();
     return [...custom, ...CuratedShortsData.shorts];
+  }
+
+  /// Returns list of all community screen blueprints (curated + user-published).
+  List<WalloraScreenBlueprint> getCommunityBlueprints() {
+    final publishedRaw = prefs.getStringList(_keyPublishedBlueprints) ?? [];
+    final List<WalloraScreenBlueprint> userPublished = [];
+    for (final item in publishedRaw) {
+      try {
+        final map = jsonDecode(item) as Map<String, dynamic>;
+        userPublished.add(WalloraScreenBlueprint.fromJson(map));
+      } catch (_) {}
+    }
+
+    final likedIds = getLikedBlueprintIds();
+    final all = [...userPublished, ...WalloraScreenBlueprint.curatedBlueprints];
+
+    return all.map((bp) {
+      if (likedIds.contains(bp.id)) {
+        return bp.copyWith(likesCount: bp.likesCount + 1);
+      }
+      return bp;
+    }).toList();
+  }
+
+  /// Saves a user-published screen blueprint to local storage.
+  Future<void> savePublishedBlueprint(WalloraScreenBlueprint blueprint) async {
+    final list = prefs.getStringList(_keyPublishedBlueprints) ?? [];
+    list.removeWhere((item) {
+      try {
+        final map = jsonDecode(item) as Map<String, dynamic>;
+        return map['id'] == blueprint.id;
+      } catch (_) {
+        return false;
+      }
+    });
+    list.insert(0, jsonEncode(blueprint.toJson()));
+    await prefs.setStringList(_keyPublishedBlueprints, list);
+  }
+
+  /// Returns set of blueprint IDs liked by the user.
+  Set<String> getLikedBlueprintIds() {
+    final list = prefs.getStringList(_keyLikedBlueprintIds) ?? [];
+    return list.toSet();
+  }
+
+  /// Toggles like status for a community screen blueprint.
+  Future<Set<String>> toggleBlueprintLike(String blueprintId) async {
+    final liked = getLikedBlueprintIds();
+    if (liked.contains(blueprintId)) {
+      liked.remove(blueprintId);
+    } else {
+      liked.add(blueprintId);
+    }
+    await prefs.setStringList(_keyLikedBlueprintIds, liked.toList());
+    return liked;
   }
 
   /// Returns set of user preferred wallpaper categories.
@@ -922,5 +980,9 @@ class WallpaperRepository {
     // 4. Reset preferences & flags
     await saveUserPreferences({});
     await setAmoledSaverMode(false);
+
+    // 5. Reset community blueprints & likes
+    await prefs.remove(_keyPublishedBlueprints);
+    await prefs.remove(_keyLikedBlueprintIds);
   }
 }

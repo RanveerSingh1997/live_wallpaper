@@ -13,6 +13,7 @@ import '../models/smart_filter_config.dart';
 import '../models/standby_dock_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
+import '../models/wallora_screen_blueprint.dart';
 
 enum WallpaperActionStatus {
   idle,
@@ -63,6 +64,9 @@ class WallpaperState extends Equatable {
   final bool autoRotationWifiOnly;
   final String autoRotationTarget;
   final bool isAmoledSaverModeEnabled;
+  final List<WalloraScreenBlueprint> communityBlueprints;
+  final Set<String> likedBlueprintIds;
+  final String communityTagFilter;
   final String? message;
   final String? errorMessage;
 
@@ -105,6 +109,9 @@ class WallpaperState extends Equatable {
     this.autoRotationWifiOnly = true,
     this.autoRotationTarget = 'both',
     this.isAmoledSaverModeEnabled = false,
+    this.communityBlueprints = const [],
+    this.likedBlueprintIds = const {},
+    this.communityTagFilter = 'All',
     this.message,
     this.errorMessage,
   });
@@ -237,6 +244,20 @@ class WallpaperState extends Equatable {
     return allShorts;
   }
 
+  /// Community blueprints filtered by the active tag filter or query.
+  List<WalloraScreenBlueprint> get filteredBlueprints {
+    if (communityTagFilter.isEmpty || communityTagFilter == 'All') {
+      return communityBlueprints;
+    }
+    final q = communityTagFilter.toLowerCase().trim();
+    return communityBlueprints.where((b) {
+      final tagMatch = b.tags.any((t) => t.toLowerCase() == q || '#${t.toLowerCase()}' == q);
+      final titleMatch = b.title.toLowerCase().contains(q);
+      final creatorMatch = b.creatorName.toLowerCase().contains(q);
+      return tagMatch || titleMatch || creatorMatch;
+    }).toList();
+  }
+
   WallpaperState copyWith({
     List<MotivationalShort>? allShorts,
     List<MotivationalShort>? filteredShorts,
@@ -276,6 +297,9 @@ class WallpaperState extends Equatable {
     bool? autoRotationWifiOnly,
     String? autoRotationTarget,
     bool? isAmoledSaverModeEnabled,
+    List<WalloraScreenBlueprint>? communityBlueprints,
+    Set<String>? likedBlueprintIds,
+    String? communityTagFilter,
     String? message,
     String? errorMessage,
   }) {
@@ -322,6 +346,9 @@ class WallpaperState extends Equatable {
       autoRotationTarget: autoRotationTarget ?? this.autoRotationTarget,
       isAmoledSaverModeEnabled:
           isAmoledSaverModeEnabled ?? this.isAmoledSaverModeEnabled,
+      communityBlueprints: communityBlueprints ?? this.communityBlueprints,
+      likedBlueprintIds: likedBlueprintIds ?? this.likedBlueprintIds,
+      communityTagFilter: communityTagFilter ?? this.communityTagFilter,
       message: message,
       errorMessage: errorMessage,
     );
@@ -367,6 +394,9 @@ class WallpaperState extends Equatable {
         autoRotationWifiOnly,
         autoRotationTarget,
         isAmoledSaverModeEnabled,
+        communityBlueprints,
+        likedBlueprintIds,
+        communityTagFilter,
         message,
         errorMessage,
       ];

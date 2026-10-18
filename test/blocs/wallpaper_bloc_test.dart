@@ -18,6 +18,7 @@ import 'package:live_wallpaper/models/standby_dock_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/models/wallora_backup_bundle.dart';
+import 'package:live_wallpaper/models/wallora_screen_blueprint.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -1535,6 +1536,117 @@ void main() {
       await enableExpectation;
 
       expect(repository.getAuroraSynthesizerConfig().isEnabled, isTrue);
+    });
+
+    test('ApplyScreenBlueprintIntent applies all aesthetic dimensions atomically', () async {
+      bloc.add(LoadFeedIntent());
+      await bloc.stream.firstWhere((s) => s.allShorts.isNotEmpty);
+
+      final blueprint = WalloraScreenBlueprint.curatedBlueprints.first;
+
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.activeWallpaperId == blueprint.wallpaper.id &&
+              s.customizedQuotes[blueprint.wallpaper.id] == blueprint.customQuote &&
+              s.auraConfig == blueprint.auraConfig &&
+              s.particleConfig == blueprint.particleConfig &&
+              s.parallaxConfig == blueprint.parallaxConfig &&
+              s.auroraSynthesizerConfig == blueprint.auroraConfig &&
+              s.message != null &&
+              s.message!.contains(blueprint.title);
+        })),
+      );
+
+      bloc.add(ApplyScreenBlueprintIntent(blueprint));
+      await expectation;
+
+      expect(repository.getActiveWallpaperId(), equals(blueprint.wallpaper.id));
+      expect(repository.getCustomQuotes()[blueprint.wallpaper.id], equals(blueprint.customQuote));
+      expect(repository.getAuraPaletteConfig(), equals(blueprint.auraConfig));
+      expect(repository.getParticleEffectConfig(), equals(blueprint.particleConfig));
+      expect(repository.getParallaxEffectConfig(), equals(blueprint.parallaxConfig));
+      expect(repository.getAuroraSynthesizerConfig(), equals(blueprint.auroraConfig));
+    });
+
+    test('PublishCurrentSetupIntent packages and publishes active setup', () async {
+      bloc.add(LoadFeedIntent());
+      await bloc.stream.firstWhere((s) => s.allShorts.isNotEmpty);
+
+      final initialCount = bloc.state.communityBlueprints.length;
+
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.communityBlueprints.length == initialCount + 1 &&
+              s.communityBlueprints.first.title == 'Neon Cyber Dreams' &&
+              s.communityBlueprints.first.creatorName == 'CyberAgent' &&
+              s.message != null &&
+              s.message!.contains('published to Community Showcase');
+        })),
+      );
+
+      bloc.add(const PublishCurrentSetupIntent(
+        title: 'Neon Cyber Dreams',
+        creatorName: 'CyberAgent',
+        description: 'Vibrant obsidian neon setup.',
+        tags: ['Cyberpunk', 'Neon'],
+      ));
+      await expectation;
+
+      expect(repository.getCommunityBlueprints().length, equals(initialCount + 1));
+    });
+
+    test('ToggleBlueprintLikeIntent increments likes and updates repository', () async {
+      bloc.add(LoadFeedIntent());
+      await bloc.stream.firstWhere((s) => s.communityBlueprints.isNotEmpty);
+
+      final targetBlueprint = bloc.state.communityBlueprints.first;
+      final initialLikes = targetBlueprint.likesCount;
+
+      final likeExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.likedBlueprintIds.contains(targetBlueprint.id) &&
+              s.communityBlueprints.firstWhere((b) => b.id == targetBlueprint.id).likesCount ==
+                  initialLikes + 1 &&
+              s.message == 'Blueprint liked! ❤️';
+        })),
+      );
+
+      bloc.add(ToggleBlueprintLikeIntent(targetBlueprint.id));
+      await likeExpectation;
+
+      expect(repository.getLikedBlueprintIds().contains(targetBlueprint.id), isTrue);
+
+      final unlikeExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return !s.likedBlueprintIds.contains(targetBlueprint.id) &&
+              s.communityBlueprints.firstWhere((b) => b.id == targetBlueprint.id).likesCount ==
+                  initialLikes &&
+              s.message == 'Blueprint unliked.';
+        })),
+      );
+
+      bloc.add(ToggleBlueprintLikeIntent(targetBlueprint.id));
+      await unlikeExpectation;
+
+      expect(repository.getLikedBlueprintIds().contains(targetBlueprint.id), isFalse);
+    });
+
+    test('FilterCommunityBlueprintsIntent updates communityTagFilter in state', () async {
+      expect(bloc.state.communityTagFilter, equals('All'));
+
+      bloc.add(const FilterCommunityBlueprintsIntent('Cyberpunk'));
+      await expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) => s.communityTagFilter == 'Cyberpunk')),
+      );
+
+      expect(bloc.state.filteredBlueprints.every((b) =>
+          b.tags.any((t) => t.toLowerCase() == 'cyberpunk') ||
+          b.title.toLowerCase().contains('cyberpunk')), isTrue);
     });
   });
 }

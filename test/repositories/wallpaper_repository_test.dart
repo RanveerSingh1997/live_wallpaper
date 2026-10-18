@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/models/aura_palette_config.dart';
 import 'package:live_wallpaper/models/aurora_synthesizer_config.dart';
 import 'package:live_wallpaper/models/battery_telemetry_config.dart';
@@ -14,6 +15,7 @@ import 'package:live_wallpaper/models/standby_dock_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/models/wallora_backup_bundle.dart';
+import 'package:live_wallpaper/models/wallora_screen_blueprint.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -559,6 +561,42 @@ void main() {
           equals(AuroraSynthesizerConfig.defaultConfig));
     });
 
+    test('Community blueprints retrieval, publishing, and like toggle', () async {
+      final initial = repository.getCommunityBlueprints();
+      expect(initial.length, equals(5));
+      expect(repository.getLikedBlueprintIds(), isEmpty);
+
+      // Like a blueprint
+      final liked = await repository.toggleBlueprintLike('bp_cyber_ronin');
+      expect(liked.contains('bp_cyber_ronin'), isTrue);
+      expect(repository.getLikedBlueprintIds().contains('bp_cyber_ronin'), isTrue);
+
+      final updated = repository.getCommunityBlueprints();
+      final cyber = updated.firstWhere((b) => b.id == 'bp_cyber_ronin');
+      expect(cyber.likesCount, equals(1421)); // 1420 + 1
+
+      // Unlike
+      final unliked = await repository.toggleBlueprintLike('bp_cyber_ronin');
+      expect(unliked.contains('bp_cyber_ronin'), isFalse);
+      expect(repository.getLikedBlueprintIds().contains('bp_cyber_ronin'), isFalse);
+
+      // Publish custom blueprint
+      final userBp = WalloraScreenBlueprint(
+        id: 'user_bp_test',
+        title: 'Custom User Theme',
+        creatorName: 'WalloraTester',
+        description: 'Test description',
+        wallpaper: CuratedShortsData.shorts.first,
+        customQuote: 'Testing custom quote',
+        createdAt: DateTime.now(),
+      );
+      await repository.savePublishedBlueprint(userBp);
+
+      final afterPublish = repository.getCommunityBlueprints();
+      expect(afterPublish.length, equals(6));
+      expect(afterPublish.any((b) => b.id == 'user_bp_test'), isTrue);
+    });
+
     test('resetToFactoryDefaults clears all user customizations and configs', () async {
       await repository.toggleFavorite('fav_wipe');
       await repository.saveCustomQuote('wipe_quote', 'Temp Quote');
@@ -572,6 +610,18 @@ void main() {
       await repository.saveAuroraSynthesizerConfig(
         const AuroraSynthesizerConfig(waveStyle: AuroraWaveStyle.monochromeOled),
       );
+      await repository.savePublishedBlueprint(
+        WalloraScreenBlueprint(
+          id: 'bp_wipe',
+          title: 'Wipe',
+          creatorName: 'User',
+          description: '',
+          wallpaper: CuratedShortsData.shorts.first,
+          customQuote: '',
+          createdAt: DateTime.now(),
+        ),
+      );
+      await repository.toggleBlueprintLike('bp_cyber_ronin');
 
       await repository.resetToFactoryDefaults();
 
@@ -581,6 +631,8 @@ void main() {
       expect(repository.getAuraPaletteConfig(), equals(AuraPaletteConfig.defaultConfig));
       expect(repository.getStandbyDockConfig(), equals(StandbyDockConfig.defaultConfig));
       expect(repository.getAuroraSynthesizerConfig(), equals(AuroraSynthesizerConfig.defaultConfig));
+      expect(repository.getLikedBlueprintIds(), isEmpty);
+      expect(repository.getCommunityBlueprints().length, equals(5));
     });
   });
 }

@@ -8,6 +8,7 @@ import 'aura_palette_sheet.dart';
 import 'aurora_synthesizer_sheet.dart';
 import 'auto_rotation_sheet.dart';
 import 'battery_telemetry_sheet.dart';
+import 'community_exchange_sheet.dart';
 import 'data_portability_sheet.dart';
 import 'day_night_schedule_sheet.dart';
 import 'gesture_control_sheet.dart';
@@ -322,6 +323,17 @@ class SettingsSheet extends StatelessWidget {
                         '${state.auroraSynthesizerConfig.waveStyle.displayName} • ${state.auroraSynthesizerConfig.colorMode.displayName}',
                     onTap: () {
                       AuroraSynthesizerSheet.show(context);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSettingTile(
+                    icon: Icons.hub_rounded,
+                    iconColor: const Color(0xFF00E5FF),
+                    title: 'Community Blueprint Showcase & Exchange',
+                    subtitle:
+                        '${state.communityBlueprints.length} blueprints • Explore, like & publish complete aesthetics',
+                    onTap: () {
+                      CommunityExchangeSheet.show(context);
                     },
                   ),
                   const SizedBox(height: 8),
