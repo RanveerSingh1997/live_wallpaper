@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:live_wallpaper/models/aura_palette_config.dart';
+import 'package:live_wallpaper/models/aurora_synthesizer_config.dart';
 import 'package:live_wallpaper/models/battery_telemetry_config.dart';
 import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/gesture_control_config.dart';
@@ -534,6 +535,30 @@ void main() {
           equals(StandbyDockConfig.defaultConfig));
     });
 
+    test('AuroraSynthesizerConfig CRUD and reset', () async {
+      expect(repository.getAuroraSynthesizerConfig(),
+          equals(AuroraSynthesizerConfig.defaultConfig));
+
+      const custom = AuroraSynthesizerConfig(
+        waveStyle: AuroraWaveStyle.solarFlarePlasma,
+        colorMode: AuroraColorMode.amberEmerald,
+        waveCount: 5,
+        waveSpeed: 1.8,
+        crestAmplitude: 65.0,
+        frequency: 2.5,
+        blurSpread: 28.0,
+        isTouchReactive: false,
+        isGyroReactive: false,
+        isEnabled: true,
+      );
+      await repository.saveAuroraSynthesizerConfig(custom);
+      expect(repository.getAuroraSynthesizerConfig(), equals(custom));
+
+      await repository.resetAuroraSynthesizerConfig();
+      expect(repository.getAuroraSynthesizerConfig(),
+          equals(AuroraSynthesizerConfig.defaultConfig));
+    });
+
     test('resetToFactoryDefaults clears all user customizations and configs', () async {
       await repository.toggleFavorite('fav_wipe');
       await repository.saveCustomQuote('wipe_quote', 'Temp Quote');
@@ -544,6 +569,9 @@ void main() {
       await repository.saveStandbyDockConfig(
         const StandbyDockConfig(clockStyle: DockClockStyle.oledMatrix),
       );
+      await repository.saveAuroraSynthesizerConfig(
+        const AuroraSynthesizerConfig(waveStyle: AuroraWaveStyle.monochromeOled),
+      );
 
       await repository.resetToFactoryDefaults();
 
@@ -552,6 +580,7 @@ void main() {
       expect(repository.isAmoledSaverModeEnabled(), isFalse);
       expect(repository.getAuraPaletteConfig(), equals(AuraPaletteConfig.defaultConfig));
       expect(repository.getStandbyDockConfig(), equals(StandbyDockConfig.defaultConfig));
+      expect(repository.getAuroraSynthesizerConfig(), equals(AuroraSynthesizerConfig.defaultConfig));
     });
   });
 }

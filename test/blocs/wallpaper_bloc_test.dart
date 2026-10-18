@@ -5,6 +5,7 @@ import 'package:live_wallpaper/blocs/wallpaper_intent.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/models/aura_palette_config.dart';
+import 'package:live_wallpaper/models/aurora_synthesizer_config.dart';
 import 'package:live_wallpaper/models/battery_telemetry_config.dart';
 import 'package:live_wallpaper/models/day_night_schedule_config.dart';
 import 'package:live_wallpaper/models/gesture_control_config.dart';
@@ -1460,6 +1461,80 @@ void main() {
       await disableExpectation;
 
       expect(repository.getStandbyDockConfig().isNightModeEnabled, isFalse);
+    });
+
+    test('UpdateAuroraSynthesizerIntent persists and updates state', () async {
+      const config = AuroraSynthesizerConfig(
+        waveStyle: AuroraWaveStyle.bioluminescentDeepSea,
+        colorMode: AuroraColorMode.cyanViolet,
+        waveCount: 5,
+        waveSpeed: 1.5,
+        crestAmplitude: 60.0,
+        frequency: 2.2,
+        blurSpread: 30.0,
+        isTouchReactive: true,
+        isGyroReactive: false,
+        isEnabled: true,
+      );
+
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.auroraSynthesizerConfig == config &&
+            s.message == 'Aurora wave settings updated.')),
+      );
+
+      bloc.add(const UpdateAuroraSynthesizerIntent(config));
+      await expectation;
+
+      expect(repository.getAuroraSynthesizerConfig(), equals(config));
+    });
+
+    test('ResetAuroraSynthesizerIntent restores defaultConfig and updates state', () async {
+      const custom = AuroraSynthesizerConfig(
+        waveStyle: AuroraWaveStyle.monochromeOled,
+        crestAmplitude: 75.0,
+      );
+      await repository.saveAuroraSynthesizerConfig(custom);
+
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.auroraSynthesizerConfig == AuroraSynthesizerConfig.defaultConfig &&
+            s.message == 'Aurora wave settings reset to defaults.')),
+      );
+
+      bloc.add(const ResetAuroraSynthesizerIntent());
+      await expectation;
+
+      expect(repository.getAuroraSynthesizerConfig(),
+          equals(AuroraSynthesizerConfig.defaultConfig));
+    });
+
+    test('ToggleAuroraSynthesizerIntent flips isEnabled in state and repository', () async {
+      expect(bloc.state.auroraSynthesizerConfig.isEnabled, isTrue);
+
+      final disableExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.auroraSynthesizerConfig.isEnabled == false &&
+            s.message == 'Procedural Aurora Wave Synthesizer paused.')),
+      );
+      bloc.add(const ToggleAuroraSynthesizerIntent());
+      await disableExpectation;
+
+      expect(repository.getAuroraSynthesizerConfig().isEnabled, isFalse);
+
+      final enableExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.auroraSynthesizerConfig.isEnabled == true &&
+            s.message == 'Procedural Aurora Wave Synthesizer active.')),
+      );
+      bloc.add(const ToggleAuroraSynthesizerIntent());
+      await enableExpectation;
+
+      expect(repository.getAuroraSynthesizerConfig().isEnabled, isTrue);
     });
   });
 }

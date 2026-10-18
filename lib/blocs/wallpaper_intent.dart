@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../models/aura_palette_config.dart';
+import '../models/aurora_synthesizer_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/gesture_control_config.dart';
@@ -525,6 +526,25 @@ class ResetStandbyDockIntent extends WallpaperIntent {
 /// Intent to toggle manual Night Standby OLED mode.
 class ToggleNightStandbyModeIntent extends WallpaperIntent {
   const ToggleNightStandbyModeIntent();
+}
+
+/// Intent to update the Wallora Procedural Aurora Wave Synthesizer configuration.
+class UpdateAuroraSynthesizerIntent extends WallpaperIntent {
+  final AuroraSynthesizerConfig config;
+  const UpdateAuroraSynthesizerIntent(this.config);
+
+  @override
+  List<Object?> get props => [config];
+}
+
+/// Intent to reset the Wallora Procedural Aurora Wave Synthesizer configuration to defaults.
+class ResetAuroraSynthesizerIntent extends WallpaperIntent {
+  const ResetAuroraSynthesizerIntent();
+}
+
+/// Intent to toggle the Wallora Procedural Aurora Wave Synthesizer on or off.
+class ToggleAuroraSynthesizerIntent extends WallpaperIntent {
+  const ToggleAuroraSynthesizerIntent();
 }
 
 

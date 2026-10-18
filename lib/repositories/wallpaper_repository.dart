@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/aura_palette_config.dart';
+import '../models/aurora_synthesizer_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/gesture_control_config.dart';
@@ -51,6 +52,7 @@ class WallpaperRepository {
   static const String _keyAuraPalette = 'aura_palette_config';
   static const String _keyGestureControl = 'gesture_control_config';
   static const String _keyStandbyDock = 'standby_dock_config';
+  static const String _keyAuroraSynthesizer = 'aurora_synthesizer_config';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
@@ -127,6 +129,30 @@ class WallpaperRepository {
   /// Resets the Horizon Standby & Ambient Desk Dock settings to default.
   Future<void> resetStandbyDockConfig() async {
     await prefs.remove(_keyStandbyDock);
+  }
+
+  /// Returns the configured Wallora Procedural Aurora Wave Synthesizer settings.
+  AuroraSynthesizerConfig getAuroraSynthesizerConfig() {
+    final raw = prefs.getString(_keyAuroraSynthesizer);
+    if (raw == null || raw.isEmpty) {
+      return AuroraSynthesizerConfig.defaultConfig;
+    }
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      return AuroraSynthesizerConfig.fromJson(json);
+    } catch (_) {
+      return AuroraSynthesizerConfig.defaultConfig;
+    }
+  }
+
+  /// Saves the Wallora Procedural Aurora Wave Synthesizer settings.
+  Future<void> saveAuroraSynthesizerConfig(AuroraSynthesizerConfig config) async {
+    await prefs.setString(_keyAuroraSynthesizer, jsonEncode(config.toJson()));
+  }
+
+  /// Resets the Wallora Procedural Aurora Wave Synthesizer settings to default.
+  Future<void> resetAuroraSynthesizerConfig() async {
+    await prefs.remove(_keyAuroraSynthesizer);
   }
 
   /// Returns the configured Battery & Display Telemetry settings.
@@ -776,6 +802,7 @@ class WallpaperRepository {
       auraConfig: getAuraPaletteConfig(),
       gestureConfig: getGestureControlConfig(),
       standbyDockConfig: getStandbyDockConfig(),
+      auroraSynthesizerConfig: getAuroraSynthesizerConfig(),
       batteryTelemetry: getBatteryTelemetryConfig(),
       smartFilter: getSmartFilterConfig(),
       userPreferences: getUserPreferences(),
@@ -847,6 +874,7 @@ class WallpaperRepository {
       await saveAuraPaletteConfig(bundle.auraConfig);
       await saveGestureControlConfig(bundle.gestureConfig);
       await saveStandbyDockConfig(bundle.standbyDockConfig);
+      await saveAuroraSynthesizerConfig(bundle.auroraSynthesizerConfig);
       await saveBatteryTelemetryConfig(bundle.batteryTelemetry);
       await saveSmartFilterConfig(bundle.smartFilter);
 
@@ -887,6 +915,7 @@ class WallpaperRepository {
     await resetAuraPaletteConfig();
     await resetGestureControlConfig();
     await resetStandbyDockConfig();
+    await resetAuroraSynthesizerConfig();
     await resetBatteryTelemetryConfig();
     await resetSmartFilterConfig();
 

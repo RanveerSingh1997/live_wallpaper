@@ -6,17 +6,22 @@ import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:live_wallpaper/models/aura_palette_config.dart';
+import 'package:live_wallpaper/models/aurora_synthesizer_config.dart';
 import 'package:live_wallpaper/models/battery_telemetry_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
+import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/parallax_effect_config.dart';
 import 'package:live_wallpaper/models/particle_effect_config.dart';
 import 'package:live_wallpaper/models/smart_filter_config.dart';
 import 'package:live_wallpaper/models/standby_dock_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
+import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/models/wallora_backup_bundle.dart';
 import 'package:live_wallpaper/screens/add_to_collection_sheet.dart';
 import 'package:live_wallpaper/screens/aura_palette_sheet.dart';
+import 'package:live_wallpaper/screens/aurora_synthesizer_sheet.dart';
 import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
+import 'package:live_wallpaper/widgets/aurora_synthesizer_canvas.dart';
 import 'package:live_wallpaper/screens/battery_telemetry_sheet.dart';
 import 'package:live_wallpaper/screens/data_portability_sheet.dart';
 import 'package:live_wallpaper/screens/gesture_control_sheet.dart';
@@ -56,6 +61,26 @@ class FakeWallpaperRepository extends WallpaperRepository {
 
   @override
   Future<bool> isWallpaperActiveOnDevice() async => false;
+
+  @override
+  Future<Map<String, dynamic>> applyAsLiveWallpaper({
+    required MotivationalShort short,
+    bool isMuted = true,
+  }) async {
+    await prefs.setString('active_wallpaper_id', short.id);
+    return {'status': 'applied_mock'};
+  }
+
+  @override
+  Future<Map<String, dynamic>> applyStaticWallpaper({
+    required MotivationalShort short,
+    String targetScreen = 'both',
+    String? customQuote,
+    WallpaperEffectConfig? effectConfig,
+  }) async {
+    await prefs.setString('active_wallpaper_id', short.id);
+    return {'status': 'applied_static'};
+  }
 }
 
 void main() {
@@ -2736,6 +2761,198 @@ void main() {
       // Verify StandbyDockSheet is opened
       expect(find.text('Horizon Standby Studio'), findsOneWidget);
       expect(find.text('CLOCK TYPOGRAPHY'), findsOneWidget);
+    });
+
+    testWidgets('AuroraSynthesizerCanvas renders with custom configuration and child',
+        (WidgetTester tester) async {
+      const config = AuroraSynthesizerConfig(
+        waveStyle: AuroraWaveStyle.cosmicNorthernLights,
+        colorMode: AuroraColorMode.auraSync,
+        waveCount: 4,
+        isEnabled: true,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AuroraSynthesizerCanvas(
+              config: config,
+              auraConfig: AuraPaletteConfig.defaultConfig,
+              child: const Text('Aurora Overlay Content'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.byType(AuroraSynthesizerCanvas), findsOneWidget);
+      expect(find.text('Aurora Overlay Content'), findsOneWidget);
+    });
+
+    testWidgets('AuroraSynthesizerSheet renders viewport preview, style presets, sliders, and save button',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: AuroraSynthesizerSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // 1. Verify Header
+      expect(find.text('Aurora Wave Synthesizer'), findsOneWidget);
+      expect(find.text('Generative fluid aurora waves & procedural light ribbons'), findsOneWidget);
+
+      // 2. Verify Sections & Presets
+      expect(find.text('PROCEDURAL WAVE STYLE'), findsOneWidget);
+      expect(find.text('Cosmic Northern Lights'), findsOneWidget);
+      expect(find.text('Cyberpunk Laser Ribbon'), findsOneWidget);
+      expect(find.text('Solar Flare Plasma'), findsOneWidget);
+
+      // 3. Verify Harmony & Dynamics
+      expect(find.text('COLOR HARMONY MODE'), findsOneWidget);
+      expect(find.text('FLUID WAVE DYNAMICS'), findsOneWidget);
+
+      // 4. Scroll to Save button
+      await tester.scrollUntilVisible(
+        find.text('Save Synthesized Aurora to Library'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('Save Synthesized Aurora to Library'), findsOneWidget);
+
+      // 5. Tap Save button
+      await tester.tap(find.text('Save Synthesized Aurora to Library'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Verify that a new synthesized wallpaper was added to bloc.state.allShorts
+      expect(bloc.state.allShorts.any((s) => s.id.startsWith('aurora_synth_')), isTrue);
+    });
+
+    testWidgets('SettingsSheet opens AuroraSynthesizerSheet when Aurora Wave Synthesizer Studio tile is tapped',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SettingsSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Scroll to Aurora Wave Synthesizer Studio tile
+      await tester.scrollUntilVisible(
+        find.text('Aurora Wave Synthesizer Studio'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('Aurora Wave Synthesizer Studio'), findsOneWidget);
+
+      // Tap to open sheet
+      await tester.tap(find.text('Aurora Wave Synthesizer Studio'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Verify AuroraSynthesizerSheet is opened
+      expect(find.text('Aurora Wave Synthesizer'), findsOneWidget);
+      expect(find.text('PROCEDURAL WAVE STYLE'), findsOneWidget);
+    });
+
+    testWidgets('DiscoverScreen renders Aurora Wave Synthesizer IconButton and opens AuroraSynthesizerSheet on tap',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: DiscoverScreen(
+              onOpenLiveFeed: () {},
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify Aurora Synthesizer IconButton
+      final auroraButton = find.byTooltip('Aurora Wave Synthesizer');
+      expect(auroraButton, findsOneWidget);
+
+      // Tap to open
+      await tester.tap(auroraButton);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Verify sheet opens
+      expect(find.text('Aurora Wave Synthesizer'), findsOneWidget);
+      expect(find.text('PROCEDURAL WAVE STYLE'), findsOneWidget);
     });
   });
 }

@@ -5,6 +5,7 @@ import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import 'aura_palette_sheet.dart';
+import 'aurora_synthesizer_sheet.dart';
 import 'auto_rotation_sheet.dart';
 import 'battery_telemetry_sheet.dart';
 import 'data_portability_sheet.dart';
@@ -310,6 +311,17 @@ class SettingsSheet extends StatelessWidget {
                         '${state.standbyDockConfig.layoutMode.displayName} • ${state.standbyDockConfig.clockStyle.displayName}',
                     onTap: () {
                       StandbyDockSheet.show(context);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSettingTile(
+                    icon: Icons.waves_rounded,
+                    iconColor: const Color(0xFF00E5FF),
+                    title: 'Aurora Wave Synthesizer Studio',
+                    subtitle:
+                        '${state.auroraSynthesizerConfig.waveStyle.displayName} • ${state.auroraSynthesizerConfig.colorMode.displayName}',
+                    onTap: () {
+                      AuroraSynthesizerSheet.show(context);
                     },
                   ),
                   const SizedBox(height: 8),

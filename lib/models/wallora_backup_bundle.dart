@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'aura_palette_config.dart';
+import 'aurora_synthesizer_config.dart';
 import 'battery_telemetry_config.dart';
 import 'day_night_schedule_config.dart';
 import 'gesture_control_config.dart';
@@ -31,6 +32,7 @@ class WalloraBackupBundle extends Equatable {
   final AuraPaletteConfig auraConfig;
   final GestureControlConfig gestureConfig;
   final StandbyDockConfig standbyDockConfig;
+  final AuroraSynthesizerConfig auroraSynthesizerConfig;
   final BatteryTelemetryConfig batteryTelemetry;
   final SmartFilterConfig smartFilter;
   final Set<String> userPreferences;
@@ -51,6 +53,7 @@ class WalloraBackupBundle extends Equatable {
     this.auraConfig = AuraPaletteConfig.defaultConfig,
     this.gestureConfig = GestureControlConfig.defaultConfig,
     this.standbyDockConfig = StandbyDockConfig.defaultConfig,
+    this.auroraSynthesizerConfig = AuroraSynthesizerConfig.defaultConfig,
     this.batteryTelemetry = BatteryTelemetryConfig.defaultConfig,
     this.smartFilter = SmartFilterConfig.defaultConfig,
     this.userPreferences = const {},
@@ -100,6 +103,7 @@ class WalloraBackupBundle extends Equatable {
       'auraConfig': auraConfig.toJson(),
       'gestureConfig': gestureConfig.toJson(),
       'standbyDockConfig': standbyDockConfig.toJson(),
+      'auroraSynthesizerConfig': auroraSynthesizerConfig.toJson(),
       'batteryTelemetry': batteryTelemetry.toJson(),
       'smartFilter': smartFilter.toJson(),
       'userPreferences': userPreferences.toList(),
@@ -180,6 +184,10 @@ class WalloraBackupBundle extends Equatable {
           ? StandbyDockConfig.fromJson(
               json['standbyDockConfig'] as Map<String, dynamic>)
           : StandbyDockConfig.defaultConfig,
+      auroraSynthesizerConfig: json['auroraSynthesizerConfig'] != null
+          ? AuroraSynthesizerConfig.fromJson(
+              json['auroraSynthesizerConfig'] as Map<String, dynamic>)
+          : AuroraSynthesizerConfig.defaultConfig,
       batteryTelemetry: json['batteryTelemetry'] != null
           ? BatteryTelemetryConfig.fromJson(
               json['batteryTelemetry'] as Map<String, dynamic>)
@@ -214,6 +222,7 @@ class WalloraBackupBundle extends Equatable {
     AuraPaletteConfig? auraConfig,
     GestureControlConfig? gestureConfig,
     StandbyDockConfig? standbyDockConfig,
+    AuroraSynthesizerConfig? auroraSynthesizerConfig,
     BatteryTelemetryConfig? batteryTelemetry,
     SmartFilterConfig? smartFilter,
     Set<String>? userPreferences,
@@ -234,6 +243,8 @@ class WalloraBackupBundle extends Equatable {
       auraConfig: auraConfig ?? this.auraConfig,
       gestureConfig: gestureConfig ?? this.gestureConfig,
       standbyDockConfig: standbyDockConfig ?? this.standbyDockConfig,
+      auroraSynthesizerConfig:
+          auroraSynthesizerConfig ?? this.auroraSynthesizerConfig,
       batteryTelemetry: batteryTelemetry ?? this.batteryTelemetry,
       smartFilter: smartFilter ?? this.smartFilter,
       userPreferences: userPreferences ?? this.userPreferences,
@@ -258,6 +269,7 @@ class WalloraBackupBundle extends Equatable {
         auraConfig,
         gestureConfig,
         standbyDockConfig,
+        auroraSynthesizerConfig,
         batteryTelemetry,
         smartFilter,
         userPreferences,

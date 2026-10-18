@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/aura_palette_config.dart';
+import '../models/aurora_synthesizer_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/gesture_control_config.dart';
@@ -86,6 +87,9 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<UpdateStandbyDockIntent>(_onUpdateStandbyDock);
     on<ResetStandbyDockIntent>(_onResetStandbyDock);
     on<ToggleNightStandbyModeIntent>(_onToggleNightStandbyMode);
+    on<UpdateAuroraSynthesizerIntent>(_onUpdateAuroraSynthesizer);
+    on<ResetAuroraSynthesizerIntent>(_onResetAuroraSynthesizer);
+    on<ToggleAuroraSynthesizerIntent>(_onToggleAuroraSynthesizer);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -158,6 +162,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final auraConfig = repository.getAuraPaletteConfig();
       final gestureConfig = repository.getGestureControlConfig();
       final standbyDock = repository.getStandbyDockConfig();
+      final auroraSynthesizer = repository.getAuroraSynthesizerConfig();
       final smartFilter = repository.getSmartFilterConfig();
       final batteryTelemetry = repository.getBatteryTelemetryConfig();
 
@@ -187,6 +192,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         auraConfig: auraConfig,
         gestureConfig: gestureConfig,
         standbyDockConfig: standbyDock,
+        auroraSynthesizerConfig: auroraSynthesizer,
         smartFilter: smartFilter,
         batteryTelemetry: batteryTelemetry,
         activeWallpaperId: activeId,
@@ -1188,6 +1194,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final aura = repository.getAuraPaletteConfig();
       final gesture = repository.getGestureControlConfig();
       final standbyDock = repository.getStandbyDockConfig();
+      final auroraSynthesizer = repository.getAuroraSynthesizerConfig();
       final telemetry = repository.getBatteryTelemetryConfig();
       final smartFilter = repository.getSmartFilterConfig();
       final preferences = repository.getUserPreferences();
@@ -1213,6 +1220,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         auraConfig: aura,
         gestureConfig: gesture,
         standbyDockConfig: standbyDock,
+        auroraSynthesizerConfig: auroraSynthesizer,
         batteryTelemetry: telemetry,
         smartFilter: smartFilter,
         userPreferences: preferences,
@@ -1251,6 +1259,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       auraConfig: AuraPaletteConfig.defaultConfig,
       gestureConfig: GestureControlConfig.defaultConfig,
       standbyDockConfig: StandbyDockConfig.defaultConfig,
+      auroraSynthesizerConfig: AuroraSynthesizerConfig.defaultConfig,
       batteryTelemetry: BatteryTelemetryConfig.defaultConfig,
       smartFilter: SmartFilterConfig.defaultConfig,
       userPreferences: {},
@@ -1433,6 +1442,44 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       message: updated.isNightModeEnabled
           ? 'Night Standby (OLED Pure Red) enabled.'
           : 'Standard Horizon Standby enabled.',
+    ));
+  }
+
+  Future<void> _onUpdateAuroraSynthesizer(
+    UpdateAuroraSynthesizerIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveAuroraSynthesizerConfig(event.config);
+    emit(state.copyWith(
+      auroraSynthesizerConfig: event.config,
+      message: 'Aurora wave settings updated.',
+    ));
+  }
+
+  Future<void> _onResetAuroraSynthesizer(
+    ResetAuroraSynthesizerIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.resetAuroraSynthesizerConfig();
+    emit(state.copyWith(
+      auroraSynthesizerConfig: AuroraSynthesizerConfig.defaultConfig,
+      message: 'Aurora wave settings reset to defaults.',
+    ));
+  }
+
+  Future<void> _onToggleAuroraSynthesizer(
+    ToggleAuroraSynthesizerIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final updated = state.auroraSynthesizerConfig.copyWith(
+      isEnabled: !state.auroraSynthesizerConfig.isEnabled,
+    );
+    await repository.saveAuroraSynthesizerConfig(updated);
+    emit(state.copyWith(
+      auroraSynthesizerConfig: updated,
+      message: updated.isEnabled
+          ? 'Procedural Aurora Wave Synthesizer active.'
+          : 'Procedural Aurora Wave Synthesizer paused.',
     ));
   }
 }

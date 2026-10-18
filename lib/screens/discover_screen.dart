@@ -7,6 +7,7 @@ import '../blocs/wallpaper_state.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
+import 'aurora_synthesizer_sheet.dart';
 import 'collection_detail_sheet.dart';
 import 'custom_wallpaper_import_sheet.dart';
 import 'preferences_modal_sheet.dart';
@@ -195,6 +196,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                     builder: (_) => const StandbyDockScreen(),
                                   ),
                                 );
+                              },
+                            ),
+                            // Aurora Synthesizer Wave Studio button
+                            IconButton(
+                              icon: const Icon(Icons.waves_rounded, color: Color(0xFFD500F9)),
+                              tooltip: 'Aurora Wave Synthesizer',
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                AuroraSynthesizerSheet.show(context);
                               },
                             ),
                             // Settings & Trust button

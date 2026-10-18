@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/aura_palette_config.dart';
+import '../models/aurora_synthesizer_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/gesture_control_config.dart';
@@ -42,6 +43,7 @@ class WallpaperState extends Equatable {
   final AuraPaletteConfig auraConfig;
   final GestureControlConfig gestureConfig;
   final StandbyDockConfig standbyDockConfig;
+  final AuroraSynthesizerConfig auroraSynthesizerConfig;
   final SmartFilterConfig smartFilter;
   final BatteryTelemetryConfig batteryTelemetry;
   final bool isFeedMuted;
@@ -83,6 +85,7 @@ class WallpaperState extends Equatable {
     this.auraConfig = AuraPaletteConfig.defaultConfig,
     this.gestureConfig = GestureControlConfig.defaultConfig,
     this.standbyDockConfig = StandbyDockConfig.defaultConfig,
+    this.auroraSynthesizerConfig = AuroraSynthesizerConfig.defaultConfig,
     this.smartFilter = SmartFilterConfig.defaultConfig,
     this.batteryTelemetry = BatteryTelemetryConfig.defaultConfig,
     this.isFeedMuted = true,
@@ -253,6 +256,7 @@ class WallpaperState extends Equatable {
     AuraPaletteConfig? auraConfig,
     GestureControlConfig? gestureConfig,
     StandbyDockConfig? standbyDockConfig,
+    AuroraSynthesizerConfig? auroraSynthesizerConfig,
     SmartFilterConfig? smartFilter,
     BatteryTelemetryConfig? batteryTelemetry,
     bool? isFeedMuted,
@@ -294,6 +298,8 @@ class WallpaperState extends Equatable {
       auraConfig: auraConfig ?? this.auraConfig,
       gestureConfig: gestureConfig ?? this.gestureConfig,
       standbyDockConfig: standbyDockConfig ?? this.standbyDockConfig,
+      auroraSynthesizerConfig:
+          auroraSynthesizerConfig ?? this.auroraSynthesizerConfig,
       smartFilter: smartFilter ?? this.smartFilter,
       batteryTelemetry: batteryTelemetry ?? this.batteryTelemetry,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
@@ -341,6 +347,7 @@ class WallpaperState extends Equatable {
         auraConfig,
         gestureConfig,
         standbyDockConfig,
+        auroraSynthesizerConfig,
         smartFilter,
         batteryTelemetry,
         isFeedMuted,
