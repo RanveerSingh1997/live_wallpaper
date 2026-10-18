@@ -8,6 +8,7 @@ import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
 import '../models/particle_effect_config.dart';
 import '../models/smart_filter_config.dart';
+import '../models/standby_dock_config.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../repositories/wallpaper_repository.dart';
 import 'wallpaper_intent.dart';
@@ -82,6 +83,9 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<ResetGestureControlIntent>(_onResetGestureControl);
     on<ExecuteGestureActionIntent>(_onExecuteGestureAction);
     on<ToggleCleanCanvasIntent>(_onToggleCleanCanvas);
+    on<UpdateStandbyDockIntent>(_onUpdateStandbyDock);
+    on<ResetStandbyDockIntent>(_onResetStandbyDock);
+    on<ToggleNightStandbyModeIntent>(_onToggleNightStandbyMode);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -153,6 +157,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final particleConfig = repository.getParticleEffectConfig();
       final auraConfig = repository.getAuraPaletteConfig();
       final gestureConfig = repository.getGestureControlConfig();
+      final standbyDock = repository.getStandbyDockConfig();
       final smartFilter = repository.getSmartFilterConfig();
       final batteryTelemetry = repository.getBatteryTelemetryConfig();
 
@@ -181,6 +186,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         particleConfig: particleConfig,
         auraConfig: auraConfig,
         gestureConfig: gestureConfig,
+        standbyDockConfig: standbyDock,
         smartFilter: smartFilter,
         batteryTelemetry: batteryTelemetry,
         activeWallpaperId: activeId,
@@ -1181,6 +1187,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final particle = repository.getParticleEffectConfig();
       final aura = repository.getAuraPaletteConfig();
       final gesture = repository.getGestureControlConfig();
+      final standbyDock = repository.getStandbyDockConfig();
       final telemetry = repository.getBatteryTelemetryConfig();
       final smartFilter = repository.getSmartFilterConfig();
       final preferences = repository.getUserPreferences();
@@ -1205,6 +1212,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         particleConfig: particle,
         auraConfig: aura,
         gestureConfig: gesture,
+        standbyDockConfig: standbyDock,
         batteryTelemetry: telemetry,
         smartFilter: smartFilter,
         userPreferences: preferences,
@@ -1242,6 +1250,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       particleConfig: ParticleEffectConfig.defaultConfig,
       auraConfig: AuraPaletteConfig.defaultConfig,
       gestureConfig: GestureControlConfig.defaultConfig,
+      standbyDockConfig: StandbyDockConfig.defaultConfig,
       batteryTelemetry: BatteryTelemetryConfig.defaultConfig,
       smartFilter: SmartFilterConfig.defaultConfig,
       userPreferences: {},
@@ -1387,6 +1396,44 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       case GestureAction.none:
         break;
     }
+  }
+
+  Future<void> _onUpdateStandbyDock(
+    UpdateStandbyDockIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveStandbyDockConfig(event.config);
+    emit(state.copyWith(
+      standbyDockConfig: event.config,
+      message: 'Standby dock settings updated.',
+    ));
+  }
+
+  Future<void> _onResetStandbyDock(
+    ResetStandbyDockIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.resetStandbyDockConfig();
+    emit(state.copyWith(
+      standbyDockConfig: StandbyDockConfig.defaultConfig,
+      message: 'Standby dock settings reset to defaults.',
+    ));
+  }
+
+  Future<void> _onToggleNightStandbyMode(
+    ToggleNightStandbyModeIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final updated = state.standbyDockConfig.copyWith(
+      isNightModeEnabled: !state.standbyDockConfig.isNightModeEnabled,
+    );
+    await repository.saveStandbyDockConfig(updated);
+    emit(state.copyWith(
+      standbyDockConfig: updated,
+      message: updated.isNightModeEnabled
+          ? 'Night Standby (OLED Pure Red) enabled.'
+          : 'Standard Horizon Standby enabled.',
+    ));
   }
 }
 

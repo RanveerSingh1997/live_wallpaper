@@ -13,6 +13,7 @@ import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
 import '../models/particle_effect_config.dart';
 import '../models/smart_filter_config.dart';
+import '../models/standby_dock_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../models/wallora_backup_bundle.dart';
@@ -49,6 +50,7 @@ class WallpaperRepository {
   static const String _keyBatteryTelemetry = 'battery_telemetry_config';
   static const String _keyAuraPalette = 'aura_palette_config';
   static const String _keyGestureControl = 'gesture_control_config';
+  static const String _keyStandbyDock = 'standby_dock_config';
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
@@ -101,6 +103,30 @@ class WallpaperRepository {
   /// Resets the Gesture Controls & Dynamic Haptics settings to default.
   Future<void> resetGestureControlConfig() async {
     await prefs.remove(_keyGestureControl);
+  }
+
+  /// Returns the configured Horizon Standby & Ambient Desk Dock settings.
+  StandbyDockConfig getStandbyDockConfig() {
+    final raw = prefs.getString(_keyStandbyDock);
+    if (raw == null || raw.isEmpty) {
+      return StandbyDockConfig.defaultConfig;
+    }
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      return StandbyDockConfig.fromJson(json);
+    } catch (_) {
+      return StandbyDockConfig.defaultConfig;
+    }
+  }
+
+  /// Saves the Horizon Standby & Ambient Desk Dock settings.
+  Future<void> saveStandbyDockConfig(StandbyDockConfig config) async {
+    await prefs.setString(_keyStandbyDock, jsonEncode(config.toJson()));
+  }
+
+  /// Resets the Horizon Standby & Ambient Desk Dock settings to default.
+  Future<void> resetStandbyDockConfig() async {
+    await prefs.remove(_keyStandbyDock);
   }
 
   /// Returns the configured Battery & Display Telemetry settings.
@@ -749,6 +775,7 @@ class WallpaperRepository {
       particleConfig: getParticleEffectConfig(),
       auraConfig: getAuraPaletteConfig(),
       gestureConfig: getGestureControlConfig(),
+      standbyDockConfig: getStandbyDockConfig(),
       batteryTelemetry: getBatteryTelemetryConfig(),
       smartFilter: getSmartFilterConfig(),
       userPreferences: getUserPreferences(),
@@ -819,6 +846,7 @@ class WallpaperRepository {
       await saveParticleEffectConfig(bundle.particleConfig);
       await saveAuraPaletteConfig(bundle.auraConfig);
       await saveGestureControlConfig(bundle.gestureConfig);
+      await saveStandbyDockConfig(bundle.standbyDockConfig);
       await saveBatteryTelemetryConfig(bundle.batteryTelemetry);
       await saveSmartFilterConfig(bundle.smartFilter);
 
@@ -858,6 +886,7 @@ class WallpaperRepository {
     await resetParticleEffectConfig();
     await resetAuraPaletteConfig();
     await resetGestureControlConfig();
+    await resetStandbyDockConfig();
     await resetBatteryTelemetryConfig();
     await resetSmartFilterConfig();
 

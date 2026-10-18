@@ -8,6 +8,7 @@ import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
 import '../models/particle_effect_config.dart';
 import '../models/smart_filter_config.dart';
+import '../models/standby_dock_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../models/wallora_backup_bundle.dart';
@@ -505,6 +506,25 @@ class ExecuteGestureActionIntent extends WallpaperIntent {
 /// Intent to toggle Clean Canvas (Zen Mode) overlay visibility.
 class ToggleCleanCanvasIntent extends WallpaperIntent {
   const ToggleCleanCanvasIntent();
+}
+
+/// Intent to update the Horizon Standby & Ambient Desk Dock configuration.
+class UpdateStandbyDockIntent extends WallpaperIntent {
+  final StandbyDockConfig config;
+  const UpdateStandbyDockIntent(this.config);
+
+  @override
+  List<Object?> get props => [config];
+}
+
+/// Intent to reset the Horizon Standby & Ambient Desk Dock configuration to defaults.
+class ResetStandbyDockIntent extends WallpaperIntent {
+  const ResetStandbyDockIntent();
+}
+
+/// Intent to toggle manual Night Standby OLED mode.
+class ToggleNightStandbyModeIntent extends WallpaperIntent {
+  const ToggleNightStandbyModeIntent();
 }
 
 

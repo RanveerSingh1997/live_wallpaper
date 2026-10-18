@@ -15,6 +15,7 @@ import 'onboarding_sheet.dart';
 import 'parallax_studio_sheet.dart';
 import 'particle_effect_sheet.dart';
 import 'preferences_modal_sheet.dart';
+import 'standby_dock_sheet.dart';
 
 class SettingsSheet extends StatelessWidget {
   const SettingsSheet({super.key});
@@ -298,6 +299,17 @@ class SettingsSheet extends StatelessWidget {
                         : 'Disabled / Touch Pass-Through',
                     onTap: () {
                       GestureControlSheet.show(context);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSettingTile(
+                    icon: Icons.desktop_windows_rounded,
+                    iconColor: const Color(0xFF00E5FF),
+                    title: 'Horizon Standby & Desk Dock Studio',
+                    subtitle:
+                        '${state.standbyDockConfig.layoutMode.displayName} • ${state.standbyDockConfig.clockStyle.displayName}',
+                    onTap: () {
+                      StandbyDockSheet.show(context);
                     },
                   ),
                   const SizedBox(height: 8),

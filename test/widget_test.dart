@@ -11,6 +11,7 @@ import 'package:live_wallpaper/models/lock_screen_style_config.dart';
 import 'package:live_wallpaper/models/parallax_effect_config.dart';
 import 'package:live_wallpaper/models/particle_effect_config.dart';
 import 'package:live_wallpaper/models/smart_filter_config.dart';
+import 'package:live_wallpaper/models/standby_dock_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallora_backup_bundle.dart';
 import 'package:live_wallpaper/screens/add_to_collection_sheet.dart';
@@ -37,6 +38,8 @@ import 'package:live_wallpaper/screens/quote_studio_sheet.dart';
 import 'package:live_wallpaper/screens/settings_sheet.dart';
 import 'package:live_wallpaper/screens/smart_discovery_sheet.dart';
 import 'package:live_wallpaper/screens/splash_screen.dart';
+import 'package:live_wallpaper/screens/standby_dock_screen.dart';
+import 'package:live_wallpaper/screens/standby_dock_sheet.dart';
 import 'package:live_wallpaper/screens/wallpaper_effects_sheet.dart';
 import 'package:live_wallpaper/screens/wallpaper_export_sheet.dart';
 import 'package:live_wallpaper/screens/wallpaper_preview_sheet.dart';
@@ -2592,6 +2595,147 @@ void main() {
       // Verify GestureControlSheet is opened
       expect(find.text('Interactive Gesture Studio'), findsOneWidget);
       expect(find.text('TACTILE TOUCH PLAYGROUND'), findsOneWidget);
+    });
+
+    testWidgets('StandbyDockScreen renders clock, battery pill, and floating controls',
+        (WidgetTester tester) async {
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          standbyDockConfig: const StandbyDockConfig(
+            showBatteryPill: true,
+            showDateAndSolarSlot: true,
+            showMotivationalQuote: true,
+          ),
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: StandbyDockScreen(),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      // Verify battery pill
+      expect(find.text('100% CHARGED'), findsOneWidget);
+
+      // Verify back exit button icon exists
+      expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
+
+      // Verify night mode toggle exists
+      expect(find.byIcon(Icons.tune_rounded), findsOneWidget);
+    });
+
+    testWidgets('StandbyDockSheet renders typography styles, layout selectors, and OLED longevity switches',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: StandbyDockSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify Header
+      expect(find.text('Horizon Standby Studio'), findsOneWidget);
+      expect(find.text('Ambient desk dock & nightstand OLED hub'), findsOneWidget);
+
+      // Verify Sections
+      expect(find.text('CLOCK TYPOGRAPHY'), findsOneWidget);
+      expect(find.text('Modern Sans-Serif'), findsOneWidget);
+      expect(find.text('Cyberpunk Mono'), findsOneWidget);
+      expect(find.text('Editorial Serif'), findsOneWidget);
+      expect(find.text('OLED Dot Matrix'), findsOneWidget);
+
+      // Verify OLED protection tile
+      expect(find.text('Anti-Burn-In Subpixel Shift'), findsOneWidget);
+
+      // Verify Launch button
+      expect(find.text('Launch Horizon Desk Dock'), findsOneWidget);
+    });
+
+    testWidgets('SettingsSheet opens StandbyDockSheet when Standby Studio tile is tapped',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SettingsSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Scroll to Horizon Standby & Desk Dock Studio tile
+      await tester.scrollUntilVisible(
+        find.text('Horizon Standby & Desk Dock Studio'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('Horizon Standby & Desk Dock Studio'), findsOneWidget);
+
+      // Tap to open sheet
+      await tester.tap(find.text('Horizon Standby & Desk Dock Studio'));
+      await tester.pumpAndSettle();
+
+      // Verify StandbyDockSheet is opened
+      expect(find.text('Horizon Standby Studio'), findsOneWidget);
+      expect(find.text('CLOCK TYPOGRAPHY'), findsOneWidget);
     });
   });
 }

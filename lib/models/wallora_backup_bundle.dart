@@ -8,6 +8,7 @@ import 'lock_screen_style_config.dart';
 import 'parallax_effect_config.dart';
 import 'particle_effect_config.dart';
 import 'smart_filter_config.dart';
+import 'standby_dock_config.dart';
 import 'wallpaper_collection.dart';
 import 'wallpaper_effect_config.dart';
 
@@ -29,6 +30,7 @@ class WalloraBackupBundle extends Equatable {
   final ParticleEffectConfig particleConfig;
   final AuraPaletteConfig auraConfig;
   final GestureControlConfig gestureConfig;
+  final StandbyDockConfig standbyDockConfig;
   final BatteryTelemetryConfig batteryTelemetry;
   final SmartFilterConfig smartFilter;
   final Set<String> userPreferences;
@@ -48,6 +50,7 @@ class WalloraBackupBundle extends Equatable {
     this.particleConfig = ParticleEffectConfig.defaultConfig,
     this.auraConfig = AuraPaletteConfig.defaultConfig,
     this.gestureConfig = GestureControlConfig.defaultConfig,
+    this.standbyDockConfig = StandbyDockConfig.defaultConfig,
     this.batteryTelemetry = BatteryTelemetryConfig.defaultConfig,
     this.smartFilter = SmartFilterConfig.defaultConfig,
     this.userPreferences = const {},
@@ -96,6 +99,7 @@ class WalloraBackupBundle extends Equatable {
       'particleConfig': particleConfig.toJson(),
       'auraConfig': auraConfig.toJson(),
       'gestureConfig': gestureConfig.toJson(),
+      'standbyDockConfig': standbyDockConfig.toJson(),
       'batteryTelemetry': batteryTelemetry.toJson(),
       'smartFilter': smartFilter.toJson(),
       'userPreferences': userPreferences.toList(),
@@ -172,6 +176,10 @@ class WalloraBackupBundle extends Equatable {
           ? GestureControlConfig.fromJson(
               json['gestureConfig'] as Map<String, dynamic>)
           : GestureControlConfig.defaultConfig,
+      standbyDockConfig: json['standbyDockConfig'] != null
+          ? StandbyDockConfig.fromJson(
+              json['standbyDockConfig'] as Map<String, dynamic>)
+          : StandbyDockConfig.defaultConfig,
       batteryTelemetry: json['batteryTelemetry'] != null
           ? BatteryTelemetryConfig.fromJson(
               json['batteryTelemetry'] as Map<String, dynamic>)
@@ -205,6 +213,7 @@ class WalloraBackupBundle extends Equatable {
     ParticleEffectConfig? particleConfig,
     AuraPaletteConfig? auraConfig,
     GestureControlConfig? gestureConfig,
+    StandbyDockConfig? standbyDockConfig,
     BatteryTelemetryConfig? batteryTelemetry,
     SmartFilterConfig? smartFilter,
     Set<String>? userPreferences,
@@ -224,6 +233,7 @@ class WalloraBackupBundle extends Equatable {
       particleConfig: particleConfig ?? this.particleConfig,
       auraConfig: auraConfig ?? this.auraConfig,
       gestureConfig: gestureConfig ?? this.gestureConfig,
+      standbyDockConfig: standbyDockConfig ?? this.standbyDockConfig,
       batteryTelemetry: batteryTelemetry ?? this.batteryTelemetry,
       smartFilter: smartFilter ?? this.smartFilter,
       userPreferences: userPreferences ?? this.userPreferences,
@@ -247,6 +257,7 @@ class WalloraBackupBundle extends Equatable {
         particleConfig,
         auraConfig,
         gestureConfig,
+        standbyDockConfig,
         batteryTelemetry,
         smartFilter,
         userPreferences,

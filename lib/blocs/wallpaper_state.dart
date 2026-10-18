@@ -9,6 +9,7 @@ import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
 import '../models/particle_effect_config.dart';
 import '../models/smart_filter_config.dart';
+import '../models/standby_dock_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 
@@ -40,6 +41,7 @@ class WallpaperState extends Equatable {
   final ParticleEffectConfig particleConfig;
   final AuraPaletteConfig auraConfig;
   final GestureControlConfig gestureConfig;
+  final StandbyDockConfig standbyDockConfig;
   final SmartFilterConfig smartFilter;
   final BatteryTelemetryConfig batteryTelemetry;
   final bool isFeedMuted;
@@ -80,6 +82,7 @@ class WallpaperState extends Equatable {
     this.particleConfig = ParticleEffectConfig.defaultConfig,
     this.auraConfig = AuraPaletteConfig.defaultConfig,
     this.gestureConfig = GestureControlConfig.defaultConfig,
+    this.standbyDockConfig = StandbyDockConfig.defaultConfig,
     this.smartFilter = SmartFilterConfig.defaultConfig,
     this.batteryTelemetry = BatteryTelemetryConfig.defaultConfig,
     this.isFeedMuted = true,
@@ -249,6 +252,7 @@ class WallpaperState extends Equatable {
     ParticleEffectConfig? particleConfig,
     AuraPaletteConfig? auraConfig,
     GestureControlConfig? gestureConfig,
+    StandbyDockConfig? standbyDockConfig,
     SmartFilterConfig? smartFilter,
     BatteryTelemetryConfig? batteryTelemetry,
     bool? isFeedMuted,
@@ -289,6 +293,7 @@ class WallpaperState extends Equatable {
       particleConfig: particleConfig ?? this.particleConfig,
       auraConfig: auraConfig ?? this.auraConfig,
       gestureConfig: gestureConfig ?? this.gestureConfig,
+      standbyDockConfig: standbyDockConfig ?? this.standbyDockConfig,
       smartFilter: smartFilter ?? this.smartFilter,
       batteryTelemetry: batteryTelemetry ?? this.batteryTelemetry,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
@@ -335,6 +340,7 @@ class WallpaperState extends Equatable {
         particleConfig,
         auraConfig,
         gestureConfig,
+        standbyDockConfig,
         smartFilter,
         batteryTelemetry,
         isFeedMuted,

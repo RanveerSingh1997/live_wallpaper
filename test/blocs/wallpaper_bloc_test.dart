@@ -13,6 +13,7 @@ import 'package:live_wallpaper/models/motivational_short.dart';
 import 'package:live_wallpaper/models/parallax_effect_config.dart';
 import 'package:live_wallpaper/models/particle_effect_config.dart';
 import 'package:live_wallpaper/models/smart_filter_config.dart';
+import 'package:live_wallpaper/models/standby_dock_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/models/wallora_backup_bundle.dart';
@@ -1392,6 +1393,73 @@ void main() {
       );
       bloc.add(const ExecuteGestureActionIntent(GestureAction.cycleAuraPalette));
       await auraExpectation;
+    });
+
+    test('UpdateStandbyDockIntent persists and updates state', () async {
+      const config = StandbyDockConfig(
+        clockStyle: DockClockStyle.cyberpunkTech,
+        layoutMode: DockLayoutMode.centeredZen,
+        isNightModeEnabled: true,
+        isBurnInProtectionEnabled: false,
+        is24HourFormat: true,
+      );
+
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.standbyDockConfig == config &&
+            s.message == 'Standby dock settings updated.')),
+      );
+
+      bloc.add(const UpdateStandbyDockIntent(config));
+      await expectation;
+
+      expect(repository.getStandbyDockConfig(), equals(config));
+    });
+
+    test('ResetStandbyDockIntent restores defaultConfig and updates state', () async {
+      const custom = StandbyDockConfig(
+        clockStyle: DockClockStyle.oledMatrix,
+        layoutMode: DockLayoutMode.fullscreenHUD,
+      );
+      await repository.saveStandbyDockConfig(custom);
+
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.standbyDockConfig == StandbyDockConfig.defaultConfig &&
+            s.message == 'Standby dock settings reset to defaults.')),
+      );
+
+      bloc.add(const ResetStandbyDockIntent());
+      await expectation;
+
+      expect(repository.getStandbyDockConfig(),
+          equals(StandbyDockConfig.defaultConfig));
+    });
+
+    test('ToggleNightStandbyModeIntent flips isNightModeEnabled in state and repository', () async {
+      expect(bloc.state.standbyDockConfig.isNightModeEnabled, isFalse);
+
+      final enableExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>(
+            (s) => s.standbyDockConfig.isNightModeEnabled == true)),
+      );
+      bloc.add(const ToggleNightStandbyModeIntent());
+      await enableExpectation;
+
+      expect(repository.getStandbyDockConfig().isNightModeEnabled, isTrue);
+
+      final disableExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>(
+            (s) => s.standbyDockConfig.isNightModeEnabled == false)),
+      );
+      bloc.add(const ToggleNightStandbyModeIntent());
+      await disableExpectation;
+
+      expect(repository.getStandbyDockConfig().isNightModeEnabled, isFalse);
     });
   });
 }

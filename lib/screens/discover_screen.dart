@@ -13,6 +13,7 @@ import 'preferences_modal_sheet.dart';
 import 'quote_studio_sheet.dart';
 import 'settings_sheet.dart';
 import 'smart_discovery_sheet.dart';
+import 'standby_dock_screen.dart';
 import 'wallpaper_preview_sheet.dart';
 import 'wallpaper_quick_actions_sheet.dart';
 import '../models/smart_filter_config.dart';
@@ -181,6 +182,19 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               onPressed: () {
                                 HapticFeedback.selectionClick();
                                 CustomWallpaperImportSheet.show(context);
+                              },
+                            ),
+                            // Horizon Standby Desk Dock Studio button
+                            IconButton(
+                              icon: const Icon(Icons.desktop_windows_rounded, color: Color(0xFF00E5FF)),
+                              tooltip: 'Horizon Standby Desk Dock',
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const StandbyDockScreen(),
+                                  ),
+                                );
                               },
                             ),
                             // Settings & Trust button
