@@ -14,6 +14,7 @@ import '../models/standby_dock_config.dart';
 import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../models/wallora_screen_blueprint.dart';
+import '../models/weather_atmosphere_config.dart';
 
 enum WallpaperActionStatus {
   idle,
@@ -47,6 +48,7 @@ class WallpaperState extends Equatable {
   final AuroraSynthesizerConfig auroraSynthesizerConfig;
   final SmartFilterConfig smartFilter;
   final BatteryTelemetryConfig batteryTelemetry;
+  final WeatherAtmosphereConfig weatherConfig;
   final bool isFeedMuted;
   final bool isLiveWallpaperActiveOnDevice;
   final String? activeWallpaperId;
@@ -92,6 +94,7 @@ class WallpaperState extends Equatable {
     this.auroraSynthesizerConfig = AuroraSynthesizerConfig.defaultConfig,
     this.smartFilter = SmartFilterConfig.defaultConfig,
     this.batteryTelemetry = BatteryTelemetryConfig.defaultConfig,
+    this.weatherConfig = WeatherAtmosphereConfig.defaultConfig,
     this.isFeedMuted = true,
     this.isLiveWallpaperActiveOnDevice = false,
     this.activeWallpaperId,
@@ -280,6 +283,7 @@ class WallpaperState extends Equatable {
     AuroraSynthesizerConfig? auroraSynthesizerConfig,
     SmartFilterConfig? smartFilter,
     BatteryTelemetryConfig? batteryTelemetry,
+    WeatherAtmosphereConfig? weatherConfig,
     bool? isFeedMuted,
     bool? isLiveWallpaperActiveOnDevice,
     String? activeWallpaperId,
@@ -326,6 +330,7 @@ class WallpaperState extends Equatable {
           auroraSynthesizerConfig ?? this.auroraSynthesizerConfig,
       smartFilter: smartFilter ?? this.smartFilter,
       batteryTelemetry: batteryTelemetry ?? this.batteryTelemetry,
+      weatherConfig: weatherConfig ?? this.weatherConfig,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
       isLiveWallpaperActiveOnDevice:
           isLiveWallpaperActiveOnDevice ?? this.isLiveWallpaperActiveOnDevice,
@@ -377,6 +382,7 @@ class WallpaperState extends Equatable {
         auroraSynthesizerConfig,
         smartFilter,
         batteryTelemetry,
+        weatherConfig,
         isFeedMuted,
         isLiveWallpaperActiveOnDevice,
         activeWallpaperId,

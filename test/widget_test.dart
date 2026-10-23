@@ -51,6 +51,8 @@ import 'package:live_wallpaper/screens/wallpaper_effects_sheet.dart';
 import 'package:live_wallpaper/screens/wallpaper_export_sheet.dart';
 import 'package:live_wallpaper/screens/wallpaper_preview_sheet.dart';
 import 'package:live_wallpaper/screens/wallpaper_quick_actions_sheet.dart';
+import 'package:live_wallpaper/screens/weather_atmosphere_sheet.dart';
+import 'package:live_wallpaper/models/weather_atmosphere_config.dart';
 import 'package:live_wallpaper/widgets/kinetic_quote_overlay.dart';
 import 'package:live_wallpaper/widgets/shorts_action_rail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -551,6 +553,7 @@ void main() {
         repository: repository,
         initialState: WallpaperState(
           allShorts: CuratedShortsData.shorts,
+          weatherConfig: const WeatherAtmosphereConfig(effectType: WeatherEffectType.none),
         ),
       );
       addTearDown(bloc.close);
@@ -598,6 +601,7 @@ void main() {
         repository: repository,
         initialState: WallpaperState(
           allShorts: CuratedShortsData.shorts,
+          weatherConfig: const WeatherAtmosphereConfig(effectType: WeatherEffectType.none),
         ),
       );
       addTearDown(bloc.close);
@@ -781,6 +785,7 @@ void main() {
         repository: repository,
         initialState: WallpaperState(
           allShorts: CuratedShortsData.shorts,
+          weatherConfig: const WeatherAtmosphereConfig(effectType: WeatherEffectType.none),
         ),
       );
       addTearDown(bloc.close);
@@ -965,6 +970,7 @@ void main() {
         repository: repository,
         initialState: WallpaperState(
           allShorts: CuratedShortsData.shorts,
+          weatherConfig: const WeatherAtmosphereConfig(effectType: WeatherEffectType.none),
         ),
       );
       addTearDown(bloc.close);
@@ -1030,6 +1036,7 @@ void main() {
         repository: repository,
         initialState: WallpaperState(
           allShorts: CuratedShortsData.shorts,
+          weatherConfig: const WeatherAtmosphereConfig(effectType: WeatherEffectType.none),
         ),
       );
       addTearDown(bloc.close);
@@ -3295,6 +3302,167 @@ void main() {
       // Verify sheet opens
       expect(find.text('AESTHETIC BLUEPRINT EXCHANGE'), findsOneWidget);
       expect(find.text('YOUR ACTIVE SETUP'), findsOneWidget);
+    });
+
+    testWidgets('WeatherAtmosphereSheet renders preview, preset choices, climate dynamics sliders, and hardware sensor toggles',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          weatherConfig: WeatherAtmosphereConfig.defaultConfig,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: WeatherAtmosphereSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // 1. Verify Header
+      expect(find.text('Atmospheric Weather Studio'), findsOneWidget);
+      expect(find.text('Dynamic particle overlays & gyroscopic tilt'), findsOneWidget);
+
+      // 2. Verify Presets
+      expect(find.text('WEATHER EFFECT PRESETS'), findsOneWidget);
+      expect(find.text('Clean Canvas (Off)'), findsOneWidget);
+      expect(find.text('Cyberpunk Rain & Drizzle'), findsNWidgets(2));
+      expect(find.text('Cosmic Snow & Blizzard'), findsOneWidget);
+      expect(find.text('Neon Thunderstorm'), findsOneWidget);
+
+      // 3. Verify Sliders
+      expect(find.text('CLIMATE DYNAMICS & VELOCITY'), findsOneWidget);
+      expect(find.text('Particle Density (Intensity)'), findsOneWidget);
+      expect(find.text('Fall Velocity & Speed'), findsOneWidget);
+
+      // 4. Verify Hardware Toggles
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -600));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('Gyroscopic Tilt Adaptation'), findsOneWidget);
+      expect(find.text('Lightning & Luminous Bursts'), findsOneWidget);
+      expect(find.text('Zero Sleep Overhead & Battery Guard'), findsOneWidget);
+
+      // 5. Verify Action Buttons
+      expect(find.text('Reset Defaults'), findsOneWidget);
+      expect(find.text('Apply to Live Canvas'), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('SettingsSheet opens WeatherAtmosphereSheet when Atmospheric Weather Studio tile is tapped',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SettingsSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final studioTile = find.text('Atmospheric Weather & Climate FX Studio');
+      await tester.scrollUntilVisible(
+        studioTile,
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(studioTile, findsOneWidget);
+
+      await tester.tap(studioTile);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('Atmospheric Weather Studio'), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('DiscoverScreen renders Weather Atmosphere Studio IconButton and opens WeatherAtmosphereSheet on tap',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: DiscoverScreen(
+              onOpenLiveFeed: () {},
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final weatherButton = find.byTooltip('Weather Atmosphere Studio');
+      expect(weatherButton, findsOneWidget);
+
+      await tester.tap(weatherButton);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('Atmospheric Weather Studio'), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox.shrink());
     });
   });
 }

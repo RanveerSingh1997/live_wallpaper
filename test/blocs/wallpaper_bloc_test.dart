@@ -19,6 +19,7 @@ import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/models/wallora_backup_bundle.dart';
 import 'package:live_wallpaper/models/wallora_screen_blueprint.dart';
+import 'package:live_wallpaper/models/weather_atmosphere_config.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -1647,6 +1648,92 @@ void main() {
       expect(bloc.state.filteredBlueprints.every((b) =>
           b.tags.any((t) => t.toLowerCase() == 'cyberpunk') ||
           b.title.toLowerCase().contains('cyberpunk')), isTrue);
+    });
+
+    test('UpdateWeatherAtmosphereIntent saves config and emits state', () async {
+      const updated = WeatherAtmosphereConfig(
+        effectType: WeatherEffectType.cosmicSnow,
+        intensity: 0.8,
+        speedMultiplier: 1.4,
+        windAngleDegrees: 75.0,
+        isGyroTiltEnabled: true,
+        isLightningEnabled: false,
+        isBatteryGuardEnabled: true,
+      );
+
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.weatherConfig == updated &&
+            s.message == 'Weather & Atmosphere FX updated.')),
+      );
+
+      bloc.add(const UpdateWeatherAtmosphereIntent(updated));
+      await expectation;
+
+      expect(repository.getWeatherAtmosphereConfig(), equals(updated));
+    });
+
+    test('ResetWeatherAtmosphereIntent resets config to defaults', () async {
+      await repository.saveWeatherAtmosphereConfig(
+        const WeatherAtmosphereConfig(effectType: WeatherEffectType.thunderstorm),
+      );
+
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.weatherConfig == WeatherAtmosphereConfig.defaultConfig &&
+            s.message == 'Weather & Atmosphere FX reset to defaults.')),
+      );
+
+      bloc.add(const ResetWeatherAtmosphereIntent());
+      await expectation;
+
+      expect(repository.getWeatherAtmosphereConfig(), equals(WeatherAtmosphereConfig.defaultConfig));
+    });
+
+    test('ToggleWeatherAtmosphereIntent toggles between enabled and clean canvas', () async {
+      // Initially cyberRain (isEnabled == true)
+      expect(bloc.state.weatherConfig.isEnabled, isTrue);
+
+      // Toggle off -> WeatherEffectType.none
+      final offExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            !s.weatherConfig.isEnabled &&
+            s.message == 'Atmospheric Weather FX disabled.')),
+      );
+
+      bloc.add(const ToggleWeatherAtmosphereIntent());
+      await offExpectation;
+      expect(bloc.state.weatherConfig.effectType, equals(WeatherEffectType.none));
+
+      // Toggle back on -> WeatherEffectType.cyberRain
+      final onExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.weatherConfig.isEnabled &&
+            s.weatherConfig.effectType == WeatherEffectType.cyberRain &&
+            s.message == 'Atmospheric Weather FX activated.')),
+      );
+
+      bloc.add(const ToggleWeatherAtmosphereIntent());
+      await onExpectation;
+      expect(bloc.state.weatherConfig.isEnabled, isTrue);
+    });
+
+    test('SetWeatherEffectPresetIntent updates effect preset', () async {
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.weatherConfig.effectType == WeatherEffectType.meteorShower &&
+            s.message == 'Applied Meteor Shower & Starfall effect.')),
+      );
+
+      bloc.add(const SetWeatherEffectPresetIntent(WeatherEffectType.meteorShower));
+      await expectation;
+
+      expect(repository.getWeatherAtmosphereConfig().effectType, equals(WeatherEffectType.meteorShower));
     });
   });
 }

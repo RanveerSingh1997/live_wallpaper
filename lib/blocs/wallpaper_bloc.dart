@@ -12,6 +12,7 @@ import '../models/smart_filter_config.dart';
 import '../models/standby_dock_config.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../models/wallora_screen_blueprint.dart';
+import '../models/weather_atmosphere_config.dart';
 import '../repositories/wallpaper_repository.dart';
 import 'wallpaper_intent.dart';
 import 'wallpaper_state.dart';
@@ -95,6 +96,10 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<PublishCurrentSetupIntent>(_onPublishCurrentSetup);
     on<ToggleBlueprintLikeIntent>(_onToggleBlueprintLike);
     on<FilterCommunityBlueprintsIntent>(_onFilterCommunityBlueprints);
+    on<UpdateWeatherAtmosphereIntent>(_onUpdateWeatherAtmosphere);
+    on<ResetWeatherAtmosphereIntent>(_onResetWeatherAtmosphere);
+    on<ToggleWeatherAtmosphereIntent>(_onToggleWeatherAtmosphere);
+    on<SetWeatherEffectPresetIntent>(_onSetWeatherEffectPreset);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -170,6 +175,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final auroraSynthesizer = repository.getAuroraSynthesizerConfig();
       final smartFilter = repository.getSmartFilterConfig();
       final batteryTelemetry = repository.getBatteryTelemetryConfig();
+      final weatherConfig = repository.getWeatherAtmosphereConfig();
       final communityBlueprints = repository.getCommunityBlueprints();
       final likedBlueprintIds = repository.getLikedBlueprintIds();
 
@@ -202,6 +208,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         auroraSynthesizerConfig: auroraSynthesizer,
         smartFilter: smartFilter,
         batteryTelemetry: batteryTelemetry,
+        weatherConfig: weatherConfig,
         communityBlueprints: communityBlueprints,
         likedBlueprintIds: likedBlueprintIds,
         activeWallpaperId: activeId,
@@ -1206,6 +1213,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final auroraSynthesizer = repository.getAuroraSynthesizerConfig();
       final telemetry = repository.getBatteryTelemetryConfig();
       final smartFilter = repository.getSmartFilterConfig();
+      final weatherConfig = repository.getWeatherAtmosphereConfig();
       final preferences = repository.getUserPreferences();
       final amoled = repository.isAmoledSaverModeEnabled();
 
@@ -1232,6 +1240,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         auroraSynthesizerConfig: auroraSynthesizer,
         batteryTelemetry: telemetry,
         smartFilter: smartFilter,
+        weatherConfig: weatherConfig,
         userPreferences: preferences,
         isAmoledSaverModeEnabled: amoled,
         message: 'Successfully restored backup (${event.bundle.summary}).',
@@ -1271,6 +1280,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       auroraSynthesizerConfig: AuroraSynthesizerConfig.defaultConfig,
       batteryTelemetry: BatteryTelemetryConfig.defaultConfig,
       smartFilter: SmartFilterConfig.defaultConfig,
+      weatherConfig: WeatherAtmosphereConfig.defaultConfig,
       userPreferences: {},
       isAmoledSaverModeEnabled: false,
       isCleanCanvasMode: false,
@@ -1628,6 +1638,59 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     Emitter<WallpaperState> emit,
   ) {
     emit(state.copyWith(communityTagFilter: event.tagQuery));
+  }
+
+  Future<void> _onUpdateWeatherAtmosphere(
+    UpdateWeatherAtmosphereIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.saveWeatherAtmosphereConfig(event.config);
+    emit(state.copyWith(
+      weatherConfig: event.config,
+      message: 'Weather & Atmosphere FX updated.',
+    ));
+  }
+
+  Future<void> _onResetWeatherAtmosphere(
+    ResetWeatherAtmosphereIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    await repository.resetWeatherAtmosphereConfig();
+    emit(state.copyWith(
+      weatherConfig: WeatherAtmosphereConfig.defaultConfig,
+      message: 'Weather & Atmosphere FX reset to defaults.',
+    ));
+  }
+
+  Future<void> _onToggleWeatherAtmosphere(
+    ToggleWeatherAtmosphereIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final isCurrentlyOn = state.weatherConfig.isEnabled;
+    final updated = state.weatherConfig.copyWith(
+      effectType: isCurrentlyOn ? WeatherEffectType.none : WeatherEffectType.cyberRain,
+    );
+    await repository.saveWeatherAtmosphereConfig(updated);
+    emit(state.copyWith(
+      weatherConfig: updated,
+      message: !isCurrentlyOn
+          ? 'Atmospheric Weather FX activated.'
+          : 'Atmospheric Weather FX disabled.',
+    ));
+  }
+
+  Future<void> _onSetWeatherEffectPreset(
+    SetWeatherEffectPresetIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final updated = state.weatherConfig.copyWith(
+      effectType: event.effectType,
+    );
+    await repository.saveWeatherAtmosphereConfig(updated);
+    emit(state.copyWith(
+      weatherConfig: updated,
+      message: 'Applied ${event.effectType.displayName} effect.',
+    ));
   }
 }
 

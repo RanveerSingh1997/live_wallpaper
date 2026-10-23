@@ -18,6 +18,7 @@ import 'smart_discovery_sheet.dart';
 import 'standby_dock_screen.dart';
 import 'wallpaper_preview_sheet.dart';
 import 'wallpaper_quick_actions_sheet.dart';
+import 'weather_atmosphere_sheet.dart';
 import '../models/smart_filter_config.dart';
 
 class DiscoverScreen extends StatefulWidget {
@@ -222,6 +223,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               onPressed: () {
                                 HapticFeedback.selectionClick();
                                 CommunityExchangeSheet.show(context);
+                              },
+                            ),
+                            // Atmospheric Weather & Climate FX Studio button
+                            IconButton(
+                              icon: const Icon(Icons.cloud_sync_rounded, color: Color(0xFF00E5FF)),
+                              tooltip: 'Weather Atmosphere Studio',
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                WeatherAtmosphereSheet.show(context);
                               },
                             ),
                             // Settings & Trust button

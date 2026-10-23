@@ -9,6 +9,7 @@ import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../widgets/interactive_particle_overlay.dart';
 import '../widgets/video_player_item.dart';
+import '../widgets/weather_atmosphere_canvas.dart';
 import 'aura_palette_sheet.dart';
 import 'battery_telemetry_sheet.dart';
 import 'ipad_wallpaper_dialog.dart';
@@ -17,6 +18,7 @@ import 'parallax_studio_sheet.dart';
 import 'particle_effect_sheet.dart';
 import 'wallpaper_effects_sheet.dart';
 import 'wallpaper_export_sheet.dart';
+import 'weather_atmosphere_sheet.dart';
 
 enum ScreenSimulationMode {
   clean('Clean View', Icons.visibility_rounded),
@@ -396,6 +398,13 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
           );
         }
 
+        if (state.weatherConfig.isEnabled) {
+          canvas = WeatherAtmosphereCanvas(
+            config: state.weatherConfig,
+            child: canvas,
+          );
+        }
+
         return canvas;
       },
     );
@@ -690,6 +699,16 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                         onPressed: () {
                           HapticFeedback.mediumImpact();
                           AuraPaletteSheet.show(context);
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      // Atmospheric Weather & Climate FX Studio Button
+                      IconButton(
+                        icon: const Icon(Icons.cloud_sync_rounded, color: Color(0xFF00E5FF)),
+                        tooltip: 'Atmospheric Weather Studio',
+                        onPressed: () {
+                          HapticFeedback.mediumImpact();
+                          WeatherAtmosphereSheet.show(context);
                         },
                       ),
                     ],

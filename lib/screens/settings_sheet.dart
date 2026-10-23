@@ -18,6 +18,7 @@ import 'parallax_studio_sheet.dart';
 import 'particle_effect_sheet.dart';
 import 'preferences_modal_sheet.dart';
 import 'standby_dock_sheet.dart';
+import 'weather_atmosphere_sheet.dart';
 
 class SettingsSheet extends StatelessWidget {
   const SettingsSheet({super.key});
@@ -334,6 +335,18 @@ class SettingsSheet extends StatelessWidget {
                         '${state.communityBlueprints.length} blueprints • Explore, like & publish complete aesthetics',
                     onTap: () {
                       CommunityExchangeSheet.show(context);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSettingTile(
+                    icon: Icons.cloud_sync_rounded,
+                    iconColor: const Color(0xFF00E5FF),
+                    title: 'Atmospheric Weather & Climate FX Studio',
+                    subtitle: state.weatherConfig.isEnabled
+                        ? '${state.weatherConfig.effectType.displayName} • Gyro & lightning active'
+                        : 'Clean Canvas • Procedural rain, snow & starfall',
+                    onTap: () {
+                      WeatherAtmosphereSheet.show(context);
                     },
                   ),
                   const SizedBox(height: 8),

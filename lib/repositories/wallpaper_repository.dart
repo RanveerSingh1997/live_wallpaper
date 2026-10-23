@@ -19,6 +19,7 @@ import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../models/wallora_backup_bundle.dart';
 import '../models/wallora_screen_blueprint.dart';
+import '../models/weather_atmosphere_config.dart';
 import '../services/wallpaper_renderer_service.dart';
 import '../services/wallpaper_service_bridge.dart';
 
@@ -54,6 +55,7 @@ class WallpaperRepository {
   static const String _keyGestureControl = 'gesture_control_config';
   static const String _keyStandbyDock = 'standby_dock_config';
   static const String _keyAuroraSynthesizer = 'aurora_synthesizer_config';
+  static const String _keyWeatherAtmosphere = 'wallora_weather_atmosphere_config';
   static const String _keyPublishedBlueprints = 'wallora_published_blueprints';
   static const String _keyLikedBlueprintIds = 'wallora_liked_blueprint_ids';
 
@@ -156,6 +158,30 @@ class WallpaperRepository {
   /// Resets the Wallora Procedural Aurora Wave Synthesizer settings to default.
   Future<void> resetAuroraSynthesizerConfig() async {
     await prefs.remove(_keyAuroraSynthesizer);
+  }
+
+  /// Returns the configured Wallora Atmospheric Weather & Climate FX settings.
+  WeatherAtmosphereConfig getWeatherAtmosphereConfig() {
+    final raw = prefs.getString(_keyWeatherAtmosphere);
+    if (raw == null || raw.isEmpty) {
+      return WeatherAtmosphereConfig.defaultConfig;
+    }
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      return WeatherAtmosphereConfig.fromJson(json);
+    } catch (_) {
+      return WeatherAtmosphereConfig.defaultConfig;
+    }
+  }
+
+  /// Saves the Wallora Atmospheric Weather & Climate FX settings.
+  Future<void> saveWeatherAtmosphereConfig(WeatherAtmosphereConfig config) async {
+    await prefs.setString(_keyWeatherAtmosphere, jsonEncode(config.toJson()));
+  }
+
+  /// Resets the Wallora Atmospheric Weather & Climate FX settings to default.
+  Future<void> resetWeatherAtmosphereConfig() async {
+    await prefs.remove(_keyWeatherAtmosphere);
   }
 
   /// Returns the configured Battery & Display Telemetry settings.
@@ -863,6 +889,7 @@ class WallpaperRepository {
       auroraSynthesizerConfig: getAuroraSynthesizerConfig(),
       batteryTelemetry: getBatteryTelemetryConfig(),
       smartFilter: getSmartFilterConfig(),
+      weatherConfig: getWeatherAtmosphereConfig(),
       userPreferences: getUserPreferences(),
       isAmoledSaverModeEnabled: isAmoledSaverModeEnabled(),
     );
@@ -935,6 +962,7 @@ class WallpaperRepository {
       await saveAuroraSynthesizerConfig(bundle.auroraSynthesizerConfig);
       await saveBatteryTelemetryConfig(bundle.batteryTelemetry);
       await saveSmartFilterConfig(bundle.smartFilter);
+      await saveWeatherAtmosphereConfig(bundle.weatherConfig);
 
       // 6. Preferences & AMOLED
       final Set<String> targetPreferences = mergeWithExisting
@@ -974,6 +1002,7 @@ class WallpaperRepository {
     await resetGestureControlConfig();
     await resetStandbyDockConfig();
     await resetAuroraSynthesizerConfig();
+    await resetWeatherAtmosphereConfig();
     await resetBatteryTelemetryConfig();
     await resetSmartFilterConfig();
 

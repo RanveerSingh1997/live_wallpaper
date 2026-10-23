@@ -16,6 +16,7 @@ import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/models/wallora_backup_bundle.dart';
 import 'package:live_wallpaper/models/wallora_screen_blueprint.dart';
+import 'package:live_wallpaper/models/weather_atmosphere_config.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -483,6 +484,7 @@ void main() {
         exportedAt: DateTime.now(),
         favoriteIds: const {'fav_2'},
         customizedQuotes: const {'quote_2': 'Imported Quote'},
+        weatherConfig: const WeatherAtmosphereConfig(effectType: WeatherEffectType.solarSunbeams),
         isAmoledSaverModeEnabled: true,
       );
 
@@ -497,6 +499,7 @@ void main() {
       expect(replacedFavorites, equals({'fav_2'}));
       expect(repository.getCustomQuotes()['quote_2'], equals('Imported Quote'));
       expect(repository.getCustomQuotes()['quote_1'], isNull);
+      expect(repository.getWeatherAtmosphereConfig().effectType, equals(WeatherEffectType.solarSunbeams));
       expect(repository.isAmoledSaverModeEnabled(), isTrue);
 
       // 4. Test Merge (mergeWithExisting)
@@ -597,6 +600,26 @@ void main() {
       expect(afterPublish.any((b) => b.id == 'user_bp_test'), isTrue);
     });
 
+    test('WeatherAtmosphereConfig CRUD and reset', () async {
+      expect(repository.getWeatherAtmosphereConfig(), equals(WeatherAtmosphereConfig.defaultConfig));
+
+      const updated = WeatherAtmosphereConfig(
+        effectType: WeatherEffectType.cyberRain,
+        intensity: 0.85,
+        speedMultiplier: 1.5,
+        windAngleDegrees: 18.0,
+        isGyroTiltEnabled: true,
+        isLightningEnabled: true,
+        isBatteryGuardEnabled: true,
+      );
+
+      await repository.saveWeatherAtmosphereConfig(updated);
+      expect(repository.getWeatherAtmosphereConfig(), equals(updated));
+
+      await repository.resetWeatherAtmosphereConfig();
+      expect(repository.getWeatherAtmosphereConfig(), equals(WeatherAtmosphereConfig.defaultConfig));
+    });
+
     test('resetToFactoryDefaults clears all user customizations and configs', () async {
       await repository.toggleFavorite('fav_wipe');
       await repository.saveCustomQuote('wipe_quote', 'Temp Quote');
@@ -609,6 +632,9 @@ void main() {
       );
       await repository.saveAuroraSynthesizerConfig(
         const AuroraSynthesizerConfig(waveStyle: AuroraWaveStyle.monochromeOled),
+      );
+      await repository.saveWeatherAtmosphereConfig(
+        const WeatherAtmosphereConfig(effectType: WeatherEffectType.thunderstorm),
       );
       await repository.savePublishedBlueprint(
         WalloraScreenBlueprint(
@@ -631,6 +657,7 @@ void main() {
       expect(repository.getAuraPaletteConfig(), equals(AuraPaletteConfig.defaultConfig));
       expect(repository.getStandbyDockConfig(), equals(StandbyDockConfig.defaultConfig));
       expect(repository.getAuroraSynthesizerConfig(), equals(AuroraSynthesizerConfig.defaultConfig));
+      expect(repository.getWeatherAtmosphereConfig(), equals(WeatherAtmosphereConfig.defaultConfig));
       expect(repository.getLikedBlueprintIds(), isEmpty);
       expect(repository.getCommunityBlueprints().length, equals(5));
     });

@@ -12,6 +12,7 @@ import 'smart_filter_config.dart';
 import 'standby_dock_config.dart';
 import 'wallpaper_collection.dart';
 import 'wallpaper_effect_config.dart';
+import 'weather_atmosphere_config.dart';
 
 /// Versioned, portable backup archive encapsulating the entire Wallora user configuration.
 class WalloraBackupBundle extends Equatable {
@@ -35,6 +36,7 @@ class WalloraBackupBundle extends Equatable {
   final AuroraSynthesizerConfig auroraSynthesizerConfig;
   final BatteryTelemetryConfig batteryTelemetry;
   final SmartFilterConfig smartFilter;
+  final WeatherAtmosphereConfig weatherConfig;
   final Set<String> userPreferences;
   final bool isAmoledSaverModeEnabled;
 
@@ -56,6 +58,7 @@ class WalloraBackupBundle extends Equatable {
     this.auroraSynthesizerConfig = AuroraSynthesizerConfig.defaultConfig,
     this.batteryTelemetry = BatteryTelemetryConfig.defaultConfig,
     this.smartFilter = SmartFilterConfig.defaultConfig,
+    this.weatherConfig = WeatherAtmosphereConfig.defaultConfig,
     this.userPreferences = const {},
     this.isAmoledSaverModeEnabled = false,
   });
@@ -106,6 +109,7 @@ class WalloraBackupBundle extends Equatable {
       'auroraSynthesizerConfig': auroraSynthesizerConfig.toJson(),
       'batteryTelemetry': batteryTelemetry.toJson(),
       'smartFilter': smartFilter.toJson(),
+      'weatherConfig': weatherConfig.toJson(),
       'userPreferences': userPreferences.toList(),
       'isAmoledSaverModeEnabled': isAmoledSaverModeEnabled,
     };
@@ -196,6 +200,10 @@ class WalloraBackupBundle extends Equatable {
           ? SmartFilterConfig.fromJson(
               json['smartFilter'] as Map<String, dynamic>)
           : SmartFilterConfig.defaultConfig,
+      weatherConfig: json['weatherConfig'] != null
+          ? WeatherAtmosphereConfig.fromJson(
+              json['weatherConfig'] as Map<String, dynamic>)
+          : WeatherAtmosphereConfig.defaultConfig,
       userPreferences: rawPreferences.toSet(),
       isAmoledSaverModeEnabled:
           json['isAmoledSaverModeEnabled'] as bool? ?? false,
@@ -225,6 +233,7 @@ class WalloraBackupBundle extends Equatable {
     AuroraSynthesizerConfig? auroraSynthesizerConfig,
     BatteryTelemetryConfig? batteryTelemetry,
     SmartFilterConfig? smartFilter,
+    WeatherAtmosphereConfig? weatherConfig,
     Set<String>? userPreferences,
     bool? isAmoledSaverModeEnabled,
   }) {
@@ -247,6 +256,7 @@ class WalloraBackupBundle extends Equatable {
           auroraSynthesizerConfig ?? this.auroraSynthesizerConfig,
       batteryTelemetry: batteryTelemetry ?? this.batteryTelemetry,
       smartFilter: smartFilter ?? this.smartFilter,
+      weatherConfig: weatherConfig ?? this.weatherConfig,
       userPreferences: userPreferences ?? this.userPreferences,
       isAmoledSaverModeEnabled:
           isAmoledSaverModeEnabled ?? this.isAmoledSaverModeEnabled,
@@ -272,6 +282,7 @@ class WalloraBackupBundle extends Equatable {
         auroraSynthesizerConfig,
         batteryTelemetry,
         smartFilter,
+        weatherConfig,
         userPreferences,
         isAmoledSaverModeEnabled,
       ];

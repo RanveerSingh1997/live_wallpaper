@@ -4,6 +4,7 @@ import 'package:live_wallpaper/models/aura_palette_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/models/wallora_backup_bundle.dart';
+import 'package:live_wallpaper/models/weather_atmosphere_config.dart';
 
 void main() {
   group('WalloraBackupBundle Model Tests', () {
@@ -48,6 +49,11 @@ void main() {
           preset: AuraThemePreset.cyberAurora,
           hueShiftDegrees: 30.0,
         ),
+        weatherConfig: const WeatherAtmosphereConfig(
+          effectType: WeatherEffectType.meteorShower,
+          intensity: 0.9,
+          speedMultiplier: 1.8,
+        ),
         userPreferences: const {'Cyberpunk', 'AMOLED'},
         isAmoledSaverModeEnabled: true,
       );
@@ -65,6 +71,8 @@ void main() {
       expect(restored.customizedQuotes['wall_1'], equals('Be legendary.'));
       expect(restored.customEffects['wall_1']?.colorFilterPreset, equals('cyber_cyan'));
       expect(restored.auraConfig.preset, equals(AuraThemePreset.cyberAurora));
+      expect(restored.weatherConfig.effectType, equals(WeatherEffectType.meteorShower));
+      expect(restored.weatherConfig.intensity, equals(0.9));
       expect(restored.userPreferences, equals({'Cyberpunk', 'AMOLED'}));
       expect(restored.isAmoledSaverModeEnabled, isTrue);
     });

@@ -14,6 +14,7 @@ import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../models/wallora_backup_bundle.dart';
 import '../models/wallora_screen_blueprint.dart';
+import '../models/weather_atmosphere_config.dart';
 
 abstract class WallpaperIntent extends Equatable {
   const WallpaperIntent();
@@ -591,6 +592,34 @@ class FilterCommunityBlueprintsIntent extends WallpaperIntent {
 
   @override
   List<Object?> get props => [tagQuery];
+}
+
+/// Intent to update Wallora Atmospheric Weather & Dynamic Climate FX settings.
+class UpdateWeatherAtmosphereIntent extends WallpaperIntent {
+  final WeatherAtmosphereConfig config;
+  const UpdateWeatherAtmosphereIntent(this.config);
+
+  @override
+  List<Object?> get props => [config];
+}
+
+/// Intent to reset Wallora Atmospheric Weather settings to factory defaults.
+class ResetWeatherAtmosphereIntent extends WallpaperIntent {
+  const ResetWeatherAtmosphereIntent();
+}
+
+/// Intent to toggle atmospheric weather overlay enabled / disabled.
+class ToggleWeatherAtmosphereIntent extends WallpaperIntent {
+  const ToggleWeatherAtmosphereIntent();
+}
+
+/// Intent to select a specific weather effect preset.
+class SetWeatherEffectPresetIntent extends WallpaperIntent {
+  final WeatherEffectType effectType;
+  const SetWeatherEffectPresetIntent(this.effectType);
+
+  @override
+  List<Object?> get props => [effectType];
 }
 
 
