@@ -144,7 +144,38 @@ WallpaperListResponse response = client.listWallpapers(1, 10, "Nature");
 
 ---
 
-## 📑 Interactive Documentation (Swagger UI)
+## 📑 Interactive Documentation (Swagger UI) & Health Telemetry
 
 - **Swagger UI**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 - **OpenAPI JSON**: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+- **Actuator Health Check**: [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health)
+- **Kubernetes Probes**:
+  - Liveness: [http://localhost:8080/actuator/health/liveness](http://localhost:8080/actuator/health/liveness)
+  - Readiness: [http://localhost:8080/actuator/health/readiness](http://localhost:8080/actuator/health/readiness)
+
+---
+
+## 🐳 Docker & Container Deployment
+
+### 1-Command Startup with Docker Compose
+```bash
+# From live_wallpaper root or backend/ directory:
+docker compose up -d --build
+```
+
+### Inspect Container Logs & Status
+```bash
+docker compose ps
+docker compose logs -f wallaza-backend
+```
+
+### Manual Docker Build & Run
+```bash
+cd backend
+docker build -t wallaza-service:latest .
+docker run -d --name wallaza-service \
+  -p 8080:8080 \
+  -e WALLAZA_API_KEY="your_api_key_here" \
+  wallaza-service:latest
+```
+
