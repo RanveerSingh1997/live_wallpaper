@@ -1,0 +1,146 @@
+name: Wallora CI / CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================================
+  # Job 1: Flutter Client Verification (Analyze & Widget/Unit Test Suite)
+  # ============================================================================
+  flutter-client:
+    name: Flutter Client (Analyze & Tests)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Display Environment & Doctor
+        run: |
+          flutter --version
+          flutter doctor -v
+
+      - name: Install Flutter Dependencies
+        run: flutter pub get
+
+      - name: Verify Zero Lint Issues (flutter analyze)
+        run: flutter analyze --fatal-infos --fatal-warnings
+
+      - name: Run Flutter Test Suite (287+ Tests)
+        run: flutter test --reporter=expanded
+
+  # ============================================================================
+  # Job 2: Java Spring Boot Backend Verification (Compile & JUnit 5 Tests)
+  # ============================================================================
+  backend-service:
+    name: Backend Service (Java 21 / Maven Tests)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Grant Executable Permissions to Maven Wrapper
+        run: chmod +x backend/mvnw
+
+      - name: Compile and Run JUnit 5 Integration Tests
+        run: |
+          cd backend
+          ./mvnw clean test -B
+
+      - name: Package Executable Spring Boot JAR
+        run: |
+          cd backend
+          ./mvnw package -DskipTests -B
+
+      - name: Archive Spring Boot Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wallaza-service-jar
+          path: backend/target/*.jar
+          retention-days: 7
+
+  # ============================================================================
+  # Job 3: Docker Multi-Stage Build & Actuator Health Probe
+  # ============================================================================
+  backend-docker:
+    name: Backend Docker Build & Actuator Health Probe
+    needs: [ backend-service ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          load: true
+          tags: wallaza-service:ci-test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Test Container & Verify Actuator Health
+        run: |
+          echo "🚀 Starting Wallaza Service container..."
+          docker run -d --name wallaza-ci \
+            -p 8080:8080 \
+            -e SERVER_PORT=8080 \
+            -e WALLAZA_API_KEY="ci_pipeline_key" \
+            wallaza-service:ci-test
+
+          echo "⏳ Waiting for Spring Boot Actuator /actuator/health to report UP..."
+          MAX_ATTEMPTS=20
+          ATTEMPT=1
+          HEALTHY=false
+
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            STATUS=$(curl -s http://localhost:8080/actuator/health | grep -o '"status":"UP"' || true)
+            if [ -n "$STATUS" ]; then
+              echo "✅ Wallaza Service is UP and healthy on attempt $ATTEMPT!"
+              HEALTHY=true
+              break
+            fi
+            echo "Attempt $ATTEMPT/$MAX_ATTEMPTS: Not ready yet. Waiting 2s..."
+            sleep 2
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+
+          if [ "$HEALTHY" != "true" ]; then
+            echo "❌ Actuator health check timed out or failed!"
+            docker logs wallaza-ci
+            docker stop wallaza-ci && docker rm wallaza-ci
+            exit 1
+          fi
+
+          echo "🧹 Cleaning up test container..."
+          docker stop wallaza-ci && docker rm wallaza-ci
