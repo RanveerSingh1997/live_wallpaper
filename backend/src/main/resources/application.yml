@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: wallaza-service
+  cache:
+    type: caffeine
+
+# Wallaza Client Configuration
+wallaza:
+  enabled: true
+  api-key: ${WALLAZA_API_KEY:demo_key}
+  base-url: ${WALLAZA_BASE_URL:https://api.wallaza.com/v1}
+  connect-timeout: 5s
+  read-timeout: 15s
+
+# OpenAPI / Swagger UI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+
+logging:
+  level:
+    com.wallaza: DEBUG
+    org.springframework.web: INFO
