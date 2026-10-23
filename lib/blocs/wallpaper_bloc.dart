@@ -289,13 +289,22 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     try {
       final success = await repository.downloadWallpaper(event.short);
       if (success) {
+        final all = repository.getCuratedShorts();
+        final updatedFiltered = _filterShorts(
+          allShorts: all,
+          category: state.selectedCategory,
+          preferences: state.userPreferences,
+          smartFilter: state.smartFilter,
+        );
         final updatedDownloads = repository.getDownloads();
         final totalStorage = await repository.getTotalDownloadSizeBytes();
         emit(state.copyWith(
+          allShorts: all,
+          filteredShorts: updatedFiltered,
           downloadedIds: updatedDownloads,
           totalStorageUsedBytes: totalStorage,
           actionStatus: WallpaperActionStatus.downloadSuccess,
-          message: 'Downloaded for offline use! (${event.short.fileSizeFormatted})',
+          message: 'Downloaded "${event.short.title}" for offline use! (${event.short.fileSizeFormatted})',
         ));
       } else {
         emit(state.copyWith(

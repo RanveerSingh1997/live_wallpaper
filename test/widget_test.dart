@@ -87,6 +87,25 @@ class FakeWallpaperRepository extends WallpaperRepository {
     await prefs.setString('active_wallpaper_id', short.id);
     return {'status': 'applied_static'};
   }
+
+  @override
+  Future<bool> downloadWallpaper(MotivationalShort short) async {
+    final current = getDownloads();
+    current.add(short.id);
+    await prefs.setStringList('downloaded_wallpaper_ids', current.toList());
+    if (short.imageUrl != null && short.imageUrl!.isNotEmpty) {
+      await saveCustomImportedWallpaper(short);
+    }
+    return true;
+  }
+
+  @override
+  Future<bool> deleteDownload(String shortId) async {
+    final current = getDownloads();
+    current.remove(shortId);
+    await prefs.setStringList('downloaded_wallpaper_ids', current.toList());
+    return true;
+  }
 }
 
 void main() {
@@ -834,11 +853,25 @@ void main() {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
       final repository = FakeWallpaperRepository(prefs: prefs);
+
+      const cloudSample = MotivationalShort(
+        id: 'cloud_wlz_test_dl',
+        title: 'Offline Cyber City',
+        quote: 'Offline Cyber City',
+        author: 'Kenji',
+        category: 'Cyberpunk',
+        videoAssetPath: '',
+        imageUrl: 'https://example.com/dl.jpg',
+        accentColor: Color(0xFF00E5FF),
+        tags: 'cyberpunk, 4k',
+        isLive: false,
+      );
+
       final bloc = WallpaperBloc(
         repository: repository,
         initialState: WallpaperState(
-          allShorts: CuratedShortsData.shorts,
-          downloadedIds: const {'ippo_hard_work', 'static_amoled_nebula'},
+          allShorts: [...CuratedShortsData.shorts, cloudSample],
+          downloadedIds: const {'ippo_hard_work', 'static_amoled_nebula', 'cloud_wlz_test_dl'},
         ),
       );
       addTearDown(bloc.close);
@@ -854,15 +887,23 @@ void main() {
 
       await tester.pump();
 
-      expect(find.widgetWithText(ChoiceChip, 'All (2)'), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, 'All (3)'), findsOneWidget);
       expect(find.widgetWithText(ChoiceChip, 'Live (1)'), findsOneWidget);
-      expect(find.widgetWithText(ChoiceChip, 'Static (1)'), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, 'Static (2)'), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, 'Cloud 4K (1)'), findsOneWidget);
 
       // Switch to Live segment
       await tester.tap(find.widgetWithText(ChoiceChip, 'Live (1)'));
       await tester.pump();
 
       expect(find.text('Hajime no Ippo: Makunouchi Creed'), findsOneWidget);
+
+      // Switch to Cloud 4K segment
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Cloud 4K (1)'));
+      await tester.pump();
+
+      expect(find.text('Offline Cyber City'), findsOneWidget);
+      expect(find.text('CLOUD 4K'), findsOneWidget);
     });
 
     testWidgets('FavoritesScreen displays filter chips and filters live and static favorites',
@@ -3649,15 +3690,18 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       // Verifies detail modal action buttons and specs
+      expect(find.text('Download Offline 4K (Save to Device)'), findsOneWidget);
       expect(find.text('Import to Library'), findsOneWidget);
       expect(find.text('Apply Wallpaper'), findsOneWidget);
       expect(find.text('RESOLUTION'), findsOneWidget);
       expect(find.text('SIZE'), findsOneWidget);
 
-      // Tap Import to Library
-      await tester.tap(find.text('Import to Library'));
+      // Tap Download Offline 4K button
+      await tester.tap(find.text('Download Offline 4K (Save to Device)'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
+
+      expect(repo.getDownloads().isNotEmpty, isTrue);
 
       await tester.pumpWidget(const SizedBox.shrink());
     });

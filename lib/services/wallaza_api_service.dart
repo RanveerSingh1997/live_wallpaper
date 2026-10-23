@@ -148,6 +148,25 @@ class WallazaApiService {
     }
   }
 
+  /// Downloads raw high-resolution wallpaper binary bytes from the Wallaza API proxy.
+  Future<List<int>?> downloadWallpaperBytes(String id) async {
+    try {
+      final uri = Uri.parse('$baseUrl/$id/download');
+      final request = await _httpClient.getUrl(uri).timeout(timeout);
+      final response = await request.close().timeout(timeout);
+      if (response.statusCode == HttpStatus.ok) {
+        final List<int> bytes = [];
+        await for (final chunk in response) {
+          bytes.addAll(chunk);
+        }
+        return bytes;
+      }
+    } catch (_) {
+      // Fallback on timeout / connection refused
+    }
+    return null;
+  }
+
   /// Curated fallback matching category
   List<WallazaCloudWallpaper> _curatedFallback({String? category}) {
     if (category == null || category.isEmpty || category == 'All') {

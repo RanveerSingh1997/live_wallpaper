@@ -46,6 +46,25 @@ class FakeWallpaperRepository extends WallpaperRepository {
     await prefs.setString('active_wallpaper_id', short.id);
     return {'status': 'applied_static'};
   }
+
+  @override
+  Future<bool> downloadWallpaper(MotivationalShort short) async {
+    final current = getDownloads();
+    current.add(short.id);
+    await prefs.setStringList('downloaded_wallpaper_ids', current.toList());
+    if (short.imageUrl != null && short.imageUrl!.isNotEmpty) {
+      await saveCustomImportedWallpaper(short);
+    }
+    return true;
+  }
+
+  @override
+  Future<bool> deleteDownload(String shortId) async {
+    final current = getDownloads();
+    current.remove(shortId);
+    await prefs.setStringList('downloaded_wallpaper_ids', current.toList());
+    return true;
+  }
 }
 
 void main() {
@@ -1879,6 +1898,34 @@ void main() {
       expect(bloc.state.activeWallpaperId!.startsWith('cloud_'), isTrue);
       final savedWallpapers = repository.getCustomImportedWallpapers();
       expect(savedWallpapers.any((s) => s.id == bloc.state.activeWallpaperId), isTrue);
+    });
+
+    test('DownloadWallpaperIntent downloads cloud wallpaper, saves to library, and adds to downloads', () async {
+      const cloudWallpaper = WallazaCloudWallpaper(
+        id: 'wlz_dl_cyber_99',
+        title: 'Offline Cyber City',
+        description: '4K download test',
+        url: 'https://example.com/dl_cyber.jpg',
+        thumbnailUrl: 'https://example.com/dl_cyber_t.jpg',
+        category: 'Cyberpunk',
+      );
+      final short = cloudWallpaper.toMotivationalShort();
+
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.downloadedIds.contains('cloud_wlz_dl_cyber_99') &&
+            s.actionStatus == WallpaperActionStatus.downloadSuccess &&
+            s.downloadedShorts.any((d) => d.id == 'cloud_wlz_dl_cyber_99') &&
+            s.message != null &&
+            s.message!.contains('Downloaded "Offline Cyber City"'))),
+      );
+
+      bloc.add(DownloadWallpaperIntent(short));
+      await expectation;
+
+      expect(repository.getDownloads().contains('cloud_wlz_dl_cyber_99'), isTrue);
+      expect(repository.getCustomImportedWallpapers().any((s) => s.id == 'cloud_wlz_dl_cyber_99'), isTrue);
     });
   });
 }

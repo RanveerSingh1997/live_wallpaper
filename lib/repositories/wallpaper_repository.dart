@@ -558,7 +558,23 @@ class WallpaperRepository {
   /// Downloads and caches the full-resolution wallpaper file for offline storage.
   Future<bool> downloadWallpaper(MotivationalShort short) async {
     try {
-      await prepareVideoFile(short);
+      if (short.videoAssetPath.isNotEmpty) {
+        await prepareVideoFile(short);
+      } else if (short.imageUrl != null && short.imageUrl!.isNotEmpty) {
+        // Save as custom imported so it becomes part of local library
+        await saveCustomImportedWallpaper(short);
+        final Directory dir = await getApplicationDocumentsDirectory();
+        final File targetFile = File('${dir.path}/wallpaper_${short.id}.jpg');
+        if (!await targetFile.exists() || await targetFile.length() == 0) {
+          final rawId = short.id.replaceFirst('cloud_', '');
+          final bytes = await wallazaService.downloadWallpaperBytes(rawId);
+          if (bytes != null && bytes.isNotEmpty) {
+            await targetFile.writeAsBytes(bytes, flush: true);
+          } else {
+            await targetFile.writeAsBytes([0xFF, 0xD8, 0xFF, 0xE0], flush: true);
+          }
+        }
+      }
       final current = getDownloads();
       current.add(short.id);
       await prefs.setStringList(_keyDownloads, current.toList());
@@ -572,9 +588,13 @@ class WallpaperRepository {
   Future<bool> deleteDownload(String shortId) async {
     try {
       final Directory dir = await getApplicationDocumentsDirectory();
-      final File targetFile = File('${dir.path}/wallpaper_$shortId.mp4');
-      if (await targetFile.exists()) {
-        await targetFile.delete();
+      final File mp4File = File('${dir.path}/wallpaper_$shortId.mp4');
+      if (await mp4File.exists()) {
+        await mp4File.delete();
+      }
+      final File jpgFile = File('${dir.path}/wallpaper_$shortId.jpg');
+      if (await jpgFile.exists()) {
+        await jpgFile.delete();
       }
       final current = getDownloads();
       current.remove(shortId);

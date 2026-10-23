@@ -810,7 +810,40 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
+
+          // Download Offline 4K button
+          SizedBox(
+            height: 48,
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.file_download_rounded, color: Colors.white, size: 20),
+              label: const Text(
+                'Download Offline 4K (Save to Device)',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.3,
+                  fontSize: 13,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1E1E2C),
+                side: const BorderSide(color: Color(0xFF00E5FF), width: 1.2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              onPressed: () {
+                final short = item.toMotivationalShort();
+                context.read<WallpaperBloc>().add(DownloadWallpaperIntent(short));
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ),
+
+          const SizedBox(height: 12),
 
           // Action Buttons: 1-Tap Import and 1-Tap Apply
           Row(

@@ -267,14 +267,19 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                     const SizedBox(height: 14),
 
                     // Filter Chips Row
-                    Row(
-                      children: [
-                        _buildFilterChip('All', downloads.length),
-                        const SizedBox(width: 8),
-                        _buildFilterChip('Live', downloads.where((s) => s.isLive).length),
-                        const SizedBox(width: 8),
-                        _buildFilterChip('Static', downloads.where((s) => !s.isLive).length),
-                      ],
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          _buildFilterChip('All', downloads.length),
+                          const SizedBox(width: 8),
+                          _buildFilterChip('Live', downloads.where((s) => s.isLive).length),
+                          const SizedBox(width: 8),
+                          _buildFilterChip('Static', downloads.where((s) => !s.isLive).length),
+                          const SizedBox(width: 8),
+                          _buildFilterChip('Cloud 4K', downloads.where((s) => s.id.startsWith('cloud_')).length),
+                        ],
+                      ),
                     ),
 
                     const SizedBox(height: 14),
@@ -284,7 +289,9 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                             ? downloads.where((s) => s.isLive).toList()
                             : _filter == 'Static'
                                 ? downloads.where((s) => !s.isLive).toList()
-                                : downloads)
+                                : _filter == 'Cloud 4K'
+                                    ? downloads.where((s) => s.id.startsWith('cloud_')).toList()
+                                    : downloads)
                         .isEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 24),
@@ -300,7 +307,9 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                               ? downloads.where((s) => s.isLive).toList()
                               : _filter == 'Static'
                                   ? downloads.where((s) => !s.isLive).toList()
-                                  : downloads)
+                                  : _filter == 'Cloud 4K'
+                                      ? downloads.where((s) => s.id.startsWith('cloud_')).toList()
+                                      : downloads)
                           .map((item) {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
@@ -316,33 +325,73 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                           onLongPress: () => WallpaperQuickActionsSheet.show(context, item),
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          leading: Container(
-                            width: 50,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              gradient: LinearGradient(
-                                colors: item.gradientColors.isNotEmpty
-                                    ? item.gradientColors
-                                    : [item.accentColor.withValues(alpha: 0.3), Colors.black],
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Container(
+                              width: 50,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                gradient: LinearGradient(
+                                  colors: item.gradientColors.isNotEmpty
+                                      ? item.gradientColors
+                                      : [item.accentColor.withValues(alpha: 0.3), Colors.black],
+                                ),
                               ),
-                            ),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              item.isLive ? Icons.videocam_rounded : Icons.image_rounded,
-                              color: item.accentColor,
-                              size: 20,
+                              alignment: Alignment.center,
+                              child: item.imageUrl != null && item.imageUrl!.isNotEmpty
+                                  ? Image.network(
+                                      item.imageUrl!,
+                                      fit: BoxFit.cover,
+                                      width: 50,
+                                      height: 60,
+                                      errorBuilder: (_, _, _) => Icon(
+                                        Icons.image_rounded,
+                                        color: item.accentColor,
+                                        size: 20,
+                                      ),
+                                    )
+                                  : Icon(
+                                      item.isLive ? Icons.videocam_rounded : Icons.image_rounded,
+                                      color: item.accentColor,
+                                      size: 20,
+                                    ),
                             ),
                           ),
-                          title: Text(
-                            item.title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          title: Row(
+                            children: [
+                              if (item.id.startsWith('cloud_')) ...[
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                  margin: const EdgeInsets.only(right: 6),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF00E5FF).withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: const Color(0xFF00E5FF), width: 0.6),
+                                  ),
+                                  child: const Text(
+                                    'CLOUD 4K',
+                                    style: TextStyle(
+                                      color: Color(0xFF00E5FF),
+                                      fontSize: 8,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              Expanded(
+                                child: Text(
+                                  item.title,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
                           subtitle: Text(
                             '${item.category} • ${item.fileSizeFormatted}',
