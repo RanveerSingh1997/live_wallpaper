@@ -52,6 +52,8 @@ import 'package:live_wallpaper/screens/wallpaper_export_sheet.dart';
 import 'package:live_wallpaper/screens/wallpaper_preview_sheet.dart';
 import 'package:live_wallpaper/screens/wallpaper_quick_actions_sheet.dart';
 import 'package:live_wallpaper/screens/weather_atmosphere_sheet.dart';
+import 'package:live_wallpaper/screens/wallaza_cloud_discovery_sheet.dart';
+import 'package:live_wallpaper/models/wallaza_cloud_wallpaper.dart';
 import 'package:live_wallpaper/models/weather_atmosphere_config.dart';
 import 'package:live_wallpaper/widgets/kinetic_quote_overlay.dart';
 import 'package:live_wallpaper/widgets/shorts_action_rail.dart';
@@ -3461,6 +3463,184 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.text('Atmospheric Weather Studio'), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('DiscoverScreen renders Wallaza Cloud Discovery IconButton and opens WallazaCloudDiscoverySheet on tap',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          weatherConfig: const WeatherAtmosphereConfig(effectType: WeatherEffectType.none),
+          cloudWallpapers: WallazaCloudWallpaper.curatedCloudLibrary,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: DiscoverScreen(
+              onOpenLiveFeed: () {},
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final cloudButton = find.byTooltip('Wallaza Cloud Discovery');
+      expect(cloudButton, findsOneWidget);
+
+      await tester.tap(cloudButton);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('Wallaza Cloud Discovery'), findsWidgets);
+      expect(find.text('4K PROXY'), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('DiscoverScreen renders Wallaza Cloud Discovery Banner and opens sheet on DISCOVER tap',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          weatherConfig: const WeatherAtmosphereConfig(effectType: WeatherEffectType.none),
+          cloudWallpapers: WallazaCloudWallpaper.curatedCloudLibrary,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: MaterialApp(
+            home: DiscoverScreen(
+              onOpenLiveFeed: () {},
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final bannerTitle = find.text('WALLAZA CLOUD DISCOVERY');
+      await tester.scrollUntilVisible(
+        bannerTitle,
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(bannerTitle, findsOneWidget);
+
+      final discoverButton = find.widgetWithText(ElevatedButton, 'DISCOVER');
+      expect(discoverButton, findsOneWidget);
+
+      await tester.tap(discoverButton);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('Wallaza Cloud Discovery'), findsWidgets);
+      expect(find.text('Cyberpunk'), findsWidgets);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('WallazaCloudDiscoverySheet renders search bar, filters, cards, and opens detail modal',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          weatherConfig: const WeatherAtmosphereConfig(effectType: WeatherEffectType.none),
+          cloudWallpapers: WallazaCloudWallpaper.curatedCloudLibrary,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: WallazaCloudDiscoverySheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+
+      // Verifies Header and badges
+      expect(find.text('Wallaza Cloud Discovery'), findsOneWidget);
+      expect(find.text('4K PROXY'), findsOneWidget);
+
+      // Verifies Search field
+      expect(find.byType(TextField), findsOneWidget);
+
+      // Verifies Category chips
+      expect(find.text('Cyberpunk'), findsOneWidget);
+      expect(find.text('AMOLED'), findsWidgets);
+
+      // Verifies Resolution filter chips
+      expect(find.text('All Resolutions'), findsOneWidget);
+      expect(find.text('3840x2160'), findsOneWidget);
+
+      // Verifies Cloud Wallpaper Card
+      final firstCardTitle = find.text(WallazaCloudWallpaper.curatedCloudLibrary.first.title);
+      expect(firstCardTitle, findsOneWidget);
+
+      // Tap card to open detail modal
+      await tester.tap(firstCardTitle);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Verifies detail modal action buttons and specs
+      expect(find.text('Import to Library'), findsOneWidget);
+      expect(find.text('Apply Wallpaper'), findsOneWidget);
+      expect(find.text('RESOLUTION'), findsOneWidget);
+      expect(find.text('SIZE'), findsOneWidget);
+
+      // Tap Import to Library
+      await tester.tap(find.text('Import to Library'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       await tester.pumpWidget(const SizedBox.shrink());
     });

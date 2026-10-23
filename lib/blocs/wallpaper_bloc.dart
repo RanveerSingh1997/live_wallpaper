@@ -13,6 +13,7 @@ import '../models/standby_dock_config.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../models/wallora_screen_blueprint.dart';
 import '../models/weather_atmosphere_config.dart';
+import '../models/wallaza_cloud_wallpaper.dart';
 import '../repositories/wallpaper_repository.dart';
 import 'wallpaper_intent.dart';
 import 'wallpaper_state.dart';
@@ -100,6 +101,10 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<ResetWeatherAtmosphereIntent>(_onResetWeatherAtmosphere);
     on<ToggleWeatherAtmosphereIntent>(_onToggleWeatherAtmosphere);
     on<SetWeatherEffectPresetIntent>(_onSetWeatherEffectPreset);
+    on<FetchCloudWallpapersIntent>(_onFetchCloudWallpapers);
+    on<SearchCloudWallpapersIntent>(_onSearchCloudWallpapers);
+    on<ImportCloudWallpaperIntent>(_onImportCloudWallpaper);
+    on<ClearCloudSearchIntent>(_onClearCloudSearch);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -179,6 +184,11 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       final communityBlueprints = repository.getCommunityBlueprints();
       final likedBlueprintIds = repository.getLikedBlueprintIds();
 
+      List<WallazaCloudWallpaper> initialCloud = const [];
+      try {
+        initialCloud = await repository.fetchCloudWallpapers();
+      } catch (_) {}
+
       final forYouList = _filterShorts(
         allShorts: shorts,
         category: 'For You',
@@ -211,6 +221,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         weatherConfig: weatherConfig,
         communityBlueprints: communityBlueprints,
         likedBlueprintIds: likedBlueprintIds,
+        cloudWallpapers: initialCloud,
         activeWallpaperId: activeId,
         userPreferences: preferences,
         isTextOverlayVisible: isTextOverlayVisible,
@@ -1691,6 +1702,136 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       weatherConfig: updated,
       message: 'Applied ${event.effectType.displayName} effect.',
     ));
+  }
+
+  Future<void> _onFetchCloudWallpapers(
+    FetchCloudWallpapersIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final cat = event.category ?? state.selectedCloudCategory;
+    emit(state.copyWith(
+      isCloudLoading: true,
+      cloudErrorMessage: null,
+      selectedCloudCategory: cat,
+      cloudCurrentPage: event.page,
+    ));
+    try {
+      final items = await repository.fetchCloudWallpapers(
+        page: event.page,
+        category: cat,
+      );
+      emit(state.copyWith(
+        isCloudLoading: false,
+        cloudWallpapers: items,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isCloudLoading: false,
+        cloudErrorMessage: 'Failed to load cloud wallpapers: $e',
+      ));
+    }
+  }
+
+  Future<void> _onSearchCloudWallpapers(
+    SearchCloudWallpapersIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final res = event.resolution ?? state.selectedCloudResolution;
+    emit(state.copyWith(
+      isCloudLoading: true,
+      cloudErrorMessage: null,
+      cloudSearchQuery: event.query,
+      selectedCloudResolution: res,
+      cloudCurrentPage: event.page,
+    ));
+    try {
+      final items = await repository.searchCloudWallpapers(
+        query: event.query,
+        resolution: res,
+        page: event.page,
+      );
+      emit(state.copyWith(
+        isCloudLoading: false,
+        cloudWallpapers: items,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isCloudLoading: false,
+        cloudErrorMessage: 'Cloud search failed: $e',
+      ));
+    }
+  }
+
+  Future<void> _onImportCloudWallpaper(
+    ImportCloudWallpaperIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    try {
+      final imported = await repository.importCloudWallpaper(event.wallpaper);
+      final all = repository.getCuratedShorts();
+      final updatedFiltered = _filterShorts(
+        allShorts: all,
+        category: state.selectedCategory,
+        preferences: state.userPreferences,
+        smartFilter: state.smartFilter,
+      );
+
+      if (event.setAsActive) {
+        final result = await repository.applyStaticWallpaper(
+          short: imported,
+          targetScreen: 'both',
+          customQuote: imported.quote,
+          effectConfig: state.getEffectiveEffects(imported.id),
+        );
+        final status = result['status']?.toString();
+        emit(state.copyWith(
+          allShorts: all,
+          filteredShorts: updatedFiltered,
+          activeWallpaperId: imported.id,
+          actionStatus: WallpaperActionStatus.appliedSuccess,
+          message: status == 'applied_static'
+              ? '✨ Applied "${imported.title}" to Home & Lock Screen!'
+              : 'Imported & configured "${imported.title}"!',
+        ));
+      } else {
+        emit(state.copyWith(
+          allShorts: all,
+          filteredShorts: updatedFiltered,
+          message: 'Imported "${imported.title}" into Wallora library!',
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        errorMessage: 'Failed to import wallpaper: $e',
+      ));
+    }
+  }
+
+  Future<void> _onClearCloudSearch(
+    ClearCloudSearchIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    emit(state.copyWith(
+      cloudSearchQuery: '',
+      selectedCloudResolution: 'All',
+      isCloudLoading: true,
+      cloudErrorMessage: null,
+    ));
+    try {
+      final items = await repository.fetchCloudWallpapers(
+        page: 1,
+        category: state.selectedCloudCategory,
+      );
+      emit(state.copyWith(
+        isCloudLoading: false,
+        cloudWallpapers: items,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isCloudLoading: false,
+        cloudErrorMessage: 'Failed to restore cloud wallpapers: $e',
+      ));
+    }
   }
 }
 

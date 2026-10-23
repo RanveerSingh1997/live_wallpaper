@@ -20,6 +20,7 @@ import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
 import 'package:live_wallpaper/models/wallora_backup_bundle.dart';
 import 'package:live_wallpaper/models/wallora_screen_blueprint.dart';
 import 'package:live_wallpaper/models/weather_atmosphere_config.dart';
+import 'package:live_wallpaper/models/wallaza_cloud_wallpaper.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -1734,6 +1735,110 @@ void main() {
       await expectation;
 
       expect(repository.getWeatherAtmosphereConfig().effectType, equals(WeatherEffectType.meteorShower));
+    });
+
+    test('FetchCloudWallpapersIntent fetches wallpapers and updates cloud state', () async {
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            !s.isCloudLoading &&
+            s.cloudWallpapers.isNotEmpty &&
+            s.selectedCloudCategory == 'Cyberpunk')),
+      );
+
+      bloc.add(const FetchCloudWallpapersIntent(
+        page: 1,
+        category: 'Cyberpunk',
+      ));
+      await expectation;
+
+      expect(bloc.state.cloudWallpapers.isNotEmpty, isTrue);
+    });
+
+    test('SearchCloudWallpapersIntent searches cloud wallpapers by query and resolution', () async {
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            !s.isCloudLoading &&
+            s.cloudSearchQuery == 'orion' &&
+            s.selectedCloudResolution == '3840x2160')),
+      );
+
+      bloc.add(const SearchCloudWallpapersIntent(
+        query: 'orion',
+        resolution: '3840x2160',
+      ));
+      await expectation;
+
+      expect(bloc.state.cloudWallpapers.isNotEmpty, isTrue);
+    });
+
+    test('ImportCloudWallpaperIntent saves wallpaper to library', () async {
+      const item = WallazaCloudWallpaper(
+        id: 'wlz_test_import_01',
+        title: 'Cyber Import Test',
+        description: 'Test import wallpaper',
+        url: 'https://example.com/import.jpg',
+        thumbnailUrl: 'https://example.com/import_thumb.jpg',
+        category: 'Cyberpunk',
+      );
+
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.message != null &&
+            s.message!.contains('Imported "Cyber Import Test"') &&
+            s.allShorts.any((sh) => sh.id == 'cloud_wlz_test_import_01'))),
+      );
+
+      bloc.add(const ImportCloudWallpaperIntent(item, setAsActive: false));
+      await expectation;
+
+      final saved = repository.getCustomImportedWallpapers();
+      expect(saved.any((s) => s.id == 'cloud_wlz_test_import_01'), isTrue);
+    });
+
+    test('ImportCloudWallpaperIntent with setAsActive sets wallpaper active', () async {
+      const item = WallazaCloudWallpaper(
+        id: 'wlz_test_apply_02',
+        title: 'Active Apply Test',
+        description: 'Apply wallpaper immediately',
+        url: 'https://example.com/apply.jpg',
+        thumbnailUrl: 'https://example.com/apply_thumb.jpg',
+        category: 'Nature',
+      );
+
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.activeWallpaperId == 'cloud_wlz_test_apply_02' &&
+            s.actionStatus == WallpaperActionStatus.appliedSuccess)),
+      );
+
+      bloc.add(const ImportCloudWallpaperIntent(item, setAsActive: true));
+      await expectation;
+
+      expect(bloc.state.activeWallpaperId, 'cloud_wlz_test_apply_02');
+    });
+
+    test('ClearCloudSearchIntent resets query and refreshes wallpapers', () async {
+      // First set search query
+      bloc.add(const SearchCloudWallpapersIntent(query: 'space'));
+      await bloc.stream.firstWhere((s) => s.cloudSearchQuery == 'space');
+
+      final clearExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.cloudSearchQuery.isEmpty &&
+            s.selectedCloudResolution == 'All' &&
+            !s.isCloudLoading &&
+            s.cloudWallpapers.isNotEmpty)),
+      );
+
+      bloc.add(const ClearCloudSearchIntent());
+      await clearExpectation;
+
+      expect(bloc.state.cloudSearchQuery, isEmpty);
     });
   });
 }

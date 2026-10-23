@@ -19,6 +19,7 @@ import 'standby_dock_screen.dart';
 import 'wallpaper_preview_sheet.dart';
 import 'wallpaper_quick_actions_sheet.dart';
 import 'weather_atmosphere_sheet.dart';
+import 'wallaza_cloud_discovery_sheet.dart';
 import '../models/smart_filter_config.dart';
 
 class DiscoverScreen extends StatefulWidget {
@@ -232,6 +233,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               onPressed: () {
                                 HapticFeedback.selectionClick();
                                 WeatherAtmosphereSheet.show(context);
+                              },
+                            ),
+                            // Wallaza Cloud Wallpaper Discovery Studio button
+                            IconButton(
+                              icon: const Icon(Icons.cloud_download_rounded, color: Color(0xFF00E5FF)),
+                              tooltip: 'Wallaza Cloud Discovery',
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                WallazaCloudDiscoverySheet.show(context);
                               },
                             ),
                             // Settings & Trust button
@@ -1012,6 +1022,110 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               ),
                               child: const Text(
                                 'EXPLORE',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 11,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Section: Wallaza Cloud Wallpaper Discovery Studio Banner
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+                      child: Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF0B1B2B), Color(0xFF1F0D2B)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                              blurRadius: 18,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Icon(
+                                Icons.cloud_download_rounded,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'WALLAZA CLOUD DISCOVERY',
+                                    style: TextStyle(
+                                      color: Color(0xFF00E5FF),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 1.0,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  const Text(
+                                    'Stream & Import 4K Wallpapers',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Browse millions of 4K and Ultra-HD wallpapers proxied through Wallaza Cloud.',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: 0.6),
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: () {
+                                HapticFeedback.mediumImpact();
+                                WallazaCloudDiscoverySheet.show(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF00E5FF),
+                                foregroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 10),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'DISCOVER',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 11,

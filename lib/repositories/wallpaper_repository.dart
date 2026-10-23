@@ -20,12 +20,15 @@ import '../models/wallpaper_effect_config.dart';
 import '../models/wallora_backup_bundle.dart';
 import '../models/wallora_screen_blueprint.dart';
 import '../models/weather_atmosphere_config.dart';
+import '../models/wallaza_cloud_wallpaper.dart';
+import '../services/wallaza_api_service.dart';
 import '../services/wallpaper_renderer_service.dart';
 import '../services/wallpaper_service_bridge.dart';
 
 class WallpaperRepository {
   final WallpaperServiceBridge _bridge;
   final SharedPreferences prefs;
+  final WallazaApiService wallazaService;
 
   static const String _keyFavorites = 'favorite_short_ids';
   static const String _keyDownloads = 'downloaded_wallpaper_ids';
@@ -61,8 +64,10 @@ class WallpaperRepository {
 
   WallpaperRepository({
     WallpaperServiceBridge? bridge,
+    WallazaApiService? wallazaService,
     required this.prefs,
-  }) : _bridge = bridge ?? WallpaperServiceBridge();
+  })  : _bridge = bridge ?? WallpaperServiceBridge(),
+        wallazaService = wallazaService ?? WallazaApiService();
 
   /// Returns the configured Aura Chromatic Harmonizer & Dynamic Palette settings.
   AuraPaletteConfig getAuraPaletteConfig() {
@@ -1013,5 +1018,47 @@ class WallpaperRepository {
     // 5. Reset community blueprints & likes
     await prefs.remove(_keyPublishedBlueprints);
     await prefs.remove(_keyLikedBlueprintIds);
+  }
+
+  /// Fetches paginated cloud wallpapers proxied through the Wallaza API.
+  Future<List<WallazaCloudWallpaper>> fetchCloudWallpapers({
+    int page = 1,
+    int limit = 20,
+    String? category,
+  }) async {
+    return wallazaService.fetchWallpapers(
+      page: page,
+      limit: limit,
+      category: category,
+    );
+  }
+
+  /// Searches cloud wallpapers by query and resolution through the Wallaza API.
+  Future<List<WallazaCloudWallpaper>> searchCloudWallpapers({
+    required String query,
+    String? resolution,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    return wallazaService.searchWallpapers(
+      query: query,
+      resolution: resolution,
+      page: page,
+      limit: limit,
+    );
+  }
+
+  /// Fetches detailed metadata for a single cloud wallpaper by ID.
+  Future<WallazaCloudWallpaper?> getCloudWallpaper(String id) async {
+    return wallazaService.getWallpaperById(id);
+  }
+
+  /// Imports a cloud wallpaper into local storage as a [MotivationalShort].
+  Future<MotivationalShort> importCloudWallpaper(
+    WallazaCloudWallpaper cloudItem,
+  ) async {
+    final short = cloudItem.toMotivationalShort();
+    await saveCustomImportedWallpaper(short);
+    return short;
   }
 }

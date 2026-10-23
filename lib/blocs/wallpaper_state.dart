@@ -15,6 +15,7 @@ import '../models/wallpaper_collection.dart';
 import '../models/wallpaper_effect_config.dart';
 import '../models/wallora_screen_blueprint.dart';
 import '../models/weather_atmosphere_config.dart';
+import '../models/wallaza_cloud_wallpaper.dart';
 
 enum WallpaperActionStatus {
   idle,
@@ -69,6 +70,13 @@ class WallpaperState extends Equatable {
   final List<WalloraScreenBlueprint> communityBlueprints;
   final Set<String> likedBlueprintIds;
   final String communityTagFilter;
+  final List<WallazaCloudWallpaper> cloudWallpapers;
+  final bool isCloudLoading;
+  final String? cloudErrorMessage;
+  final String selectedCloudCategory;
+  final String selectedCloudResolution;
+  final String cloudSearchQuery;
+  final int cloudCurrentPage;
   final String? message;
   final String? errorMessage;
 
@@ -115,6 +123,13 @@ class WallpaperState extends Equatable {
     this.communityBlueprints = const [],
     this.likedBlueprintIds = const {},
     this.communityTagFilter = 'All',
+    this.cloudWallpapers = const [],
+    this.isCloudLoading = false,
+    this.cloudErrorMessage,
+    this.selectedCloudCategory = 'All',
+    this.selectedCloudResolution = 'All',
+    this.cloudSearchQuery = '',
+    this.cloudCurrentPage = 1,
     this.message,
     this.errorMessage,
   });
@@ -304,6 +319,13 @@ class WallpaperState extends Equatable {
     List<WalloraScreenBlueprint>? communityBlueprints,
     Set<String>? likedBlueprintIds,
     String? communityTagFilter,
+    List<WallazaCloudWallpaper>? cloudWallpapers,
+    bool? isCloudLoading,
+    String? cloudErrorMessage,
+    String? selectedCloudCategory,
+    String? selectedCloudResolution,
+    String? cloudSearchQuery,
+    int? cloudCurrentPage,
     String? message,
     String? errorMessage,
   }) {
@@ -354,6 +376,15 @@ class WallpaperState extends Equatable {
       communityBlueprints: communityBlueprints ?? this.communityBlueprints,
       likedBlueprintIds: likedBlueprintIds ?? this.likedBlueprintIds,
       communityTagFilter: communityTagFilter ?? this.communityTagFilter,
+      cloudWallpapers: cloudWallpapers ?? this.cloudWallpapers,
+      isCloudLoading: isCloudLoading ?? this.isCloudLoading,
+      cloudErrorMessage: cloudErrorMessage,
+      selectedCloudCategory:
+          selectedCloudCategory ?? this.selectedCloudCategory,
+      selectedCloudResolution:
+          selectedCloudResolution ?? this.selectedCloudResolution,
+      cloudSearchQuery: cloudSearchQuery ?? this.cloudSearchQuery,
+      cloudCurrentPage: cloudCurrentPage ?? this.cloudCurrentPage,
       message: message,
       errorMessage: errorMessage,
     );
@@ -403,6 +434,13 @@ class WallpaperState extends Equatable {
         communityBlueprints,
         likedBlueprintIds,
         communityTagFilter,
+        cloudWallpapers,
+        isCloudLoading,
+        cloudErrorMessage,
+        selectedCloudCategory,
+        selectedCloudResolution,
+        cloudSearchQuery,
+        cloudCurrentPage,
         message,
         errorMessage,
       ];

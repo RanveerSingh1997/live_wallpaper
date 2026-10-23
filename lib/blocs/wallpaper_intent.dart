@@ -15,6 +15,7 @@ import '../models/wallpaper_effect_config.dart';
 import '../models/wallora_backup_bundle.dart';
 import '../models/wallora_screen_blueprint.dart';
 import '../models/weather_atmosphere_config.dart';
+import '../models/wallaza_cloud_wallpaper.dart';
 
 abstract class WallpaperIntent extends Equatable {
   const WallpaperIntent();
@@ -620,6 +621,55 @@ class SetWeatherEffectPresetIntent extends WallpaperIntent {
 
   @override
   List<Object?> get props => [effectType];
+}
+
+/// Intent to fetch a page of wallpapers from the Wallaza Cloud API.
+class FetchCloudWallpapersIntent extends WallpaperIntent {
+  final int page;
+  final String? category;
+
+  const FetchCloudWallpapersIntent({
+    this.page = 1,
+    this.category,
+  });
+
+  @override
+  List<Object?> get props => [page, category];
+}
+
+/// Intent to search cloud wallpapers by keywords and optional resolution.
+class SearchCloudWallpapersIntent extends WallpaperIntent {
+  final String query;
+  final String? resolution;
+  final int page;
+
+  const SearchCloudWallpapersIntent({
+    required this.query,
+    this.resolution,
+    this.page = 1,
+  });
+
+  @override
+  List<Object?> get props => [query, resolution, page];
+}
+
+/// Intent to import a Wallaza cloud wallpaper into the local library, optionally setting it as active wallpaper.
+class ImportCloudWallpaperIntent extends WallpaperIntent {
+  final WallazaCloudWallpaper wallpaper;
+  final bool setAsActive;
+
+  const ImportCloudWallpaperIntent(
+    this.wallpaper, {
+    this.setAsActive = false,
+  });
+
+  @override
+  List<Object?> get props => [wallpaper, setAsActive];
+}
+
+/// Intent to clear active cloud search query and restore standard category browse.
+class ClearCloudSearchIntent extends WallpaperIntent {
+  const ClearCloudSearchIntent();
 }
 
 
