@@ -680,6 +680,18 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       autoRotationSource: event.source,
       message: 'Rotation playlist updated.',
     ));
+
+    if (event.source == 'wallaza_cloud' || event.source.startsWith('cloud_cat_')) {
+      final String? cat = event.source.startsWith('cloud_cat_')
+          ? event.source.replaceFirst('cloud_cat_', '')
+          : null;
+      if (state.cloudWallpapers.isEmpty) {
+        try {
+          final items = await repository.fetchCloudWallpapers(category: cat);
+          emit(state.copyWith(cloudWallpapers: items));
+        } catch (_) {}
+      }
+    }
   }
 
   Future<void> _onUpdateAutoRotationWifiOnly(
@@ -749,19 +761,35 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
           ));
         }
       } else {
+        if (nextWallpaper.id.startsWith('cloud_')) {
+          await repository.saveCustomImportedWallpaper(nextWallpaper);
+        }
         final res = await repository.applyStaticWallpaper(
           short: nextWallpaper,
           targetScreen: state.autoRotationTarget,
           customQuote: state.getEffectiveQuote(nextWallpaper),
         );
+        final all = repository.getCuratedShorts();
+        final updatedFiltered = _filterShorts(
+          allShorts: all,
+          category: state.selectedCategory,
+          preferences: state.userPreferences,
+          smartFilter: state.smartFilter,
+        );
         if (res['status'] == 'applied_static' || res['status'] == 'shared_ios') {
           emit(state.copyWith(
+            allShorts: all,
+            filteredShorts: updatedFiltered,
             activeWallpaperId: nextWallpaper.id,
             actionStatus: WallpaperActionStatus.appliedSuccess,
-            message: 'Rotated to "${nextWallpaper.title}"',
+            message: nextWallpaper.id.startsWith('cloud_')
+                ? 'Rotated to Wallaza 4K: "${nextWallpaper.title}"'
+                : 'Rotated to "${nextWallpaper.title}"',
           ));
         } else {
           emit(state.copyWith(
+            allShorts: all,
+            filteredShorts: updatedFiltered,
             actionStatus: WallpaperActionStatus.idle,
             message: 'Rotated to "${nextWallpaper.title}"',
           ));

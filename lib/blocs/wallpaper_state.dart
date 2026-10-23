@@ -249,6 +249,23 @@ class WallpaperState extends Equatable {
   List<MotivationalShort> get rotationPoolShorts {
     if (autoRotationSource == 'favorites') {
       return favoriteShorts.isNotEmpty ? favoriteShorts : allShorts;
+    } else if (autoRotationSource == 'wallaza_cloud') {
+      final source = cloudWallpapers.isNotEmpty
+          ? cloudWallpapers
+          : WallazaCloudWallpaper.curatedCloudLibrary;
+      return source.map((c) => c.toMotivationalShort()).toList();
+    } else if (autoRotationSource.startsWith('cloud_cat_')) {
+      final cat = autoRotationSource.replaceFirst('cloud_cat_', '').toLowerCase();
+      final source = cloudWallpapers.isNotEmpty
+          ? cloudWallpapers
+          : WallazaCloudWallpaper.curatedCloudLibrary;
+      final filtered = source
+          .where((c) => c.category.toLowerCase() == cat)
+          .map((c) => c.toMotivationalShort())
+          .toList();
+      return filtered.isNotEmpty
+          ? filtered
+          : source.map((c) => c.toMotivationalShort()).toList();
     } else if (autoRotationSource.startsWith('col_') || autoRotationSource.startsWith('custom_col_')) {
       final col = allCollections.cast<WallpaperCollection?>().firstWhere(
         (c) => c?.id == autoRotationSource,

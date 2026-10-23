@@ -397,6 +397,98 @@ class AutoRotationSheet extends StatelessWidget {
                           );
                         }),
 
+                        // Section: Wallaza 4K Cloud Streams
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            const Icon(Icons.cloud_download_rounded, color: Color(0xFF00E5FF), size: 16),
+                            const SizedBox(width: 6),
+                            const Text(
+                              'WALLAZA 4K CLOUD STREAMS',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.8,
+                                color: Color(0xFF00E5FF),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: const Color(0xFF00E5FF), width: 0.6),
+                              ),
+                              child: const Text(
+                                'PROXY STREAM',
+                                style: TextStyle(
+                                  color: Color(0xFF00E5FF),
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+
+                        _buildSourceTile(
+                          context: context,
+                          id: 'wallaza_cloud',
+                          title: 'Wallaza 4K Cloud Feed',
+                          subtitle: 'Auto-cycles fresh 4K & Ultra-HD cloud wallpapers',
+                          icon: Icons.cloud_sync_rounded,
+                          accentColor: const Color(0xFF00E5FF),
+                          isSelected: state.autoRotationSource == 'wallaza_cloud',
+                        ),
+                        const SizedBox(height: 8),
+
+                        _buildSourceTile(
+                          context: context,
+                          id: 'cloud_cat_cyberpunk',
+                          title: 'Wallaza Cyberpunk 4K',
+                          subtitle: 'Neon nightscapes & futuristic metropolis streams',
+                          icon: Icons.bolt_rounded,
+                          accentColor: const Color(0xFF00E5FF),
+                          isSelected: state.autoRotationSource == 'cloud_cat_cyberpunk',
+                        ),
+                        const SizedBox(height: 8),
+
+                        _buildSourceTile(
+                          context: context,
+                          id: 'cloud_cat_amoled',
+                          title: 'Wallaza AMOLED True-Black',
+                          subtitle: 'Zero-nit deep black OLED preservation stream',
+                          icon: Icons.dark_mode_rounded,
+                          accentColor: const Color(0xFF00E676),
+                          isSelected: state.autoRotationSource == 'cloud_cat_amoled',
+                        ),
+                        const SizedBox(height: 8),
+
+                        _buildSourceTile(
+                          context: context,
+                          id: 'cloud_cat_space',
+                          title: 'Wallaza Cosmic Space 4K',
+                          subtitle: 'Nebulae, star clusters & deep telescopic captures',
+                          icon: Icons.blur_circular_rounded,
+                          accentColor: const Color(0xFFD500F9),
+                          isSelected: state.autoRotationSource == 'cloud_cat_space',
+                        ),
+                        const SizedBox(height: 8),
+
+                        _buildSourceTile(
+                          context: context,
+                          id: 'cloud_cat_nature',
+                          title: 'Wallaza Alpine Nature 4K',
+                          subtitle: 'Mountain ridges, pine valleys & morning mist',
+                          icon: Icons.landscape_rounded,
+                          accentColor: const Color(0xFF00E676),
+                          isSelected: state.autoRotationSource == 'cloud_cat_nature',
+                        ),
+                        const SizedBox(height: 8),
+
                         // Option C: All Library
                         _buildSourceTile(
                           context: context,

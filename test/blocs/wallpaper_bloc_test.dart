@@ -1840,5 +1840,45 @@ void main() {
 
       expect(bloc.state.cloudSearchQuery, isEmpty);
     });
+
+    test('rotationPoolShorts yields Wallaza Cloud wallpapers when source is wallaza_cloud', () async {
+      bloc.add(const UpdateAutoRotationSourceIntent('wallaza_cloud'));
+      await bloc.stream.firstWhere((s) => s.autoRotationSource == 'wallaza_cloud');
+
+      final pool = bloc.state.rotationPoolShorts;
+      expect(pool.isNotEmpty, isTrue);
+      expect(pool.any((s) => s.id.startsWith('cloud_')), isTrue);
+    });
+
+    test('rotationPoolShorts filters by category when source is cloud_cat_*', () async {
+      bloc.add(const UpdateAutoRotationSourceIntent('cloud_cat_cyberpunk'));
+      await bloc.stream.firstWhere((s) => s.autoRotationSource == 'cloud_cat_cyberpunk');
+
+      final pool = bloc.state.rotationPoolShorts;
+      expect(pool.isNotEmpty, isTrue);
+      expect(pool.every((s) => s.category.toLowerCase() == 'cyberpunk'), isTrue);
+    });
+
+    test('RotateWallpaperNowIntent rotates to Wallaza Cloud wallpaper and persists to library', () async {
+      bloc.add(const UpdateAutoRotationSourceIntent('wallaza_cloud'));
+      await bloc.stream.firstWhere((s) => s.autoRotationSource == 'wallaza_cloud');
+
+      final rotateExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.activeWallpaperId != null &&
+            s.activeWallpaperId!.startsWith('cloud_') &&
+            s.actionStatus == WallpaperActionStatus.appliedSuccess &&
+            s.message != null &&
+            s.message!.contains('Rotated to Wallaza 4K'))),
+      );
+
+      bloc.add(RotateWallpaperNowIntent());
+      await rotateExpectation;
+
+      expect(bloc.state.activeWallpaperId!.startsWith('cloud_'), isTrue);
+      final savedWallpapers = repository.getCustomImportedWallpapers();
+      expect(savedWallpapers.any((s) => s.id == bloc.state.activeWallpaperId), isTrue);
+    });
   });
 }

@@ -954,6 +954,23 @@ void main() {
       // Select 3 Hours interval
       await tester.tap(find.widgetWithText(ChoiceChip, '3 Hours'));
       await tester.pump();
+
+      // Scroll to Wallaza 4K Cloud Streams section
+      final cloudStreamHeader = find.text('WALLAZA 4K CLOUD STREAMS');
+      await tester.scrollUntilVisible(
+        cloudStreamHeader,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(cloudStreamHeader, findsOneWidget);
+
+      final cloudFeedOption = find.text('Wallaza 4K Cloud Feed');
+      expect(cloudFeedOption, findsOneWidget);
+
+      await tester.tap(cloudFeedOption);
+      await tester.pump();
+
+      expect(bloc.state.autoRotationSource, 'wallaza_cloud');
     });
 
     testWidgets('CustomWallpaperImportSheet renders creator controls, formats, and handles import',
