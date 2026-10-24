@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/wallpaper_collection.dart';
 
 class CreateCollectionSheet extends StatefulWidget {
@@ -51,12 +52,12 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
   ];
 
   static const List<List<Color>> _gradientChoices = [
-    [Color(0xFF00E5FF), Color(0xFFD500F9)],
-    [Color(0xFF1B0B2E), Color(0xFF7C4DFF), Color(0xFF0D061A)],
-    [Color(0xFFFF5722), Color(0xFFFF1744)],
-    [Color(0xFF00E676), Color(0xFF00B0FF)],
-    [Color(0xFFFFD600), Color(0xFFFF6D00)],
-    [Color(0xFF0D47A1), Color(0xFF1976D2)],
+    [AppColors.neonCyan, AppColors.auroraViolet],
+    [AppColors.deepPurple, AppColors.auroraViolet, AppColors.obsidianBlack],
+    [AppColors.sunsetAmber, AppColors.favoriteRed],
+    [AppColors.auroraEmerald, AppColors.electricBlue],
+    [AppColors.solarGold, AppColors.sunsetAmber],
+    [AppColors.electricBlue, AppColors.neonCyan],
   ];
 
   static const List<String> _badgeChoices = [
@@ -121,7 +122,7 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Created playlist "$title"'),
-        backgroundColor: const Color(0xFF00E5FF),
+        backgroundColor: AppColors.neonCyan,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
       ),
@@ -143,7 +144,7 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF101014),
+                color: AppColors.darkBackground,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: Form(
@@ -172,7 +173,7 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
                         const Row(
                           children: [
                             Icon(Icons.playlist_add_rounded,
-                                color: Color(0xFF00E5FF), size: 24),
+                                color: AppColors.neonCyan, size: 24),
                             SizedBox(width: 10),
                             Text(
                               'NEW PLAYLIST',
@@ -297,7 +298,7 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
                         hintText: 'e.g. Cyberpunk Vibes, Night Grind',
                         hintStyle: const TextStyle(color: Colors.white24),
                         filled: true,
-                        fillColor: const Color(0xFF18181E),
+                        fillColor: AppColors.cardSurface,
                         contentPadding:
                             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         border: OutlineInputBorder(
@@ -310,7 +311,7 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(color: Color(0xFF00E5FF), width: 1.5),
+                          borderSide: const BorderSide(color: AppColors.neonCyan, width: 1.5),
                         ),
                       ),
                       validator: (value) {
@@ -341,7 +342,7 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
                         hintText: 'e.g. Neon nights for AMOLED lock screen',
                         hintStyle: const TextStyle(color: Colors.white24),
                         filled: true,
-                        fillColor: const Color(0xFF18181E),
+                        fillColor: AppColors.cardSurface,
                         contentPadding:
                             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         border: OutlineInputBorder(
@@ -354,7 +355,7 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(color: Color(0xFF00E5FF), width: 1.5),
+                          borderSide: const BorderSide(color: AppColors.neonCyan, width: 1.5),
                         ),
                       ),
                     ),
@@ -392,12 +393,12 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
                               height: 52,
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? const Color(0xFF00E5FF).withValues(alpha: 0.2)
-                                    : const Color(0xFF18181E),
+                                    ? AppColors.neonCyan.withValues(alpha: 0.2)
+                                    : AppColors.cardSurface,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
                                   color: isSelected
-                                      ? const Color(0xFF00E5FF)
+                                      ? AppColors.neonCyan
                                       : Colors.white12,
                                   width: isSelected ? 1.5 : 1,
                                 ),
@@ -405,7 +406,7 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
                               child: Icon(
                                 icon,
                                 color: isSelected
-                                    ? const Color(0xFF00E5FF)
+                                    ? AppColors.neonCyan
                                     : Colors.white70,
                                 size: 24,
                               ),
@@ -504,11 +505,11 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
                             }
                           },
                           selectedColor:
-                              const Color(0xFF00E5FF).withValues(alpha: 0.2),
-                          backgroundColor: const Color(0xFF18181E),
+                              AppColors.neonCyan.withValues(alpha: 0.2),
+                          backgroundColor: AppColors.cardSurface,
                           labelStyle: TextStyle(
                             color: isSelected
-                                ? const Color(0xFF00E5FF)
+                                ? AppColors.neonCyan
                                 : Colors.white70,
                             fontWeight: isSelected
                                 ? FontWeight.w800
@@ -517,7 +518,7 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
                           ),
                           side: BorderSide(
                             color: isSelected
-                                ? const Color(0xFF00E5FF)
+                                ? AppColors.neonCyan
                                 : Colors.white12,
                           ),
                         );
@@ -544,7 +545,7 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
                           style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w800,
-                            color: Color(0xFF00E5FF),
+                            color: AppColors.neonCyan,
                           ),
                         ),
                       ],
@@ -580,13 +581,13 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
                                 gradient: LinearGradient(
                                   colors: short.gradientColors.isNotEmpty
                                       ? short.gradientColors
-                                      : [const Color(0xFF1F1F24), Colors.black],
+                                      : [AppColors.cardSurface, Colors.black],
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                 ),
                                 border: Border.all(
                                   color: isIncluded
-                                      ? const Color(0xFF00E5FF)
+                                      ? AppColors.neonCyan
                                       : Colors.white12,
                                   width: isIncluded ? 2 : 1,
                                 ),
@@ -613,7 +614,7 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
                                       child: Container(
                                         padding: const EdgeInsets.all(2),
                                         decoration: const BoxDecoration(
-                                          color: Color(0xFF00E5FF),
+                                          color: AppColors.neonCyan,
                                           shape: BoxShape.circle,
                                         ),
                                         child: const Icon(
@@ -639,7 +640,7 @@ class _CreateCollectionSheetState extends State<CreateCollectionSheet> {
                       child: ElevatedButton.icon(
                         onPressed: _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00E5FF),
+                          backgroundColor: AppColors.neonCyan,
                           foregroundColor: Colors.black,
                           elevation: 4,
                           shape: RoundedRectangleBorder(

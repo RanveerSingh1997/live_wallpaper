@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/smart_filter_config.dart';
 
 class SmartDiscoverySheet extends StatefulWidget {
@@ -52,7 +53,7 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
           child: Container(
             padding: EdgeInsets.only(bottom: bottomInset),
             decoration: const BoxDecoration(
-              color: Color(0xFF141416),
+              color: AppColors.modalBackground,
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               boxShadow: [
                 BoxShadow(
@@ -84,7 +85,7 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                          colors: [AppColors.neonCyan, AppColors.auroraViolet],
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -114,7 +115,7 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
                                 : 'Filter by vibe, color harmony & format',
                             style: TextStyle(
                               color: _config.hasActiveFilters
-                                  ? const Color(0xFF00E5FF)
+                                  ? AppColors.neonCyan
                                   : Colors.white60,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -131,11 +132,11 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
                             _config = SmartFilterConfig.defaultConfig;
                           });
                         },
-                        icon: const Icon(Icons.refresh_rounded, size: 16, color: Color(0xFFFF5722)),
+                        icon: const Icon(Icons.refresh_rounded, size: 16, color: AppColors.sunsetAmber),
                         label: const Text(
                           'Reset',
                           style: TextStyle(
-                            color: Color(0xFFFF5722),
+                            color: AppColors.sunsetAmber,
                             fontWeight: FontWeight.w700,
                             fontSize: 13,
                           ),
@@ -210,11 +211,11 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E1E24),
+                          color: AppColors.cardSurface,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
                             color: matchCount > 0
-                                ? const Color(0xFF00E5FF).withAlpha(100)
+                                ? AppColors.neonCyan.withAlpha(100)
                                 : Colors.redAccent.withAlpha(100),
                           ),
                         ),
@@ -227,7 +228,7 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
                                   : Icons.search_off_rounded,
                               size: 16,
                               color: matchCount > 0
-                                  ? const Color(0xFF00E5FF)
+                                  ? AppColors.neonCyan
                                   : Colors.redAccent,
                             ),
                             const SizedBox(width: 8),
@@ -249,12 +250,12 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
                         child: Container(
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                              colors: [AppColors.neonCyan, AppColors.auroraViolet],
                             ),
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF00E5FF).withAlpha(80),
+                                color: AppColors.neonCyan.withAlpha(80),
                                 blurRadius: 16,
                                 offset: const Offset(0, 4),
                               ),
@@ -308,7 +309,7 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: const Color(0xFF00E5FF)),
+        Icon(icon, size: 18, color: AppColors.neonCyan),
         const SizedBox(width: 10),
         Expanded(
           child: Column(
@@ -342,7 +343,7 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
   Widget _buildFormatSelector() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E24),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white10),
       ),
@@ -364,7 +365,7 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
                 decoration: BoxDecoration(
                   gradient: isSelected
                       ? const LinearGradient(
-                          colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                          colors: [AppColors.neonCyan, AppColors.auroraViolet],
                         )
                       : null,
                   color: isSelected ? null : Colors.transparent,
@@ -405,8 +406,8 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
               );
             });
           },
-          backgroundColor: const Color(0xFF1E1E24),
-          selectedColor: const Color(0xFFFF5722),
+          backgroundColor: AppColors.cardSurface,
+          selectedColor: AppColors.sunsetAmber,
           labelStyle: TextStyle(
             color: isSelected ? Colors.white : Colors.white70,
             fontSize: 12,
@@ -415,7 +416,7 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
             side: BorderSide(
-              color: isSelected ? const Color(0xFFFF5722) : Colors.white10,
+              color: isSelected ? AppColors.sunsetAmber : Colors.white10,
             ),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -501,7 +502,7 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
   Widget _buildAttributesToggles() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E24),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white10),
       ),
@@ -511,8 +512,8 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
           children: [
             SwitchListTile.adaptive(
               value: _config.amoledCertifiedOnly,
-              activeThumbColor: const Color(0xFF00E676),
-              activeTrackColor: const Color(0xFF00E676).withAlpha(120),
+              activeThumbColor: AppColors.auroraEmerald,
+              activeTrackColor: AppColors.auroraEmerald.withAlpha(120),
               title: const Text(
                 'AMOLED Certified Only',
                 style: TextStyle(
@@ -535,8 +536,8 @@ class _SmartDiscoverySheetState extends State<SmartDiscoverySheet> {
             const Divider(color: Colors.white10, height: 1),
             SwitchListTile.adaptive(
               value: _config.requiresTextOverlay,
-              activeThumbColor: const Color(0xFF00E5FF),
-              activeTrackColor: const Color(0xFF00E5FF).withAlpha(120),
+              activeThumbColor: AppColors.neonCyan,
+              activeTrackColor: AppColors.neonCyan.withAlpha(120),
               title: const Text(
                 'Requires Text / Quote Overlay',
                 style: TextStyle(

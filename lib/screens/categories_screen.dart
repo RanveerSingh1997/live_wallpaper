@@ -68,7 +68,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A22),
+        backgroundColor: AppColors.modalBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text(
           'Delete Playlist?',
@@ -96,14 +96,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Deleted playlist "${col.title}"'),
-                  backgroundColor: const Color(0xFFFF1744),
+                  backgroundColor: AppColors.error,
                   behavior: SnackBarBehavior.floating,
                   duration: const Duration(seconds: 2),
                 ),
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF1744),
+              backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -130,7 +130,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             elevation: 0,
             title: Row(
               children: [
-                const Icon(Icons.grid_view_rounded, color: Color(0xFFFF5722), size: 20),
+                const Icon(Icons.grid_view_rounded, color: AppColors.sunsetAmber, size: 20),
                 const SizedBox(width: 8),
                 const Text(
                   'CATEGORIES',
@@ -145,7 +145,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 if (_selectedTabIndex == 1)
                   IconButton(
                     icon: const Icon(Icons.add_circle_outline_rounded,
-                        color: Color(0xFF00E5FF), size: 22),
+                        color: AppColors.neonCyan, size: 22),
                     tooltip: 'New Playlist',
                     onPressed: () {
                       HapticFeedback.selectionClick();
@@ -162,7 +162,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   height: 38,
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF16161A),
+                    color: AppColors.cardSurface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.white10),
                   ),
@@ -178,7 +178,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             duration: const Duration(milliseconds: 200),
                             decoration: BoxDecoration(
                               color: _selectedTabIndex == 0
-                                  ? const Color(0xFFFF5722)
+                                  ? AppColors.sunsetAmber
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(9),
                             ),
@@ -207,7 +207,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             duration: const Duration(milliseconds: 200),
                             decoration: BoxDecoration(
                               color: _selectedTabIndex == 1
-                                  ? const Color(0xFF00E5FF)
+                                  ? AppColors.neonCyan
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(9),
                             ),
@@ -268,7 +268,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             },
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF16161A),
+                color: AppColors.cardSurface,
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(color: color.withValues(alpha: 0.25)),
                 boxShadow: [
@@ -339,15 +339,15 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF1B0B2E), Color(0xFF00E5FF)],
+                colors: [AppColors.deepPurple, AppColors.neonCyan],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0xFF00E5FF).withValues(alpha: 0.4)),
+              border: Border.all(color: AppColors.neonCyan.withValues(alpha: 0.4)),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF00E5FF).withValues(alpha: 0.2),
+                  color: AppColors.neonCyan.withValues(alpha: 0.2),
                   blurRadius: 16,
                   offset: const Offset(0, 4),
                 ),
@@ -363,7 +363,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   ),
                   child: const Icon(
                     Icons.add_rounded,
-                    color: Color(0xFF00E5FF),
+                    color: AppColors.neonCyan,
                     size: 26,
                   ),
                 ),
@@ -407,7 +407,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             const Row(
               children: [
                 Icon(Icons.person_pin_rounded,
-                    color: Color(0xFF00E5FF), size: 18),
+                    color: AppColors.neonCyan, size: 18),
                 SizedBox(width: 6),
                 Text(
                   'MY PLAYLISTS',
@@ -437,7 +437,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             decoration: BoxDecoration(
-              color: const Color(0xFF141418),
+              color: AppColors.cardSurface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.white10),
             ),
@@ -492,7 +492,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             const Row(
               children: [
                 Icon(Icons.auto_awesome_rounded,
-                    color: Color(0xFFD500F9), size: 18),
+                    color: AppColors.auroraViolet, size: 18),
                 SizedBox(width: 6),
                 Text(
                   'EDITORIAL COLLECTIONS',
@@ -654,7 +654,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           builder: (ctx, scrollController) {
             return Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF141418),
+                color: AppColors.modalBackground,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: Column(
@@ -763,14 +763,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                           color: Colors.black.withValues(alpha: 0.7),
                                           borderRadius: BorderRadius.circular(6),
                                           border: Border.all(
-                                            color: const Color(0xFF00E676).withValues(alpha: 0.5),
+                                            color: AppColors.auroraEmerald.withValues(alpha: 0.5),
                                             width: 0.6,
                                           ),
                                         ),
                                         child: Text(
                                           '${item.trueBlackPercentage}% OLED',
                                           style: const TextStyle(
-                                            color: Color(0xFF00E676),
+                                            color: AppColors.auroraEmerald,
                                             fontSize: 8,
                                             fontWeight: FontWeight.w800,
                                           ),

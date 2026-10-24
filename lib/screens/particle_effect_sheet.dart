@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/motivational_short.dart';
 import '../models/particle_effect_config.dart';
 import '../widgets/interactive_particle_overlay.dart';
@@ -59,7 +60,7 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
           child: Container(
             padding: EdgeInsets.only(bottom: bottomInset),
             decoration: const BoxDecoration(
-              color: Color(0xFF141416),
+              color: AppColors.modalBackground,
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               boxShadow: [
                 BoxShadow(
@@ -94,14 +95,14 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                            colors: [AppColors.neonCyan, AppColors.auroraViolet],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(14),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFD500F9).withValues(alpha: 0.35),
+                              color: AppColors.auroraViolet.withValues(alpha: 0.35),
                               blurRadius: 12,
                             ),
                           ],
@@ -160,7 +161,7 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
                       const Text(
                         'PARTICLE PRESETS',
                         style: TextStyle(
-                          color: Color(0xFF00E5FF),
+                          color: AppColors.neonCyan,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.1,
@@ -175,7 +176,7 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
                       const Text(
                         'PHYSICS & VISUAL TUNING',
                         style: TextStyle(
-                          color: Color(0xFF00E5FF),
+                          color: AppColors.neonCyan,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.1,
@@ -248,7 +249,7 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
                       const Text(
                         'HARDWARE CONTROLS',
                         style: TextStyle(
-                          color: Color(0xFF00E5FF),
+                          color: AppColors.neonCyan,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.1,
@@ -258,7 +259,7 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
 
                       _buildSwitchTile(
                         icon: Icons.vibration_rounded,
-                        accentColor: const Color(0xFF00E5FF),
+                        accentColor: AppColors.neonCyan,
                         title: 'Touch Haptic Feedback',
                         subtitle: 'Generate subtle haptic pulse when tapping interactive particles.',
                         value: _config.isHapticsEnabled,
@@ -273,7 +274,7 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
 
                       _buildSwitchTile(
                         icon: Icons.battery_saver_rounded,
-                        accentColor: const Color(0xFF00E676),
+                        accentColor: AppColors.auroraEmerald,
                         title: 'Low-Battery Auto-Pause (<15%)',
                         subtitle: 'Automatically suspends particle simulation when device battery is critical.',
                         value: _config.isBatteryGuardEnabled,
@@ -294,7 +295,7 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   decoration: const BoxDecoration(
-                    color: Color(0xFF101012),
+                    color: AppColors.darkBackground,
                     border: Border(top: BorderSide(color: Colors.white10)),
                   ),
                   child: Row(
@@ -318,7 +319,7 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
                       // Apply button
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00E5FF),
+                          backgroundColor: AppColors.neonCyan,
                           foregroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
@@ -364,7 +365,7 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
       height: 180,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A22),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: _config.preset.accentColor.withValues(alpha: 0.35),
@@ -388,8 +389,8 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
                 colors: wallpaper != null && wallpaper.gradientColors.isNotEmpty
                     ? wallpaper.gradientColors
                     : [
-                        const Color(0xFF1E1030),
-                        const Color(0xFF05050A),
+                        AppColors.deepPurple,
+                        AppColors.obsidianBlack,
                       ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -479,7 +480,7 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
             decoration: BoxDecoration(
               color: isSelected
                   ? preset.accentColor.withValues(alpha: 0.12)
-                  : const Color(0xFF1C1C20),
+                  : AppColors.cardSurface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isSelected ? preset.accentColor : Colors.white10,
@@ -547,7 +548,7 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1C20),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white10),
       ),
@@ -568,13 +569,13 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                  color: AppColors.neonCyan.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   valueDisplay,
                   style: const TextStyle(
-                    color: Color(0xFF00E5FF),
+                    color: AppColors.neonCyan,
                     fontWeight: FontWeight.bold,
                     fontSize: 11,
                   ),
@@ -584,10 +585,10 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
           ),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: const Color(0xFF00E5FF),
+              activeTrackColor: AppColors.neonCyan,
               inactiveTrackColor: Colors.white12,
-              thumbColor: const Color(0xFF00E5FF),
-              overlayColor: const Color(0xFF00E5FF).withValues(alpha: 0.2),
+              thumbColor: AppColors.neonCyan,
+              overlayColor: AppColors.neonCyan.withValues(alpha: 0.2),
               trackHeight: 3,
             ),
             child: Slider(
@@ -616,7 +617,7 @@ class _ParticleEffectSheetState extends State<ParticleEffectSheet> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFF1C1C20),
+          color: AppColors.cardSurface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.white10),
         ),
