@@ -33,6 +33,9 @@ abstract final class AppColors {
   static const Color surfaceMedium = modalBackground;
   static const Color sheetBackground = Color(0xFF1E1E28);
   static const Color cardHighlight = Color(0xFF222630);
+  static const Color obsidianGlass = Color(0xE6101018);
+  static const Color obsidianGlassCard = Color(0xF014141E);
+  static const Color obsidianGlassFrosted = Color(0xB30A0A0E);
 
   // Text & Neutral Shades
   static const Color textPrimary = Color(0xFFFFFFFF);
@@ -40,10 +43,18 @@ abstract final class AppColors {
   static const Color textTertiary = Color(0x61FFFFFF);  // 38%
   static const Color textDisabled = Color(0x3DFFFFFF);  // 24%
 
-  // Borders & Dividers
+  // Borders & Specular Highlights
   static const Color borderSubtle = Color(0x1AFFFFFF);  // 10%
   static const Color borderMedium = Color(0x1FFFFFFF);  // 12%
   static const Color borderAccent = Color(0xFF00E5FF);
+  static const Color specularHighlight = Color(0x33FFFFFF); // 20%
+  static const Color specularRim = Color(0x1FFFFFFF);       // 12%
+
+  // Ambient Glows
+  static const Color ambientGlowCyan = Color(0x3300E5FF);
+  static const Color ambientGlowViolet = Color(0x33D500F9);
+  static const Color ambientGlowAmber = Color(0x33FF5722);
+  static const Color ambientGlowEmerald = Color(0x3300E676);
 
   // Status & Semantic Colors
   static const Color error = Color(0xFFFF5252);
@@ -76,5 +87,24 @@ abstract final class AppColors {
     colors: [obsidianBlack, modalBackground],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
+  );
+
+  static const LinearGradient auroraMeshGradient = LinearGradient(
+    colors: [neonCyan, auroraViolet, sunsetAmber],
+    stops: [0.0, 0.52, 1.0],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient obsidianGlassGradient = LinearGradient(
+    colors: [Color(0xF0181826), Color(0xF00D0D14)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
+  static const LinearGradient specularRimGradient = LinearGradient(
+    colors: [Color(0x33FFFFFF), Color(0x0AFFFFFF)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
   );
 }

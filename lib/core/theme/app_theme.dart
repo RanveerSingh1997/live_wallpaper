@@ -47,6 +47,7 @@ abstract final class AppTheme {
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.modalBackground,
+        elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(22),
           side: const BorderSide(color: Colors.white12),
@@ -72,6 +73,7 @@ abstract final class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.sheetBackground,
+        elevation: 8,
         contentTextStyle: const TextStyle(
           color: AppColors.textPrimary,
           fontWeight: FontWeight.w600,
@@ -96,6 +98,7 @@ abstract final class AppTheme {
           }
           return Colors.white12;
         }),
+        trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -193,6 +196,61 @@ abstract final class AppTheme {
         iconColor: AppColors.neonCyan,
         textColor: Colors.white,
         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      ),
+      tabBarTheme: const TabBarThemeData(
+        labelColor: AppColors.neonCyan,
+        unselectedLabelColor: Colors.white60,
+        indicatorColor: AppColors.neonCyan,
+        indicatorSize: TabBarIndicatorSize.label,
+        dividerColor: Colors.transparent,
+        labelStyle: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.4,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.2,
+        ),
+      ),
+      tooltipTheme: TooltipThemeData(
+        decoration: BoxDecoration(
+          color: AppColors.modalBackground,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: const Color(0x26FFFFFF), width: 1.0),
+        ),
+        textStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        waitDuration: const Duration(milliseconds: 400),
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: AppColors.modalBackground,
+        elevation: 12,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Color(0x26FFFFFF), width: 1.0),
+        ),
+        textStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.darkBackground,
+        indicatorColor: AppColors.neonCyan.withValues(alpha: 0.18),
+      ),
+
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: AppColors.neonCyan,
+        linearTrackColor: Colors.white12,
+        circularTrackColor: Colors.white12,
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
