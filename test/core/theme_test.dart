@@ -35,6 +35,35 @@ void main() {
     });
   });
 
+  group('AuroraThemeExtension Unit Tests', () {
+    test('standard configuration provides aurora gradients and specular borders', () {
+      const ext = AuroraThemeExtension.standard;
+      expect(ext.primaryAuroraGradient, AppColors.auroraGradient);
+      expect(ext.cyberGradient, AppColors.cyberGradient);
+      expect(ext.sunsetGradient, AppColors.sunsetGradient);
+      expect(ext.neonBorder.color, const Color(0x5900E5FF));
+      expect(ext.neonGlowShadow.isNotEmpty, isTrue);
+    });
+
+    test('copyWith updates specified properties', () {
+      const ext = AuroraThemeExtension.standard;
+      final updated = ext.copyWith(
+        glassmorphicSurface: Colors.red,
+      );
+      expect(updated.glassmorphicSurface, Colors.red);
+      expect(updated.primaryAuroraGradient, ext.primaryAuroraGradient);
+    });
+
+    test('lerp smoothly interpolates theme extension values', () {
+      const ext1 = AuroraThemeExtension.standard;
+      final ext2 = ext1.copyWith(glassmorphicSurface: Colors.black);
+      final lerped = ext1.lerp(ext2, 0.5);
+
+      expect(lerped, isNotNull);
+      expect(lerped.primaryAuroraGradient, isNotNull);
+    });
+  });
+
   group('AppTheme Unit Tests', () {
     test('Dark theme configures obsidian background and aurora neon accents', () {
       final theme = AppTheme.darkTheme;
@@ -44,6 +73,25 @@ void main() {
       expect(theme.colorScheme.secondary, AppColors.neonCyan);
       expect(theme.colorScheme.surface, AppColors.surfaceElevated);
       expect(theme.cardTheme.color, AppColors.cardBackground);
+    });
+
+    test('Dark theme registers AuroraThemeExtension', () {
+      final theme = AppTheme.darkTheme;
+      final auroraExt = theme.extension<AuroraThemeExtension>();
+
+      expect(auroraExt, isNotNull);
+      expect(auroraExt!.primaryAuroraGradient, AppColors.auroraGradient);
+    });
+
+    test('Dark theme configures cohesive component themes', () {
+      final theme = AppTheme.darkTheme;
+
+      expect(theme.appBarTheme.backgroundColor, Colors.transparent);
+      expect(theme.chipTheme.backgroundColor, AppColors.cardSurface);
+      expect(theme.elevatedButtonTheme.style, isNotNull);
+      expect(theme.inputDecorationTheme.filled, isTrue);
+      expect(theme.dialogTheme.backgroundColor, AppColors.modalBackground);
+      expect(theme.bottomSheetTheme.backgroundColor, Colors.transparent);
     });
   });
 }

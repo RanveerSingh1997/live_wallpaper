@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
+import 'aurora_theme_extension.dart';
 
-/// Centralized ThemeData definitions for Wallora.
+/// Centralized ThemeData definitions for Wallora — Obsidian aesthetic with fluid Aurora Neon gradients.
 abstract final class AppTheme {
   /// Wallora's signature Dark Obsidian theme with fluid Aurora neon accents.
   static ThemeData get darkTheme {
@@ -20,17 +21,35 @@ abstract final class AppTheme {
         onSurface: AppColors.textPrimary,
         onError: Colors.white,
       ),
-      cardTheme: const CardThemeData(
+      extensions: const [
+        AuroraThemeExtension.standard,
+      ],
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        iconTheme: IconThemeData(color: Colors.white, size: 22),
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 1.0,
+        ),
+      ),
+      cardTheme: CardThemeData(
         color: AppColors.cardBackground,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
+          borderRadius: BorderRadius.circular(18),
+          side: const BorderSide(color: Colors.white10),
         ),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.modalBackground,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
+          side: const BorderSide(color: Colors.white12),
         ),
         titleTextStyle: const TextStyle(
           color: AppColors.textPrimary,
@@ -39,20 +58,29 @@ abstract final class AppTheme {
         ),
         contentTextStyle: const TextStyle(
           color: AppColors.textSecondary,
-          fontSize: 14,
+          fontSize: 13,
+          height: 1.4,
         ),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: Colors.transparent,
         modalBackgroundColor: Colors.transparent,
         elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.sheetBackground,
-        contentTextStyle: const TextStyle(color: AppColors.textPrimary),
+        contentTextStyle: const TextStyle(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
+        ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: Colors.white12),
         ),
       ),
       switchTheme: SwitchThemeData(
@@ -68,6 +96,110 @@ abstract final class AppTheme {
           }
           return Colors.white12;
         }),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.neonCyan,
+          foregroundColor: Colors.black,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: 12,
+            letterSpacing: 0.6,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.neonCyan,
+          side: const BorderSide(color: AppColors.neonCyan, width: 1.2),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 12,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.neonCyan,
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 12,
+            letterSpacing: 0.4,
+          ),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.cardSurface,
+        selectedColor: AppColors.neonCyan.withValues(alpha: 0.2),
+        labelStyle: const TextStyle(
+          color: Colors.white70,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+        secondaryLabelStyle: const TextStyle(
+          color: AppColors.neonCyan,
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+        ),
+        side: const BorderSide(color: Colors.white10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AppColors.cardSurface,
+        hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
+        labelStyle: const TextStyle(color: Colors.white70, fontSize: 13),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Colors.white10),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Colors.white10),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.neonCyan, width: 1.4),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+      sliderTheme: SliderThemeData(
+        activeTrackColor: AppColors.neonCyan,
+        inactiveTrackColor: Colors.white12,
+        thumbColor: AppColors.neonCyan,
+        overlayColor: AppColors.neonCyan.withValues(alpha: 0.15),
+        trackHeight: 4,
+        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+      ),
+      dividerTheme: const DividerThemeData(
+        color: Colors.white10,
+        thickness: 0.8,
+        space: 1,
+      ),
+      listTileTheme: const ListTileThemeData(
+        iconColor: AppColors.neonCyan,
+        textColor: Colors.white,
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      ),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          TargetPlatform.iOS: ZoomPageTransitionsBuilder(),
+          TargetPlatform.macOS: ZoomPageTransitionsBuilder(),
+        },
       ),
       textTheme: base.textTheme.apply(
         fontFamily: 'sans-serif',
