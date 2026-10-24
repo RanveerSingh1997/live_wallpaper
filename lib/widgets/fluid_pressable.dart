@@ -11,6 +11,7 @@ class FluidPressable extends StatefulWidget {
   final Curve curve;
   final bool enableHaptic;
   final HitTestBehavior behavior;
+  final String? semanticsLabel;
 
   const FluidPressable({
     super.key,
@@ -22,6 +23,7 @@ class FluidPressable extends StatefulWidget {
     this.curve = Curves.easeOutCubic,
     this.enableHaptic = true,
     this.behavior = HitTestBehavior.opaque,
+    this.semanticsLabel,
   });
 
   @override
@@ -77,6 +79,19 @@ class _FluidPressableState extends State<FluidPressable>
 
   @override
   Widget build(BuildContext context) {
+    Widget content = ScaleTransition(
+      scale: _scaleAnimation,
+      child: widget.child,
+    );
+
+    if (widget.semanticsLabel != null) {
+      content = Semantics(
+        button: widget.onTap != null,
+        label: widget.semanticsLabel,
+        child: content,
+      );
+    }
+
     return GestureDetector(
       behavior: widget.behavior,
       onTapDown: widget.onTap != null || widget.onLongPress != null ? _onTapDown : null,
@@ -84,10 +99,7 @@ class _FluidPressableState extends State<FluidPressable>
       onTapCancel: widget.onTap != null || widget.onLongPress != null ? _onTapCancel : null,
       onTap: widget.onTap,
       onLongPress: widget.onLongPress,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: widget.child,
-      ),
+      child: content,
     );
   }
 }

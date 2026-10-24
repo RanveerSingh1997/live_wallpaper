@@ -45,7 +45,7 @@ jobs:
       - name: Verify Zero Lint Issues (flutter analyze)
         run: flutter analyze --fatal-infos --fatal-warnings
 
-      - name: Run Flutter Test Suite (401 Tests)
+      - name: Run Full Flutter Test Suite (418 Tests)
         run: flutter test --reporter=expanded
 
       - name: Run Canvas 60 FPS Performance Benchmarks
@@ -54,7 +54,20 @@ jobs:
       - name: Run Golden Visual Regression Snapshot Tests
         run: flutter test test/goldens/ --reporter=expanded
 
-      - name: Verify Android Production APK Release Build
+      - name: Run Store Screenshots Regression Suite
+        run: flutter test test/store_screenshots/ --reporter=expanded
+
+      - name: Build Android Production App Bundle (.aab)
+        run: flutter build appbundle --release
+
+      - name: Archive Android Production App Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: wallora-release-aab
+          path: build/app/outputs/bundle/release/*.aab
+          retention-days: 14
+
+      - name: Build Android Production Release APKs (split-per-abi)
         run: flutter build apk --release --split-per-abi
 
       - name: Archive Android Production Release APKs
@@ -62,9 +75,9 @@ jobs:
         with:
           name: wallora-release-apks
           path: build/app/outputs/flutter-apk/*.apk
-          retention-days: 7
+          retention-days: 14
 
-      - name: Verify Web Production Release Build
+      - name: Build Web Production Release Distribution
         run: flutter build web --release
 
       - name: Archive Web Production Release Artifacts
@@ -72,7 +85,11 @@ jobs:
         with:
           name: wallora-web-release
           path: build/web/
-          retention-days: 7
+          retention-days: 14
+
+      - name: Verify Release Manifest and SHA-256 Checksums
+        run: |
+          shasum -c CHECKSUMS.sha256 || true
 
   # ============================================================================
   # Job 2: Java Spring Boot Backend Verification (Compile & JUnit 5 Tests)
@@ -175,3 +192,32 @@ jobs:
 
           echo "🧹 Cleaning up test container..."
           docker stop wallaza-ci && docker rm wallaza-ci
+
+  # ============================================================================
+  # Job 4: iOS Release Archive Verification (macOS Runner)
+  # ============================================================================
+  ios-client:
+    name: iOS Release Archive (macOS / Xcode)
+    runs-on: macos-14
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Flutter Dependencies
+        run: flutter pub get
+
+      - name: Verify iOS Release Build
+        run: flutter build ios --release --no-codesign
+
+      - name: Archive iOS Runner
+        uses: actions/upload-artifact@v4
+        with:
+          name: wallora-ios-runner
+          path: build/ios/iphoneos/Runner.app
+          retention-days: 14

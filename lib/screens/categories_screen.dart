@@ -170,84 +170,95 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   child: Row(
                     children: [
                       Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            setState(() => _selectedTabIndex = 0);
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            decoration: BoxDecoration(
-                              gradient: _selectedTabIndex == 0
-                                  ? const LinearGradient(
-                                      colors: [AppColors.neonCyan, AppColors.auroraViolet],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    )
-                                  : null,
-                              borderRadius: BorderRadius.circular(9),
-                              boxShadow: _selectedTabIndex == 0
-                                  ? [
-                                      BoxShadow(
-                                        color: AppColors.neonCyan.withValues(alpha: 0.35),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                  : null,
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              'GENRES',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.6,
-                                color: _selectedTabIndex == 0
-                                    ? Colors.white
-                                    : Colors.white60,
+                        child: Semantics(
+                          button: true,
+                          selected: _selectedTabIndex == 0,
+                          label: 'Genres tab, ${_selectedTabIndex == 0 ? "selected" : "not selected"}',
+                          child: GestureDetector(
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              setState(() => _selectedTabIndex = 0);
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              decoration: BoxDecoration(
+                                gradient: _selectedTabIndex == 0
+                                    ? const LinearGradient(
+                                        colors: [AppColors.neonCyan, AppColors.auroraViolet],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      )
+                                    : null,
+                                borderRadius: BorderRadius.circular(9),
+                                boxShadow: _selectedTabIndex == 0
+                                    ? [
+                                        BoxShadow(
+                                          color: AppColors.neonCyan.withValues(alpha: 0.35),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : null,
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'GENRES',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.6,
+                                  color: _selectedTabIndex == 0
+                                      ? Colors.white
+                                      : Colors.white60,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
                       Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            setState(() => _selectedTabIndex = 1);
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            decoration: BoxDecoration(
-                              gradient: _selectedTabIndex == 1
-                                  ? const LinearGradient(
-                                      colors: [AppColors.auroraViolet, AppColors.neonCyan],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    )
-                                  : null,
-                              borderRadius: BorderRadius.circular(9),
-                              boxShadow: _selectedTabIndex == 1
-                                  ? [
-                                      BoxShadow(
-                                        color: AppColors.auroraViolet.withValues(alpha: 0.35),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                  : null,
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              'PLAYLISTS (${state.allCollections.length})',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.6,
-                                color: _selectedTabIndex == 1
-                                    ? Colors.white
-                                    : Colors.white60,
+                        child: Semantics(
+                          button: true,
+                          selected: _selectedTabIndex == 1,
+                          label:
+                              'Playlists and collections tab (${state.allCollections.length}), ${_selectedTabIndex == 1 ? "selected" : "not selected"}',
+                          child: GestureDetector(
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              setState(() => _selectedTabIndex = 1);
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              decoration: BoxDecoration(
+                                gradient: _selectedTabIndex == 1
+                                    ? const LinearGradient(
+                                        colors: [AppColors.auroraViolet, AppColors.neonCyan],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      )
+                                    : null,
+                                borderRadius: BorderRadius.circular(9),
+                                boxShadow: _selectedTabIndex == 1
+                                    ? [
+                                        BoxShadow(
+                                          color: AppColors.auroraViolet.withValues(alpha: 0.35),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : null,
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'PLAYLISTS (${state.allCollections.length})',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.6,
+                                  color: _selectedTabIndex == 1
+                                      ? Colors.white
+                                      : Colors.white60,
+                                ),
                               ),
                             ),
                           ),

@@ -15,24 +15,28 @@ class KineticQuoteOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.transparent,
-            Colors.black.withValues(alpha: 0.2),
-            Colors.black.withValues(alpha: 0.85),
-          ],
-          stops: const [0.0, 0.45, 1.0],
+    return Semantics(
+      header: true,
+      label:
+          'Wallpaper: ${short.title}. Quote: $effectiveQuote by ${short.author}. Category: ${short.category}',
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.transparent,
+              Colors.black.withValues(alpha: 0.2),
+              Colors.black.withValues(alpha: 0.85),
+            ],
+            stops: const [0.0, 0.45, 1.0],
+          ),
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           // Category & Custom Tag Badge
           Row(
             children: [
@@ -156,6 +160,7 @@ class KineticQuoteOverlay extends StatelessWidget {
           const SizedBox(height: 12),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

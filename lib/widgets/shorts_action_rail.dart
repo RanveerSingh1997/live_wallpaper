@@ -47,6 +47,7 @@ class ShortsActionRail extends StatelessWidget {
           _buildActionButton(
             icon: Icons.edit_note_rounded,
             label: 'Customize',
+            semanticLabel: 'Customize quote studio for ${short.title}',
             accentColor: Colors.white,
             onTap: onCustomizeQuote,
           ),
@@ -57,6 +58,7 @@ class ShortsActionRail extends StatelessWidget {
           _buildActionButton(
             icon: isMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
             label: isMuted ? 'Muted' : 'Sound',
+            semanticLabel: isMuted ? 'Unmute video audio' : 'Mute video audio',
             accentColor: isMuted ? Colors.white70 : short.accentColor,
             onTap: onToggleMute,
           ),
@@ -67,6 +69,9 @@ class ShortsActionRail extends StatelessWidget {
           _buildActionButton(
             icon: isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
             label: isFavorite ? 'Saved' : 'Like',
+            semanticLabel: isFavorite
+                ? 'Remove ${short.title} from favorites'
+                : 'Save ${short.title} to favorites',
             accentColor: isFavorite ? AppColors.favoriteRed : Colors.white,
             onTap: onToggleFavorite,
           ),
@@ -77,6 +82,7 @@ class ShortsActionRail extends StatelessWidget {
           _buildActionButton(
             icon: Icons.info_outline_rounded,
             label: 'Info',
+            semanticLabel: 'Wallpaper specifications and details for ${short.title}',
             accentColor: Colors.white70,
             onTap: () => _showShortInfo(context),
           ),
@@ -86,6 +92,7 @@ class ShortsActionRail extends StatelessWidget {
             _buildActionButton(
               icon: Icons.ios_share_rounded,
               label: 'Share',
+              semanticLabel: 'Share wallpaper blueprint for ${short.title}',
               accentColor: AppColors.electricBlue,
               onTap: onShare!,
             ),
@@ -96,66 +103,77 @@ class ShortsActionRail extends StatelessWidget {
   }
 
   Widget _buildApplyButton(BuildContext context) {
-    return FluidPressable(
-      onTap: isApplying
-          ? null
-          : () {
-              HapticFeedback.mediumImpact();
-              onApplyWallpaper();
-            },
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: isCurrentActive
-                    ? [AppColors.auroraEmerald, AppColors.electricBlue]
-                    : [short.accentColor, short.accentColor.withValues(alpha: 0.8)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: (isCurrentActive ? AppColors.auroraEmerald : short.accentColor)
-                      .withValues(alpha: 0.5),
-                  blurRadius: 16,
-                  spreadRadius: 2,
+    final semanticLabel = isApplying
+        ? 'Applying live wallpaper'
+        : isCurrentActive
+            ? 'Wallpaper is active on device'
+            : 'Apply ${short.title} as live wallpaper';
+
+    return Semantics(
+      button: true,
+      enabled: !isApplying,
+      label: semanticLabel,
+      child: FluidPressable(
+        onTap: isApplying
+            ? null
+            : () {
+                HapticFeedback.mediumImpact();
+                onApplyWallpaper();
+              },
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: isCurrentActive
+                      ? [AppColors.auroraEmerald, AppColors.electricBlue]
+                      : [short.accentColor, short.accentColor.withValues(alpha: 0.8)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ],
-            ),
-            child: Center(
-              child: isApplying
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                boxShadow: [
+                  BoxShadow(
+                    color: (isCurrentActive ? AppColors.auroraEmerald : short.accentColor)
+                        .withValues(alpha: 0.5),
+                    blurRadius: 16,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Center(
+                child: isApplying
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : Icon(
+                        isCurrentActive ? Icons.check_circle_rounded : Icons.wallpaper_rounded,
+                        color: Colors.white,
+                        size: 28,
                       ),
-                    )
-                  : Icon(
-                      isCurrentActive ? Icons.check_circle_rounded : Icons.wallpaper_rounded,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+              ),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            isCurrentActive ? 'ACTIVE' : 'APPLY',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.0,
-              color: isCurrentActive ? AppColors.auroraEmerald : Colors.white,
+            const SizedBox(height: 6),
+            Text(
+              isCurrentActive ? 'ACTIVE' : 'APPLY',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.0,
+                color: isCurrentActive ? AppColors.auroraEmerald : Colors.white,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -165,48 +183,53 @@ class ShortsActionRail extends StatelessWidget {
     required String label,
     required Color accentColor,
     required VoidCallback onTap,
+    String? semanticLabel,
   }) {
-    return FluidPressable(
-      onTap: () {
-        HapticFeedback.selectionClick();
-        onTap();
-      },
-      child: Column(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.black.withValues(alpha: 0.45),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.2),
-                width: 1,
+    return Semantics(
+      button: true,
+      label: semanticLabel ?? label,
+      child: FluidPressable(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        child: Column(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.black.withValues(alpha: 0.45),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: Icon(
+                icon,
+                color: accentColor,
+                size: 22,
               ),
             ),
-            child: Icon(
-              icon,
-              color: accentColor,
-              size: 22,
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+                shadows: [
+                  Shadow(
+                    color: Colors.black,
+                    offset: Offset(0, 1),
+                    blurRadius: 3,
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-              shadows: [
-                Shadow(
-                  color: Colors.black,
-                  offset: Offset(0, 1),
-                  blurRadius: 3,
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

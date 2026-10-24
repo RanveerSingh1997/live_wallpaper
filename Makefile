@@ -3,7 +3,7 @@
 # "Make every screen yours."
 # ==============================================================================
 
-.PHONY: all analyze test test-goldens test-benchmarks test-screenshots screenshots test-integration test-backend test-all build-android build-web build-backend clean help
+.PHONY: all analyze test test-goldens test-benchmarks test-screenshots screenshots test-a11y test-integration test-backend test-all build-android build-web build-backend clean help
 
 help:
 	@echo "Wallora Enterprise Build & Verification Commands:"
@@ -13,6 +13,7 @@ help:
 	@echo "  make test-benchmarks  - Run procedural canvas rendering 60 FPS performance benchmarks"
 	@echo "  make test-screenshots - Run automated store screenshots visual regression tests"
 	@echo "  make screenshots      - Generate/update canonical store screenshots (Play Store & App Store)"
+	@echo "  make test-a11y        - Run VoiceOver & TalkBack accessibility semantics test suite"
 	@echo "  make test-integration - Run End-to-End full application integration test"
 	@echo "  make test-backend     - Run Spring Boot Checkstyle & JUnit 5 tests"
 	@echo "  make test-all         - Run 100% of tests across client and backend"
@@ -39,13 +40,16 @@ test-screenshots:
 screenshots:
 	flutter test test/store_screenshots/ --update-goldens
 
+test-a11y:
+	flutter test test/a11y/
+
 test-integration:
 	flutter test integration_test/ -d macos
 
 test-backend:
 	cd backend && ./mvnw checkstyle:check test
 
-test-all: analyze test test-goldens test-benchmarks test-screenshots test-backend
+test-all: analyze test test-goldens test-benchmarks test-screenshots test-a11y test-backend
 
 build-android:
 	flutter build apk --release --split-per-abi

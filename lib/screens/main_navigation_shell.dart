@@ -125,11 +125,13 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                       icon: Icon(Icons.explore_outlined),
                       activeIcon: Icon(Icons.explore_rounded, color: AppColors.neonCyan),
                       label: AppStrings.navDiscover,
+                      tooltip: 'Discover Curated Wallpapers',
                     ),
                     const BottomNavigationBarItem(
                       icon: Icon(Icons.grid_view_outlined),
                       activeIcon: Icon(Icons.grid_view_rounded, color: AppColors.neonCyan),
                       label: AppStrings.navCategories,
+                      tooltip: 'Browse Wallpaper Categories & Playlists',
                     ),
                     BottomNavigationBarItem(
                       icon: Badge(
@@ -145,6 +147,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                         child: const Icon(Icons.favorite_rounded, color: AppColors.favoriteRed),
                       ),
                       label: AppStrings.navFavorites,
+                      tooltip: 'Favorite Wallpapers (${state.favoriteIds.length})',
                     ),
                     BottomNavigationBarItem(
                       icon: Badge(
@@ -162,6 +165,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                         child: const Icon(Icons.download_done_rounded, color: AppColors.auroraEmerald),
                       ),
                       label: AppStrings.navDownloads,
+                      tooltip: 'Downloaded Wallpapers (${state.downloadedIds.length})',
                     ),
                   ],
                 ),
