@@ -110,7 +110,7 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Material(
-        color: const Color(0xFF16161A),
+        color: AppColors.modalBackground,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
@@ -163,7 +163,9 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
               subtitle: const Text('Set on both screens simultaneously',
                   style: TextStyle(color: Colors.white54, fontSize: 12)),
               onTap: () {
-                Navigator.of(ctx).pop();
+                if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                  Navigator.of(ctx).pop();
+                }
                 _applyWallpaper(short, 'both');
               },
             ),
@@ -183,7 +185,9 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
               subtitle: const Text('Keeps your current lock screen untouched',
                   style: TextStyle(color: Colors.white54, fontSize: 12)),
               onTap: () {
-                Navigator.of(ctx).pop();
+                if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                  Navigator.of(ctx).pop();
+                }
                 _applyWallpaper(short, 'home');
               },
             ),
@@ -203,7 +207,9 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
               subtitle: const Text('Display this aesthetic on wake and lock',
                   style: TextStyle(color: Colors.white54, fontSize: 12)),
               onTap: () {
-                Navigator.of(ctx).pop();
+                if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                  Navigator.of(ctx).pop();
+                }
                 _applyWallpaper(short, 'lock');
               },
             ),
@@ -234,7 +240,7 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Applying "${short.title}" to $target screen...'),
-        backgroundColor: const Color(0xFF222226),
+        backgroundColor: AppColors.cardSurface,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         duration: const Duration(seconds: 2),
@@ -312,19 +318,19 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
             break;
           case 'cyber_cyan':
             colorFilter = ColorFilter.mode(
-                const Color(0xFF00E5FF).withValues(alpha: 0.35), BlendMode.color);
+                AppColors.neonCyan.withValues(alpha: 0.35), BlendMode.color);
             break;
           case 'sunset_amber':
             colorFilter = ColorFilter.mode(
-                const Color(0xFFFF5722).withValues(alpha: 0.35), BlendMode.color);
+                AppColors.sunsetAmber.withValues(alpha: 0.35), BlendMode.color);
             break;
           case 'matrix_emerald':
             colorFilter = ColorFilter.mode(
-                const Color(0xFF00E676).withValues(alpha: 0.35), BlendMode.color);
+                AppColors.auroraEmerald.withValues(alpha: 0.35), BlendMode.color);
             break;
           case 'aurora_violet':
             colorFilter = ColorFilter.mode(
-                const Color(0xFFD500F9).withValues(alpha: 0.35), BlendMode.color);
+                AppColors.auroraViolet.withValues(alpha: 0.35), BlendMode.color);
             break;
           default:
             colorFilter = null;
@@ -432,7 +438,11 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
           IconButton(
             icon: const Icon(Icons.arrow_back_ios_new_rounded,
                 color: Colors.white, size: 20),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              if (mounted && Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              }
+            },
           ),
 
           // Simulation Mode Segmented Toggle
@@ -569,11 +579,11 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF00E676)
+                              color: AppColors.auroraEmerald
                                   .withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
-                                color: const Color(0xFF00E676)
+                                color: AppColors.auroraEmerald
                                     .withValues(alpha: 0.3),
                                 width: 0.8,
                               ),
@@ -582,12 +592,12 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Icon(Icons.bolt_rounded,
-                                    size: 11, color: Color(0xFF00E676)),
+                                    size: 11, color: AppColors.auroraEmerald),
                                 const SizedBox(width: 3),
                                 Text(
                                   '${state.batteryTelemetry.calculateHourlyDrainPercent(short)}%/hr • ${state.batteryTelemetry.targetFps.fps > 0 ? "${state.batteryTelemetry.targetFps.fps} FPS" : "Auto FPS"}',
                                   style: const TextStyle(
-                                    color: Color(0xFF00E676),
+                                    color: AppColors.auroraEmerald,
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -608,7 +618,7 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                               ? Icons.favorite_rounded
                               : Icons.favorite_border_rounded,
                           color: isFav
-                              ? const Color(0xFFFF1744)
+                              ? AppColors.favoriteRed
                               : Colors.white,
                         ),
                         onPressed: () {
@@ -626,7 +636,7 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                               ? Icons.check_circle_rounded
                               : Icons.download_rounded,
                           color: state.downloadedIds.contains(short.id)
-                              ? const Color(0xFF00E676)
+                              ? AppColors.auroraEmerald
                               : Colors.white,
                         ),
                         onPressed: () {
@@ -639,7 +649,7 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                       const SizedBox(width: 4),
                       // Visual Effects Studio Button
                       IconButton(
-                        icon: const Icon(Icons.tune_rounded, color: Color(0xFF00E5FF)),
+                        icon: const Icon(Icons.tune_rounded, color: AppColors.neonCyan),
                         tooltip: 'Visual Effects Studio',
                         onPressed: () {
                           HapticFeedback.mediumImpact();
@@ -649,7 +659,7 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                       const SizedBox(width: 4),
                       // Export Story Poster Button
                       IconButton(
-                        icon: const Icon(Icons.ios_share_rounded, color: Color(0xFFFF5722)),
+                        icon: const Icon(Icons.ios_share_rounded, color: AppColors.sunsetAmber),
                         tooltip: 'Export Story Poster',
                         onPressed: () {
                           HapticFeedback.mediumImpact();
@@ -659,7 +669,7 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                       const SizedBox(width: 4),
                       // Lock Screen Studio Button
                       IconButton(
-                        icon: const Icon(Icons.lock_clock_rounded, color: Color(0xFFD500F9)),
+                        icon: const Icon(Icons.lock_clock_rounded, color: AppColors.auroraViolet),
                         tooltip: 'Lock Screen Studio',
                         onPressed: () {
                           HapticFeedback.mediumImpact();
@@ -669,7 +679,7 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                       const SizedBox(width: 4),
                       // 3D Spatial Parallax Studio Button
                       IconButton(
-                        icon: const Icon(Icons.view_in_ar_rounded, color: Color(0xFF00E5FF)),
+                        icon: const Icon(Icons.view_in_ar_rounded, color: AppColors.neonCyan),
                         tooltip: '3D Spatial Parallax Studio',
                         onPressed: () {
                           HapticFeedback.mediumImpact();
@@ -684,7 +694,7 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                       const SizedBox(width: 4),
                       // Interactive Particle FX Studio Button
                       IconButton(
-                        icon: const Icon(Icons.grain_rounded, color: Color(0xFF00E676)),
+                        icon: const Icon(Icons.grain_rounded, color: AppColors.auroraEmerald),
                         tooltip: 'Interactive Particle FX',
                         onPressed: () {
                           HapticFeedback.mediumImpact();
@@ -694,7 +704,7 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                       const SizedBox(width: 4),
                       // Aura Chromatic Harmonizer Button
                       IconButton(
-                        icon: const Icon(Icons.palette_rounded, color: Color(0xFFD500F9)),
+                        icon: const Icon(Icons.palette_rounded, color: AppColors.auroraViolet),
                         tooltip: 'Aura Chromatic Harmonizer',
                         onPressed: () {
                           HapticFeedback.mediumImpact();
@@ -704,7 +714,7 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                       const SizedBox(width: 4),
                       // Atmospheric Weather & Climate FX Studio Button
                       IconButton(
-                        icon: const Icon(Icons.cloud_sync_rounded, color: Color(0xFF00E5FF)),
+                        icon: const Icon(Icons.cloud_sync_rounded, color: AppColors.neonCyan),
                         tooltip: 'Atmospheric Weather Studio',
                         onPressed: () {
                           HapticFeedback.mediumImpact();
@@ -986,18 +996,18 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
             color: Colors.black.withValues(alpha: 0.45),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-                color: const Color(0xFF00E676).withValues(alpha: 0.4)),
+                color: AppColors.auroraEmerald.withValues(alpha: 0.4)),
           ),
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.bolt_rounded, color: Color(0xFF00E676), size: 16),
+              Icon(Icons.bolt_rounded, color: AppColors.auroraEmerald, size: 16),
               SizedBox(width: 8),
               Flexible(
                 child: Text(
                   '98% • Ultra-Fast Charging • AMOLED Saver Active',
                   style: TextStyle(
-                    color: Color(0xFF00E676),
+                    color: AppColors.auroraEmerald,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     overflow: TextOverflow.ellipsis,
@@ -1015,18 +1025,18 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
             color: Colors.black.withValues(alpha: 0.45),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-                color: const Color(0xFFFFD600).withValues(alpha: 0.4)),
+                color: AppColors.solarGold.withValues(alpha: 0.4)),
           ),
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.wb_sunny_rounded, color: Color(0xFFFFD600), size: 16),
+              Icon(Icons.wb_sunny_rounded, color: AppColors.solarGold, size: 16),
               SizedBox(width: 8),
               Flexible(
                 child: Text(
                   '72°F • Luminous Clear Sky',
                   style: TextStyle(
-                    color: Color(0xFFFFD600),
+                    color: AppColors.solarGold,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     overflow: TextOverflow.ellipsis,
@@ -1106,13 +1116,13 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
               mainAxisSpacing: 24,
               crossAxisSpacing: 16,
               children: [
-                _buildAppIcon(Icons.phone_rounded, 'Phone', const Color(0xFF00E676)),
-                _buildAppIcon(Icons.chat_bubble_rounded, 'Messages', const Color(0xFF2979FF)),
-                _buildAppIcon(Icons.camera_alt_rounded, 'Camera', const Color(0xFF424242)),
-                _buildAppIcon(Icons.language_rounded, 'Browser', const Color(0xFFFF9100)),
-                _buildAppIcon(Icons.music_note_rounded, 'Music', const Color(0xFFFF1744)),
-                _buildAppIcon(Icons.photo_library_rounded, 'Photos', const Color(0xFFD500F9)),
-                _buildAppIcon(Icons.settings_rounded, 'Settings', const Color(0xFF78909C)),
+                _buildAppIcon(Icons.phone_rounded, 'Phone', AppColors.auroraEmerald),
+                _buildAppIcon(Icons.chat_bubble_rounded, 'Messages', AppColors.electricBlue),
+                _buildAppIcon(Icons.camera_alt_rounded, 'Camera', AppColors.cardHighlight),
+                _buildAppIcon(Icons.language_rounded, 'Browser', AppColors.sunsetAmber),
+                _buildAppIcon(Icons.music_note_rounded, 'Music', AppColors.favoriteRed),
+                _buildAppIcon(Icons.photo_library_rounded, 'Photos', AppColors.auroraViolet),
+                _buildAppIcon(Icons.settings_rounded, 'Settings', AppColors.textSecondary),
                 _buildAppIcon(Icons.auto_awesome_rounded, 'Wallora', short.accentColor),
               ],
             ),
@@ -1130,10 +1140,10 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildDockIcon(Icons.phone_rounded, const Color(0xFF00E676)),
-                  _buildDockIcon(Icons.chat_bubble_rounded, const Color(0xFF2979FF)),
-                  _buildDockIcon(Icons.language_rounded, const Color(0xFFFF9100)),
-                  _buildDockIcon(Icons.camera_alt_rounded, const Color(0xFF424242)),
+                  _buildDockIcon(Icons.phone_rounded, AppColors.auroraEmerald),
+                  _buildDockIcon(Icons.chat_bubble_rounded, AppColors.electricBlue),
+                  _buildDockIcon(Icons.language_rounded, AppColors.sunsetAmber),
+                  _buildDockIcon(Icons.camera_alt_rounded, AppColors.cardHighlight),
                 ],
               ),
             ),

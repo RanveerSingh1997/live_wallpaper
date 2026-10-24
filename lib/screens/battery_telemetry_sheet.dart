@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/battery_telemetry_config.dart';
 
 class BatteryTelemetrySheet extends StatefulWidget {
@@ -54,7 +55,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
           child: Container(
             padding: EdgeInsets.only(bottom: bottomInset),
             decoration: const BoxDecoration(
-              color: Color(0xFF141416),
+              color: AppColors.modalBackground,
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               boxShadow: [
                 BoxShadow(
@@ -89,14 +90,14 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF00E5FF), Color(0xFF00E676)],
+                            colors: [AppColors.neonCyan, AppColors.auroraEmerald],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(14),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF00E676).withValues(alpha: 0.35),
+                              color: AppColors.auroraEmerald.withValues(alpha: 0.35),
                               blurRadius: 12,
                             ),
                           ],
@@ -160,7 +161,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
                       const Text(
                         'TARGET FRAME-RATE GOVERNOR',
                         style: TextStyle(
-                          color: Color(0xFF00E5FF),
+                          color: AppColors.neonCyan,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.1,
@@ -175,7 +176,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
                       const Text(
                         'HARDWARE & DISPLAY OPTIMIZATION',
                         style: TextStyle(
-                          color: Color(0xFF00E5FF),
+                          color: AppColors.neonCyan,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.1,
@@ -185,7 +186,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
 
                       _buildSwitchTile(
                         icon: Icons.grain_rounded,
-                        accentColor: const Color(0xFFD500F9),
+                        accentColor: AppColors.auroraViolet,
                         title: 'Micro-Pixel Shift Drift',
                         subtitle:
                             'Imperceptibly shifts clock and overlay badges every 15 minutes to prevent OLED phosphor burn-in.',
@@ -201,7 +202,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
 
                       _buildSwitchTile(
                         icon: Icons.speed_rounded,
-                        accentColor: const Color(0xFF00E5FF),
+                        accentColor: AppColors.neonCyan,
                         title: 'Hardware Surface Acceleration',
                         subtitle:
                             'Routes frames directly via MediaCodec (Android) & VideoToolbox (iOS) GPU surfaces.',
@@ -218,7 +219,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
 
                       _buildSwitchTile(
                         icon: Icons.battery_saver_rounded,
-                        accentColor: const Color(0xFFFF5722),
+                        accentColor: AppColors.sunsetAmber,
                         title: 'Adaptive Eco Throttle (<20%)',
                         subtitle:
                             'Auto-throttles wallpaper rendering to 15 FPS when system battery level falls below 20%.',
@@ -245,7 +246,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   decoration: const BoxDecoration(
-                    color: Color(0xFF101012),
+                    color: AppColors.darkBackground,
                     border: Border(top: BorderSide(color: Colors.white10)),
                   ),
                   child: Row(
@@ -269,7 +270,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
                       // Apply button
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00E676),
+                          backgroundColor: AppColors.auroraEmerald,
                           foregroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
@@ -319,15 +320,15 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1C20),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFF00E676).withValues(alpha: 0.3),
+          color: AppColors.auroraEmerald.withValues(alpha: 0.3),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF00E676).withValues(alpha: 0.08),
+            color: AppColors.auroraEmerald.withValues(alpha: 0.08),
             blurRadius: 20,
             spreadRadius: 2,
           ),
@@ -340,7 +341,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
             children: [
               const Icon(
                 Icons.analytics_rounded,
-                color: Color(0xFF00E676),
+                color: AppColors.auroraEmerald,
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -357,13 +358,13 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E676).withValues(alpha: 0.15),
+                  color: AppColors.auroraEmerald.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
                   'OPTIMIZED',
                   style: TextStyle(
-                    color: Color(0xFF00E676),
+                    color: AppColors.auroraEmerald,
                     fontWeight: FontWeight.w800,
                     fontSize: 10,
                   ),
@@ -379,7 +380,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
                   label: 'Hourly Drain',
                   value: '$hourlyDrain%',
                   unit: '/ hr screen-on',
-                  valueColor: const Color(0xFF00E676),
+                  valueColor: AppColors.auroraEmerald,
                 ),
               ),
               Container(width: 1, height: 44, color: Colors.white12),
@@ -388,7 +389,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
                   label: 'Energy Conserved',
                   value: '$dailyMahSaved',
                   unit: 'mAh / day',
-                  valueColor: const Color(0xFF00E5FF),
+                  valueColor: AppColors.neonCyan,
                 ),
               ),
             ],
@@ -400,7 +401,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
             children: [
               Icon(
                 isAmoledCertified ? Icons.dark_mode_rounded : Icons.palette_outlined,
-                color: isAmoledCertified ? const Color(0xFF00E676) : Colors.white60,
+                color: isAmoledCertified ? AppColors.auroraEmerald : Colors.white60,
                 size: 16,
               ),
               const SizedBox(width: 8),
@@ -478,11 +479,11 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
               color: isSelected
-                  ? const Color(0xFF00E5FF).withValues(alpha: 0.12)
-                  : const Color(0xFF1C1C20),
+                  ? AppColors.neonCyan.withValues(alpha: 0.12)
+                  : AppColors.cardSurface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isSelected ? const Color(0xFF00E5FF) : Colors.white10,
+                color: isSelected ? AppColors.neonCyan : Colors.white10,
                 width: isSelected ? 1.5 : 1,
               ),
             ),
@@ -492,7 +493,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
                   isSelected
                       ? Icons.radio_button_checked_rounded
                       : Icons.radio_button_off_rounded,
-                  color: isSelected ? const Color(0xFF00E5FF) : Colors.white38,
+                  color: isSelected ? AppColors.neonCyan : Colors.white38,
                   size: 20,
                 ),
                 const SizedBox(width: 14),
@@ -541,7 +542,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFF1C1C20),
+          color: AppColors.cardSurface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.white10),
         ),
@@ -601,10 +602,10 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF10241A),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: const Color(0xFF00E676).withValues(alpha: 0.4),
+          color: AppColors.auroraEmerald.withValues(alpha: 0.4),
         ),
       ),
       child: Row(
@@ -612,7 +613,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
         children: [
           const Icon(
             Icons.verified_user_rounded,
-            color: Color(0xFF00E676),
+            color: AppColors.auroraEmerald,
             size: 24,
           ),
           const SizedBox(width: 12),
@@ -623,7 +624,7 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
                 const Text(
                   'Zero Sleep Overhead Verified',
                   style: TextStyle(
-                    color: Color(0xFF00E676),
+                    color: AppColors.auroraEmerald,
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
                   ),

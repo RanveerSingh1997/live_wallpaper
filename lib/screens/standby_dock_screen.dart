@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/standby_dock_config.dart';
 import '../widgets/interactive_gesture_canvas.dart';
 import 'standby_dock_sheet.dart';
@@ -168,18 +169,18 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
 
         // Color theme palette
         final primaryColor = isNight
-            ? const Color(0xFFFF3B30) // OLED Red to preserve night vision
-            : const Color(0xFF00E5FF); // Electric Cyan
+            ? AppColors.nightCrimson // OLED Red to preserve night vision
+            : AppColors.neonCyan; // Electric Cyan
         final secondaryColor = isNight
-            ? const Color(0xFFFF5722).withValues(alpha: 0.7) // Dim Amber
-            : const Color(0xFFD500F9).withValues(alpha: 0.8); // Aurora Violet
+            ? AppColors.sunsetAmber.withValues(alpha: 0.7) // Dim Amber
+            : AppColors.auroraViolet.withValues(alpha: 0.8); // Aurora Violet
         final textPrimary = isNight
-            ? const Color(0xFFFF3B30)
+            ? AppColors.nightCrimson
             : Colors.white;
         final textSecondary = isNight
-            ? const Color(0xFFFF5722).withValues(alpha: 0.6)
+            ? AppColors.sunsetAmber.withValues(alpha: 0.6)
             : Colors.white70;
-        final backgroundColor = const Color(0xFF000000); // True OLED Pitch Black
+        final backgroundColor = AppColors.obsidianBlack; // True OLED Pitch Black
 
         return Scaffold(
           backgroundColor: backgroundColor,
@@ -258,9 +259,9 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
             center: Alignment.center,
             radius: 1.2,
             colors: [
-              Color(0xFF101424),
-              Color(0xFF05060A),
-              Color(0xFF000000),
+              AppColors.darkSurface,
+              AppColors.darkBackground,
+              AppColors.obsidianBlack,
             ],
           ),
         ),
@@ -272,7 +273,7 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
           ? currentShort.gradientColors
           : [
               currentShort.accentColor.withValues(alpha: 0.35),
-              const Color(0xFF000000),
+              AppColors.obsidianBlack,
             ];
       return Opacity(
         opacity: config.layoutMode == DockLayoutMode.fullscreenHUD ? 0.35 : 0.15,
@@ -294,8 +295,8 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF090D1A),
-            Color(0xFF000000),
+            AppColors.darkBackground,
+            AppColors.obsidianBlack,
           ],
         ),
       ),
@@ -379,7 +380,7 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
             width: 1,
             margin: const EdgeInsets.symmetric(vertical: 32),
             color: isNight
-                ? const Color(0xFFFF3B30).withValues(alpha: 0.15)
+                ? AppColors.nightCrimson.withValues(alpha: 0.15)
                 : Colors.white.withValues(alpha: 0.08),
           ),
           Expanded(flex: 6, child: rightPane),
@@ -393,7 +394,7 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
             height: 1,
             margin: const EdgeInsets.symmetric(horizontal: 32),
             color: isNight
-                ? const Color(0xFFFF3B30).withValues(alpha: 0.15)
+                ? AppColors.nightCrimson.withValues(alpha: 0.15)
                 : Colors.white.withValues(alpha: 0.08),
           ),
           Expanded(flex: 6, child: rightPane),
@@ -538,14 +539,14 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: const Color(0xFFFF3B30).withValues(alpha: 0.3),
+              color: AppColors.nightCrimson.withValues(alpha: 0.3),
               width: 2,
             ),
           ),
           child: const Center(
             child: Icon(
               Icons.bedtime_rounded,
-              color: Color(0xFFFF3B30),
+              color: AppColors.nightCrimson,
               size: 48,
             ),
           ),
@@ -558,8 +559,8 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
           ? currentShort.gradientColors
           : [
               currentShort.accentColor.withValues(alpha: 0.5),
-              const Color(0xFF0A0E1A),
-              const Color(0xFF000000),
+              AppColors.darkBackground,
+              AppColors.obsidianBlack,
             ];
 
       return Center(
@@ -644,7 +645,7 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
     return const Center(
       child: Icon(
         Icons.auto_awesome_rounded,
-        color: Color(0xFF00E5FF),
+        color: AppColors.neonCyan,
         size: 56,
       ),
     );
@@ -747,13 +748,13 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
               shadows: isNight
                   ? [
                       Shadow(
-                        color: const Color(0xFFFF3B30).withValues(alpha: 0.6),
+                        color: AppColors.nightCrimson.withValues(alpha: 0.6),
                         blurRadius: 16,
                       ),
                     ]
                   : [
                       Shadow(
-                        color: const Color(0xFF00E5FF).withValues(alpha: 0.4),
+                        color: AppColors.neonCyan.withValues(alpha: 0.4),
                         blurRadius: 20,
                       ),
                     ],
@@ -769,8 +770,8 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
                 style: style.copyWith(
                   fontSize: fontSize * 0.35,
                   color: isNight
-                      ? const Color(0xFFFF3B30).withValues(alpha: 0.8)
-                      : const Color(0xFF00E5FF),
+                      ? AppColors.nightCrimson.withValues(alpha: 0.8)
+                      : AppColors.neonCyan,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -837,12 +838,12 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: isNight
-            ? const Color(0xFFFF3B30).withValues(alpha: 0.1)
+            ? AppColors.nightCrimson.withValues(alpha: 0.1)
             : Colors.white.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isNight
-              ? const Color(0xFFFF3B30).withValues(alpha: 0.25)
+              ? AppColors.nightCrimson.withValues(alpha: 0.25)
               : Colors.white.withValues(alpha: 0.15),
           width: 1,
         ),
@@ -853,14 +854,14 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
           Icon(
             Icons.bolt_rounded,
             size: 14,
-            color: isNight ? const Color(0xFFFF3B30) : const Color(0xFF00E676),
+            color: isNight ? AppColors.nightCrimson : AppColors.auroraEmerald,
           ),
           const SizedBox(width: 4),
           Text(
             '100% CHARGED',
             style: TextStyle(
               color: isNight
-                  ? const Color(0xFFFF3B30).withValues(alpha: 0.9)
+                  ? AppColors.nightCrimson.withValues(alpha: 0.9)
                   : Colors.white,
               fontSize: 11,
               fontWeight: FontWeight.w700,
@@ -912,12 +913,12 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: isNight
-            ? const Color(0xFFFF3B30).withValues(alpha: 0.06)
+            ? AppColors.nightCrimson.withValues(alpha: 0.06)
             : Colors.white.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isNight
-              ? const Color(0xFFFF3B30).withValues(alpha: 0.15)
+              ? AppColors.nightCrimson.withValues(alpha: 0.15)
               : Colors.white.withValues(alpha: 0.08),
           width: 1,
         ),
@@ -987,12 +988,12 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: isNight
-                          ? const Color(0xFFFF3B30).withValues(alpha: 0.25)
+                          ? AppColors.nightCrimson.withValues(alpha: 0.25)
                           : Colors.black.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isNight
-                            ? const Color(0xFFFF3B30)
+                            ? AppColors.nightCrimson
                             : Colors.white.withValues(alpha: 0.2),
                         width: 1,
                       ),
@@ -1006,7 +1007,7 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
                               : Icons.bedtime_outlined,
                           size: 16,
                           color: isNight
-                              ? const Color(0xFFFF3B30)
+                              ? AppColors.nightCrimson
                               : Colors.white,
                         ),
                         const SizedBox(width: 6),
@@ -1014,7 +1015,7 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
                           isNight ? 'OLED RED' : 'NIGHT MODE',
                           style: TextStyle(
                             color: isNight
-                                ? const Color(0xFFFF3B30)
+                                ? AppColors.nightCrimson
                                 : Colors.white,
                             fontSize: 11,
                             fontWeight: FontWeight.w700,

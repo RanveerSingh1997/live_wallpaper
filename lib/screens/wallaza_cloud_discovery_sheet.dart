@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/wallaza_cloud_wallpaper.dart';
 
 /// Modal bottom sheet for discovering, searching, and importing millions of
@@ -182,15 +183,15 @@ class _WallazaCloudDiscoverySheetState
       minChildSize: 0.5,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF0D0D12),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          decoration: BoxDecoration(
+            color: AppColors.modalBackground,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             boxShadow: [
               BoxShadow(
-                color: Color(0x6600E5FF),
+                color: AppColors.neonCyan.withValues(alpha: 0.4),
                 blurRadius: 36,
                 spreadRadius: -8,
-                offset: Offset(0, -6),
+                offset: const Offset(0, -6),
               ),
             ],
           ),
@@ -218,7 +219,7 @@ class _WallazaCloudDiscoverySheetState
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                          colors: [AppColors.neonCyan, AppColors.auroraViolet],
                         ),
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -249,7 +250,7 @@ class _WallazaCloudDiscoverySheetState
                               SizedBox(width: 6),
                               DecoratedBox(
                                 decoration: BoxDecoration(
-                                  color: Color(0xFF00E5FF),
+                                  color: AppColors.neonCyan,
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(6)),
                                 ),
@@ -300,7 +301,7 @@ class _WallazaCloudDiscoverySheetState
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF161622),
+                    color: AppColors.cardSurface,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: Colors.white12),
                   ),
@@ -313,7 +314,7 @@ class _WallazaCloudDiscoverySheetState
                       hintStyle:
                           const TextStyle(color: Colors.white38, fontSize: 13),
                       prefixIcon: const Icon(Icons.search_rounded,
-                          color: Color(0xFF00E5FF), size: 20),
+                          color: AppColors.neonCyan, size: 20),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear_rounded,
@@ -351,8 +352,8 @@ class _WallazaCloudDiscoverySheetState
                           child: ChoiceChip(
                             label: Text(cat),
                             selected: isSelected,
-                            selectedColor: const Color(0xFF00E5FF),
-                            backgroundColor: const Color(0xFF1A1A26),
+                            selectedColor: AppColors.neonCyan,
+                            backgroundColor: AppColors.cardSurface,
                             labelStyle: TextStyle(
                               color: isSelected ? Colors.black : Colors.white70,
                               fontWeight: isSelected
@@ -364,7 +365,7 @@ class _WallazaCloudDiscoverySheetState
                               borderRadius: BorderRadius.circular(20),
                               side: BorderSide(
                                 color: isSelected
-                                    ? const Color(0xFF00E5FF)
+                                    ? AppColors.neonCyan
                                     : Colors.white10,
                               ),
                             ),
@@ -408,13 +409,13 @@ class _WallazaCloudDiscoverySheetState
                               ),
                             ),
                             selected: isSelected,
-                            selectedColor: const Color(0xFFD500F9).withAlpha(100),
+                            selectedColor: AppColors.auroraViolet.withAlpha(100),
                             backgroundColor: Colors.transparent,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                               side: BorderSide(
                                 color: isSelected
-                                    ? const Color(0xFFD500F9)
+                                    ? AppColors.auroraViolet
                                     : Colors.white12,
                               ),
                             ),
@@ -458,12 +459,12 @@ class _WallazaCloudDiscoverySheetState
                                   horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? const Color(0xFF00E5FF).withAlpha(35)
-                                    : const Color(0xFF14141E),
+                                    ? AppColors.neonCyan.withAlpha(35)
+                                    : AppColors.cardSurface,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: isSelected
-                                      ? const Color(0xFF00E5FF)
+                                      ? AppColors.neonCyan
                                       : Colors.white12,
                                 ),
                               ),
@@ -474,7 +475,7 @@ class _WallazaCloudDiscoverySheetState
                                     icon,
                                     size: 13,
                                     color: isSelected
-                                        ? const Color(0xFF00E5FF)
+                                        ? AppColors.neonCyan
                                         : Colors.white54,
                                   ),
                                   const SizedBox(width: 4),
@@ -482,7 +483,7 @@ class _WallazaCloudDiscoverySheetState
                                     label,
                                     style: TextStyle(
                                       color: isSelected
-                                          ? const Color(0xFF00E5FF)
+                                          ? AppColors.neonCyan
                                           : Colors.white70,
                                       fontSize: 11,
                                       fontWeight: isSelected
@@ -516,16 +517,16 @@ class _WallazaCloudDiscoverySheetState
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF26103A), Color(0xFF14142B)],
+                        colors: [AppColors.deepPurple, AppColors.cardSurface],
                       ),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                          color: const Color(0xFFD500F9).withAlpha(160)),
+                          color: AppColors.auroraViolet.withAlpha(160)),
                     ),
                     child: Row(
                       children: [
                         const Icon(Icons.person_pin_circle_rounded,
-                            color: Color(0xFFD500F9), size: 16),
+                            color: AppColors.auroraViolet, size: 16),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -576,7 +577,7 @@ class _WallazaCloudDiscoverySheetState
                           children: [
                             CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFF00E5FF),
+                                AppColors.neonCyan,
                               ),
                             ),
                             SizedBox(height: 16),
@@ -611,7 +612,7 @@ class _WallazaCloudDiscoverySheetState
                                 icon: const Icon(Icons.refresh_rounded),
                                 label: const Text('Retry Connection'),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF00E5FF),
+                                  backgroundColor: AppColors.neonCyan,
                                   foregroundColor: Colors.black,
                                 ),
                                 onPressed: () {
@@ -643,10 +644,10 @@ class _WallazaCloudDiscoverySheetState
                             const SizedBox(height: 12),
                             TextButton.icon(
                               icon: const Icon(Icons.clear_all_rounded,
-                                  color: Color(0xFF00E5FF)),
+                                  color: AppColors.neonCyan),
                               label: const Text(
                                 'Clear Filters',
-                                style: TextStyle(color: Color(0xFF00E5FF)),
+                                style: TextStyle(color: AppColors.neonCyan),
                               ),
                               onPressed: () {
                                 _searchController.clear();
@@ -707,7 +708,7 @@ class _CloudWallpaperCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(18),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF161622),
+          color: AppColors.cardSurface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: Colors.white10),
           boxShadow: const [
@@ -727,7 +728,7 @@ class _CloudWallpaperCard extends StatelessWidget {
               item.thumbnailUrl.isNotEmpty ? item.thumbnailUrl : item.url,
               fit: BoxFit.cover,
               errorBuilder: (_, _, _) => Container(
-                color: const Color(0xFF1B1B2A),
+                color: AppColors.cardHighlight,
                 child: const Center(
                   child: Icon(Icons.broken_image_rounded,
                       color: Colors.white24, size: 36),
@@ -736,7 +737,7 @@ class _CloudWallpaperCard extends StatelessWidget {
               loadingBuilder: (context, child, progress) {
                 if (progress == null) return child;
                 return Container(
-                  color: const Color(0xFF12121B),
+                  color: AppColors.modalBackground,
                   child: const Center(
                     child: SizedBox(
                       width: 24,
@@ -744,7 +745,7 @@ class _CloudWallpaperCard extends StatelessWidget {
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Color(0xFF00E5FF),
+                          AppColors.neonCyan,
                         ),
                       ),
                     ),
@@ -772,7 +773,7 @@ class _CloudWallpaperCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: item.is4K
-                                ? const Color(0xFF00E5FF).withAlpha(150)
+                                ? AppColors.neonCyan.withAlpha(150)
                                 : Colors.white24,
                           ),
                         ),
@@ -783,7 +784,7 @@ class _CloudWallpaperCard extends StatelessWidget {
                               Icons.hd_rounded,
                               size: 11,
                               color: item.is4K
-                                  ? const Color(0xFF00E5FF)
+                                  ? AppColors.neonCyan
                                   : Colors.white70,
                             ),
                             const SizedBox(width: 4),
@@ -791,7 +792,7 @@ class _CloudWallpaperCard extends StatelessWidget {
                               item.is4K ? '4K UHD' : 'FHD',
                               style: TextStyle(
                                 color: item.is4K
-                                    ? const Color(0xFF00E5FF)
+                                    ? AppColors.neonCyan
                                     : Colors.white70,
                                 fontSize: 9,
                                 fontWeight: FontWeight.bold,
@@ -807,12 +808,12 @@ class _CloudWallpaperCard extends StatelessWidget {
                               horizontal: 6, vertical: 3),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                              colors: [AppColors.neonCyan, AppColors.auroraViolet],
                             ),
                             borderRadius: BorderRadius.circular(8),
-                            boxShadow: const [
+                            boxShadow: [
                               BoxShadow(
-                                color: Color(0x6600E5FF),
+                                color: AppColors.neonCyan.withValues(alpha: 0.4),
                                 blurRadius: 4,
                               ),
                             ],
@@ -849,12 +850,12 @@ class _CloudWallpaperCard extends StatelessWidget {
                         color: Colors.black.withAlpha(210),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                            color: const Color(0xFF00E676).withAlpha(160)),
+                            color: AppColors.auroraEmerald.withAlpha(160)),
                       ),
                       child: const Text(
                         'OLED',
                         style: TextStyle(
-                          color: Color(0xFF00E676),
+                          color: AppColors.auroraEmerald,
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
                         ),
@@ -874,12 +875,12 @@ class _CloudWallpaperCard extends StatelessWidget {
                     color: Colors.black.withAlpha(150),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: const Color(0xFF00E5FF).withAlpha(200),
+                      color: AppColors.neonCyan.withAlpha(200),
                       width: 1.5,
                     ),
-                    boxShadow: const [
+                    boxShadow: [
                       BoxShadow(
-                        color: Color(0x5500E5FF),
+                        color: AppColors.neonCyan.withValues(alpha: 0.33),
                         blurRadius: 8,
                       ),
                     ],
@@ -887,7 +888,7 @@ class _CloudWallpaperCard extends StatelessWidget {
                   child: const Center(
                     child: Icon(
                       Icons.play_arrow_rounded,
-                      color: Color(0xFF00E5FF),
+                      color: AppColors.neonCyan,
                       size: 22,
                     ),
                   ),
@@ -901,14 +902,14 @@ class _CloudWallpaperCard extends StatelessWidget {
               right: 0,
               child: Container(
                 padding: const EdgeInsets.fromLTRB(10, 24, 10, 10),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Color(0xCC000000),
-                      Color(0xF5000000),
+                      Colors.black.withValues(alpha: 0.8),
+                      Colors.black.withValues(alpha: 0.96),
                     ],
                   ),
                 ),
@@ -936,7 +937,7 @@ class _CloudWallpaperCard extends StatelessWidget {
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                             gradient: LinearGradient(
-                              colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                              colors: [AppColors.neonCyan, AppColors.auroraViolet],
                             ),
                           ),
                           child: Center(
@@ -963,11 +964,11 @@ class _CloudWallpaperCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 6),
                         const Icon(Icons.arrow_downward_rounded,
-                            size: 10, color: Color(0xFF00E5FF)),
+                            size: 10, color: AppColors.neonCyan),
                         Text(
                           _formatCount(item.downloads),
                           style: const TextStyle(
-                            color: Color(0xFF00E5FF),
+                            color: AppColors.neonCyan,
                             fontSize: 9,
                             fontWeight: FontWeight.bold,
                           ),
@@ -1002,7 +1003,7 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF101018),
+        color: AppColors.modalBackground,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
@@ -1057,7 +1058,7 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                                 horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                                colors: [AppColors.neonCyan, AppColors.auroraViolet],
                               ),
                               borderRadius: BorderRadius.circular(6),
                             ),
@@ -1080,7 +1081,7 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.close_rounded, color: Colors.white60),
                 onPressed: () {
-                  if (Navigator.of(context).canPop()) {
+                  if (context.mounted && Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
                   }
                 },
@@ -1105,7 +1106,7 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                   item.url,
                   fit: BoxFit.cover,
                   errorBuilder: (_, _, _) => Container(
-                    color: const Color(0xFF1A1A24),
+                    color: AppColors.cardSurface,
                     child: const Center(
                       child: Icon(Icons.broken_image_rounded,
                           color: Colors.white30, size: 48),
@@ -1120,19 +1121,19 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                         color: Colors.black.withAlpha(160),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: const Color(0xFF00E5FF),
+                          color: AppColors.neonCyan,
                           width: 2,
                         ),
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x6600E5FF),
+                            color: AppColors.neonCyan.withValues(alpha: 0.4),
                             blurRadius: 16,
                           ),
                         ],
                       ),
                       child: const Icon(
                         Icons.play_arrow_rounded,
-                        color: Color(0xFF00E5FF),
+                        color: AppColors.neonCyan,
                         size: 36,
                       ),
                     ),
@@ -1147,9 +1148,9 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFF161624),
+              color: AppColors.cardSurface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF00E5FF).withAlpha(60)),
+              border: Border.all(color: AppColors.neonCyan.withAlpha(60)),
             ),
             child: Row(
               children: [
@@ -1159,7 +1160,7 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
-                      colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                      colors: [AppColors.neonCyan, AppColors.auroraViolet],
                     ),
                   ),
                   child: Center(
@@ -1193,7 +1194,7 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           const Icon(Icons.verified_rounded,
-                              size: 14, color: Color(0xFF00E5FF)),
+                              size: 14, color: AppColors.neonCyan),
                         ],
                       ),
                       Text(
@@ -1210,8 +1211,8 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                   icon: const Icon(Icons.art_track_rounded, size: 14),
                   label: const Text('Filter Artist', style: TextStyle(fontSize: 11)),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF00E5FF),
-                    side: const BorderSide(color: Color(0xFF00E5FF), width: 1.0),
+                    foregroundColor: AppColors.neonCyan,
+                    side: const BorderSide(color: AppColors.neonCyan, width: 1.0),
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     visualDensity: VisualDensity.compact,
                     shape: RoundedRectangleBorder(
@@ -1223,7 +1224,7 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                     if (author != null) {
                       context.read<WallpaperBloc>().add(FilterCloudByAuthorIntent(author));
                     }
-                    if (Navigator.of(context).canPop()) {
+                    if (context.mounted && Navigator.of(context).canPop()) {
                       Navigator.of(context).pop();
                     }
                   },
@@ -1268,8 +1269,8 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E1E2C),
-                side: const BorderSide(color: Color(0xFF00E5FF), width: 1.2),
+                backgroundColor: AppColors.cardSurface,
+                side: const BorderSide(color: AppColors.neonCyan, width: 1.2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -1277,7 +1278,7 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
               onPressed: () {
                 final short = item.toMotivationalShort();
                 context.read<WallpaperBloc>().add(DownloadWallpaperIntent(short));
-                if (Navigator.of(context).canPop()) {
+                if (context.mounted && Navigator.of(context).canPop()) {
                   Navigator.of(context).pop();
                 }
               },
@@ -1292,16 +1293,16 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
               Expanded(
                 child: OutlinedButton.icon(
                   icon: const Icon(Icons.add_photo_alternate_rounded,
-                      color: Color(0xFF00E5FF)),
+                      color: AppColors.neonCyan),
                   label: const Text(
                     'Import to Library',
                     style: TextStyle(
-                      color: Color(0xFF00E5FF),
+                      color: AppColors.neonCyan,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF00E5FF)),
+                    side: const BorderSide(color: AppColors.neonCyan),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -1311,13 +1312,13 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                     context.read<WallpaperBloc>().add(
                           ImportCloudWallpaperIntent(item, setAsActive: false),
                         );
-                    if (Navigator.of(context).canPop()) {
+                    if (context.mounted && Navigator.of(context).canPop()) {
                       Navigator.of(context).pop();
                     }
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Imported "${item.title}" into library!'),
-                        backgroundColor: const Color(0xFF00E5FF),
+                        backgroundColor: AppColors.neonCyan,
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
@@ -1342,8 +1343,8 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: item.isVideo
-                        ? const Color(0xFF00E676)
-                        : const Color(0xFF00E5FF),
+                        ? AppColors.auroraEmerald
+                        : AppColors.neonCyan,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -1353,7 +1354,7 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                     context.read<WallpaperBloc>().add(
                           ImportCloudWallpaperIntent(item, setAsActive: true),
                         );
-                    if (Navigator.of(context).canPop()) {
+                    if (context.mounted && Navigator.of(context).canPop()) {
                       Navigator.of(context).pop();
                     }
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -1361,7 +1362,7 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                         content: Text(item.isVideo
                             ? 'Applied live motion "${item.title}" to screen!'
                             : 'Applied "${item.title}" to screen!'),
-                        backgroundColor: const Color(0xFF00E676),
+                        backgroundColor: AppColors.auroraEmerald,
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
@@ -1381,7 +1382,7 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFF181824),
+          color: AppColors.cardSurface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.white10),
         ),

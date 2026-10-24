@@ -53,19 +53,19 @@ class WallpaperPreviewSheet extends StatelessWidget {
             break;
           case 'cyber_cyan':
             colorFilter = ColorFilter.mode(
-                const Color(0xFF00E5FF).withValues(alpha: 0.35), BlendMode.color);
+                AppColors.neonCyan.withValues(alpha: 0.35), BlendMode.color);
             break;
           case 'sunset_amber':
             colorFilter = ColorFilter.mode(
-                const Color(0xFFFF5722).withValues(alpha: 0.35), BlendMode.color);
+                AppColors.sunsetAmber.withValues(alpha: 0.35), BlendMode.color);
             break;
           case 'matrix_emerald':
             colorFilter = ColorFilter.mode(
-                const Color(0xFF00E676).withValues(alpha: 0.35), BlendMode.color);
+                AppColors.auroraEmerald.withValues(alpha: 0.35), BlendMode.color);
             break;
           case 'aurora_violet':
             colorFilter = ColorFilter.mode(
-                const Color(0xFFD500F9).withValues(alpha: 0.35), BlendMode.color);
+                AppColors.auroraViolet.withValues(alpha: 0.35), BlendMode.color);
             break;
           default:
             colorFilter = null;
@@ -83,7 +83,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF101012),
+                color: AppColors.modalBackground,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: ListView(
@@ -222,7 +222,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                         },
                                       ),
                                       IconButton(
-                                        icon: const Icon(Icons.view_in_ar_rounded, color: Color(0xFF00E5FF)),
+                                        icon: const Icon(Icons.view_in_ar_rounded, color: AppColors.neonCyan),
                                         tooltip: '3D Spatial Parallax Studio',
                                         onPressed: () {
                                           HapticFeedback.mediumImpact();
@@ -248,7 +248,11 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                       ),
                                       IconButton(
                                         icon: const Icon(Icons.close_rounded, color: Colors.white70),
-                                        onPressed: () => Navigator.of(context).pop(),
+                                        onPressed: () {
+                                          if (context.mounted && Navigator.of(context).canPop()) {
+                                            Navigator.of(context).pop();
+                                          }
+                                        },
                                       ),
                                     ],
                                   ),
@@ -320,7 +324,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF18181E),
+                          color: AppColors.cardSurface,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(color: Colors.white12),
                         ),
@@ -385,7 +389,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF18181E),
+                                color: AppColors.cardSurface,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(color: Colors.white12),
                               ),
@@ -394,10 +398,10 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                   Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                                      color: AppColors.neonCyan.withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: const Icon(Icons.tune_rounded, color: Color(0xFF00E5FF), size: 16),
+                                    child: const Icon(Icons.tune_rounded, color: AppColors.neonCyan, size: 16),
                                   ),
                                   const SizedBox(width: 8),
                                   const Expanded(
@@ -441,7 +445,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF18181E),
+                                color: AppColors.cardSurface,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(color: Colors.white12),
                               ),
@@ -450,10 +454,10 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                   Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFFF5722).withValues(alpha: 0.15),
+                                      color: AppColors.sunsetAmber.withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: const Icon(Icons.ios_share_rounded, color: Color(0xFFFF5722), size: 16),
+                                    child: const Icon(Icons.ios_share_rounded, color: AppColors.sunsetAmber, size: 16),
                                   ),
                                   const SizedBox(width: 8),
                                   const Expanded(
@@ -497,7 +501,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF18181E),
+                                color: AppColors.cardSurface,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(color: Colors.white12),
                               ),
@@ -506,10 +510,10 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                   Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFD500F9).withValues(alpha: 0.15),
+                                      color: AppColors.auroraViolet.withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: const Icon(Icons.lock_clock_rounded, color: Color(0xFFD500F9), size: 16),
+                                    child: const Icon(Icons.lock_clock_rounded, color: AppColors.auroraViolet, size: 16),
                                   ),
                                   const SizedBox(width: 6),
                                   const Expanded(
@@ -585,14 +589,14 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF00E676).withValues(alpha: 0.2),
+                                  color: AppColors.auroraEmerald.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: const Color(0xFF00E676)),
+                                  border: Border.all(color: AppColors.auroraEmerald),
                                 ),
                                 child: const Text(
                                   'ACTIVE ON DEVICE',
                                   style: TextStyle(
-                                    color: Color(0xFF00E676),
+                                    color: AppColors.auroraEmerald,
                                     fontSize: 9,
                                     fontWeight: FontWeight.w800,
                                   ),
@@ -643,7 +647,9 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                 child: ElevatedButton.icon(
                                   onPressed: () {
                                     HapticFeedback.mediumImpact();
-                                    Navigator.of(context).pop();
+                                    if (context.mounted && Navigator.of(context).canPop()) {
+                                      Navigator.of(context).pop();
+                                    }
                                     if (AppPlatform.isIOS) {
                                       IPadWallpaperDialog.show(context, wallpaper);
                                     } else if (wallpaper.isLive) {
@@ -690,7 +696,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                   ? Icons.check_circle_rounded
                                   : Icons.file_download_outlined,
                               color: isDownloaded
-                                  ? const Color(0xFF00E676)
+                                  ? AppColors.auroraEmerald
                                   : Colors.white,
                               tooltip: isDownloaded ? 'Downloaded' : 'Download for Offline',
                               onTap: () {
@@ -710,7 +716,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
                               icon: isFav
                                   ? Icons.favorite_rounded
                                   : Icons.favorite_border_rounded,
-                              color: isFav ? const Color(0xFFFF1744) : Colors.white,
+                              color: isFav ? AppColors.favoriteRed : Colors.white,
                               tooltip: isFav ? 'Remove Favorite' : 'Save to Favorites',
                               onTap: () {
                                 HapticFeedback.selectionClick();
@@ -839,7 +845,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1E22),
+          color: AppColors.cardSurface,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
         ),
@@ -882,7 +888,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: const Color(0xFF1E1E22),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
@@ -909,7 +915,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
   ) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF141418),
+      backgroundColor: AppColors.modalBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -952,9 +958,11 @@ class WallpaperPreviewSheet extends StatelessWidget {
                   title: 'Home Screen',
                   subtitle: 'Set on main home screen only',
                   icon: Icons.home_rounded,
-                  color: const Color(0xFFFF5722),
+                  color: AppColors.sunsetAmber,
                   onTap: () {
-                    Navigator.of(ctx).pop();
+                    if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                      Navigator.of(ctx).pop();
+                    }
                     context.read<WallpaperBloc>().add(
                           ApplyStaticWallpaperIntent(
                             short: wallpaper,
@@ -970,9 +978,11 @@ class WallpaperPreviewSheet extends StatelessWidget {
                   title: 'Lock Screen',
                   subtitle: 'Set on device lock screen only',
                   icon: Icons.lock_outline_rounded,
-                  color: const Color(0xFF00E5FF),
+                  color: AppColors.neonCyan,
                   onTap: () {
-                    Navigator.of(ctx).pop();
+                    if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                      Navigator.of(ctx).pop();
+                    }
                     context.read<WallpaperBloc>().add(
                           ApplyStaticWallpaperIntent(
                             short: wallpaper,
@@ -988,9 +998,11 @@ class WallpaperPreviewSheet extends StatelessWidget {
                   title: 'Home & Lock Screen',
                   subtitle: 'Apply seamlessly across both screens',
                   icon: Icons.smartphone_rounded,
-                  color: const Color(0xFF00E676),
+                  color: AppColors.auroraEmerald,
                   onTap: () {
-                    Navigator.of(ctx).pop();
+                    if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                      Navigator.of(ctx).pop();
+                    }
                     context.read<WallpaperBloc>().add(
                           ApplyStaticWallpaperIntent(
                             short: wallpaper,
@@ -1026,7 +1038,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1E24),
+          color: AppColors.cardSurface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.white10),
         ),
@@ -1083,11 +1095,11 @@ class WallpaperPreviewSheet extends StatelessWidget {
         ];
 
         return AlertDialog(
-          backgroundColor: const Color(0xFF1E1E24),
+          backgroundColor: AppColors.modalBackground,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Row(
             children: [
-              Icon(Icons.flag_rounded, color: Color(0xFFFF5252), size: 22),
+              Icon(Icons.flag_rounded, color: AppColors.error, size: 22),
               SizedBox(width: 8),
               Text(
                 'Report Wallpaper',
@@ -1110,7 +1122,9 @@ class WallpaperPreviewSheet extends StatelessWidget {
                     leading: const Icon(Icons.radio_button_unchecked, color: Colors.white38, size: 18),
                     title: Text(reason, style: const TextStyle(color: Colors.white, fontSize: 13)),
                     onTap: () {
-                      Navigator.of(ctx).pop();
+                      if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                        Navigator.of(ctx).pop();
+                      }
                       context.read<WallpaperBloc>().add(
                             ReportWallpaperIntent(
                               wallpaperId: wallpaper.id,
@@ -1123,7 +1137,11 @@ class WallpaperPreviewSheet extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
+              onPressed: () {
+                if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                  Navigator.of(ctx).pop();
+                }
+              },
               child: const Text('Cancel', style: TextStyle(color: Colors.white38)),
             ),
           ],

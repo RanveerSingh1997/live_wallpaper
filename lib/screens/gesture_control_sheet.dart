@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/gesture_control_config.dart';
 import '../widgets/interactive_gesture_canvas.dart';
 
@@ -61,7 +62,7 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
       isScrollControlled: true,
       builder: (sheetContext) {
         return Material(
-          color: const Color(0xFF14141A),
+          color: AppColors.modalBackground,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           child: SafeArea(
             top: false,
@@ -106,14 +107,14 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
 
                         return Material(
                           color: isSelected
-                              ? const Color(0xFF00E5FF).withAlpha(35)
+                              ? AppColors.neonCyan.withAlpha(35)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(12),
                           child: ListTile(
                             leading: Icon(
                               action.icon,
                               color: isSelected
-                                  ? const Color(0xFF00E5FF)
+                                  ? AppColors.neonCyan
                                   : Colors.white60,
                               size: 22,
                             ),
@@ -121,7 +122,7 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                               action.label,
                               style: TextStyle(
                                 color: isSelected
-                                    ? const Color(0xFF00E5FF)
+                                    ? AppColors.neonCyan
                                     : Colors.white,
                                 fontWeight: isSelected
                                     ? FontWeight.w700
@@ -139,7 +140,7 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                             trailing: isSelected
                                 ? const Icon(
                                     Icons.check_circle_rounded,
-                                    color: Color(0xFF00E5FF),
+                                    color: AppColors.neonCyan,
                                     size: 20,
                                   )
                                 : null,
@@ -169,11 +170,11 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A22),
+        backgroundColor: AppColors.modalBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
-            Icon(Icons.restart_alt_rounded, color: Color(0xFF00E5FF)),
+            Icon(Icons.restart_alt_rounded, color: AppColors.neonCyan),
             SizedBox(width: 12),
             Text(
               'Reset Gesture Controls',
@@ -200,7 +201,7 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF00E5FF),
+              backgroundColor: AppColors.neonCyan,
               foregroundColor: Colors.black,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -235,7 +236,7 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
         return Container(
           height: MediaQuery.of(context).size.height * 0.90,
           decoration: const BoxDecoration(
-            color: Color(0xFF0B0B0E),
+            color: AppColors.modalBackground,
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             boxShadow: [
               BoxShadow(
@@ -272,12 +273,12 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color:
-                              const Color(0xFF00E5FF).withAlpha((0.15 * 255).round()),
+                              AppColors.neonCyan.withAlpha((0.15 * 255).round()),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
                           Icons.touch_app_rounded,
-                          color: Color(0xFF00E5FF),
+                          color: AppColors.neonCyan,
                           size: 22,
                         ),
                       ),
@@ -335,7 +336,7 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF14141A),
+                          color: AppColors.cardSurface,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: Colors.white10),
                         ),
@@ -344,13 +345,13 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF00E5FF)
+                                color: AppColors.neonCyan
                                     .withAlpha((0.15 * 255).round()),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(
                                 Icons.gesture_rounded,
-                                color: Color(0xFF00E5FF),
+                                color: AppColors.neonCyan,
                                 size: 20,
                               ),
                             ),
@@ -380,8 +381,8 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                             ),
                             Switch.adaptive(
                               value: _config.isGesturesEnabled,
-                              activeThumbColor: const Color(0xFF00E5FF),
-                              activeTrackColor: const Color(0xFF00E5FF)
+                              activeThumbColor: AppColors.neonCyan,
+                              activeTrackColor: AppColors.neonCyan
                                   .withAlpha((0.35 * 255).round()),
                               onChanged: (val) {
                                 HapticFeedback.selectionClick();
@@ -479,8 +480,8 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                           return ChoiceChip(
                             label: Text(profile.displayName),
                             selected: isSelected,
-                            selectedColor: const Color(0xFF00E5FF),
-                            backgroundColor: const Color(0xFF14141A),
+                            selectedColor: AppColors.neonCyan,
+                            backgroundColor: AppColors.cardSurface,
                             labelStyle: TextStyle(
                               color: isSelected ? Colors.black : Colors.white,
                               fontWeight: isSelected
@@ -490,7 +491,7 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                             ),
                             side: BorderSide(
                               color: isSelected
-                                  ? const Color(0xFF00E5FF)
+                                  ? AppColors.neonCyan
                                   : Colors.white12,
                             ),
                             onSelected: (selected) {
@@ -536,12 +537,12 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                               size: 16,
                               color: isSelected
                                   ? Colors.black
-                                  : const Color(0xFF00E5FF),
+                                  : AppColors.neonCyan,
                             ),
                             label: Text(effect.displayName),
                             selected: isSelected,
-                            selectedColor: const Color(0xFF00E5FF),
-                            backgroundColor: const Color(0xFF14141A),
+                            selectedColor: AppColors.neonCyan,
+                            backgroundColor: AppColors.cardSurface,
                             labelStyle: TextStyle(
                               color: isSelected ? Colors.black : Colors.white,
                               fontWeight: isSelected
@@ -551,7 +552,7 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                             ),
                             side: BorderSide(
                               color: isSelected
-                                  ? const Color(0xFF00E5FF)
+                                  ? AppColors.neonCyan
                                   : Colors.white12,
                             ),
                             onSelected: (selected) {
@@ -592,8 +593,8 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                             ),
                             label: Text(mode.displayName),
                             selected: isSelected,
-                            selectedColor: const Color(0xFF00E5FF),
-                            backgroundColor: const Color(0xFF14141A),
+                            selectedColor: AppColors.neonCyan,
+                            backgroundColor: AppColors.cardSurface,
                             labelStyle: TextStyle(
                               color: isSelected ? Colors.black : Colors.white,
                               fontWeight: isSelected
@@ -603,7 +604,7 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                             ),
                             side: BorderSide(
                               color: isSelected
-                                  ? const Color(0xFF00E5FF)
+                                  ? AppColors.neonCyan
                                   : Colors.white12,
                             ),
                             onSelected: (selected) {
@@ -668,18 +669,18 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
     return Container(
       height: 180,
       decoration: BoxDecoration(
-        color: const Color(0xFF14141A),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFF00E5FF).withAlpha((0.3 * 255).round()),
+          color: AppColors.neonCyan.withAlpha((0.3 * 255).round()),
           width: 1.2,
         ),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFF1A1A24),
-            const Color(0xFF0C0C12),
+            AppColors.modalBackground,
+            AppColors.darkBackground,
             state.auraConfig.preset.primaryAccent.withAlpha(20),
           ],
         ),
@@ -725,7 +726,7 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                         color: Colors.black.withAlpha((0.65 * 255).round()),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: const Color(0xFF00E5FF)
+                          color: AppColors.neonCyan
                               .withAlpha((0.4 * 255).round()),
                         ),
                       ),
@@ -734,7 +735,7 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
                         children: [
                           const Icon(
                             Icons.touch_app_rounded,
-                            color: Color(0xFF00E5FF),
+                            color: AppColors.neonCyan,
                             size: 15,
                           ),
                           const SizedBox(width: 8),
@@ -779,7 +780,7 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: const Color(0xFF14141A),
+      color: AppColors.cardSurface,
       borderRadius: BorderRadius.circular(16),
       child: ListTile(
         shape: RoundedRectangleBorder(
@@ -789,10 +790,10 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFF00E5FF).withAlpha((0.15 * 255).round()),
+            color: AppColors.neonCyan.withAlpha((0.15 * 255).round()),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: const Color(0xFF00E5FF), size: 20),
+          child: Icon(icon, color: AppColors.neonCyan, size: 20),
         ),
         title: Text(
           title,
@@ -805,7 +806,7 @@ class _GestureControlSheetState extends State<GestureControlSheet> {
         subtitle: Text(
           action.label,
           style: TextStyle(
-            color: action.isEnabled ? const Color(0xFF00E5FF) : Colors.white38,
+            color: action.isEnabled ? AppColors.neonCyan : Colors.white38,
             fontWeight: FontWeight.w600,
             fontSize: 12,
           ),

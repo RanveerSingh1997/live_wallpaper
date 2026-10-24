@@ -180,7 +180,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             ),
                             // Quote Studio button
                             IconButton(
-                              icon: const Icon(Icons.format_quote_rounded, color: Color(0xFF00E5FF)),
+                              icon: const Icon(Icons.format_quote_rounded, color: AppColors.neonCyan),
                               tooltip: 'Quote Studio',
                               onPressed: () {
                                 HapticFeedback.selectionClick();
@@ -189,7 +189,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             ),
                             // Creator Import Studio button
                             IconButton(
-                              icon: const Icon(Icons.add_photo_alternate_rounded, color: Color(0xFFFFD600)),
+                              icon: const Icon(Icons.add_photo_alternate_rounded, color: AppColors.solarGold),
                               tooltip: 'Import Wallpaper',
                               onPressed: () {
                                 HapticFeedback.selectionClick();
@@ -198,7 +198,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             ),
                             // Horizon Standby Desk Dock Studio button
                             IconButton(
-                              icon: const Icon(Icons.desktop_windows_rounded, color: Color(0xFF00E5FF)),
+                              icon: const Icon(Icons.desktop_windows_rounded, color: AppColors.neonCyan),
                               tooltip: 'Horizon Standby Desk Dock',
                               onPressed: () {
                                 HapticFeedback.selectionClick();
@@ -211,7 +211,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             ),
                             // Aurora Synthesizer Wave Studio button
                             IconButton(
-                              icon: const Icon(Icons.waves_rounded, color: Color(0xFFD500F9)),
+                              icon: const Icon(Icons.waves_rounded, color: AppColors.auroraViolet),
                               tooltip: 'Aurora Wave Synthesizer',
                               onPressed: () {
                                 HapticFeedback.selectionClick();
@@ -220,7 +220,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             ),
                             // Community Aesthetic Exchange Studio button
                             IconButton(
-                              icon: const Icon(Icons.hub_rounded, color: Color(0xFF00E5FF)),
+                              icon: const Icon(Icons.hub_rounded, color: AppColors.neonCyan),
                               tooltip: 'Blueprint Exchange',
                               onPressed: () {
                                 HapticFeedback.selectionClick();
@@ -229,7 +229,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             ),
                             // Atmospheric Weather & Climate FX Studio button
                             IconButton(
-                              icon: const Icon(Icons.cloud_sync_rounded, color: Color(0xFF00E5FF)),
+                              icon: const Icon(Icons.cloud_sync_rounded, color: AppColors.neonCyan),
                               tooltip: 'Weather Atmosphere Studio',
                               onPressed: () {
                                 HapticFeedback.selectionClick();
@@ -238,7 +238,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             ),
                             // Wallaza Cloud Wallpaper Discovery Studio button
                             IconButton(
-                              icon: const Icon(Icons.cloud_download_rounded, color: Color(0xFF00E5FF)),
+                              icon: const Icon(Icons.cloud_download_rounded, color: AppColors.neonCyan),
                               tooltip: 'Wallaza Cloud Discovery',
                               onPressed: () {
                                 HapticFeedback.selectionClick();
@@ -262,7 +262,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                 widget.onOpenLiveFeed();
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFF5722),
+                                backgroundColor: AppColors.sunsetAmber,
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                 shape: RoundedRectangleBorder(
@@ -297,7 +297,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1E1E22),
+                              color: AppColors.cardSurface,
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(color: Colors.white10),
                             ),
@@ -336,12 +336,12 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             Container(
                               decoration: BoxDecoration(
                                 color: state.smartFilter.hasActiveFilters
-                                    ? const Color(0xFF00E5FF).withAlpha(35)
-                                    : const Color(0xFF1E1E22),
+                                    ? AppColors.neonCyan.withAlpha(35)
+                                    : AppColors.cardSurface,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
                                   color: state.smartFilter.hasActiveFilters
-                                      ? const Color(0xFF00E5FF)
+                                      ? AppColors.neonCyan
                                       : Colors.white10,
                                 ),
                               ),
@@ -350,7 +350,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                 icon: Icon(
                                   Icons.tune_rounded,
                                   color: state.smartFilter.hasActiveFilters
-                                      ? const Color(0xFF00E5FF)
+                                      ? AppColors.neonCyan
                                       : Colors.white70,
                                 ),
                                 onPressed: () {
@@ -366,7 +366,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
                                   decoration: const BoxDecoration(
-                                    color: Color(0xFFFF5722),
+                                    color: AppColors.sunsetAmber,
                                     shape: BoxShape.circle,
                                   ),
                                   constraints: const BoxConstraints(
@@ -414,8 +414,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               context.read<WallpaperBloc>().add(FilterByCategoryIntent(cat));
                             }
                           },
-                          backgroundColor: const Color(0xFF1E1E22),
-                          selectedColor: const Color(0xFFFF5722),
+                          backgroundColor: AppColors.cardSurface,
+                          selectedColor: AppColors.sunsetAmber,
                           labelStyle: TextStyle(
                             color: isSelected ? Colors.white : Colors.white70,
                             fontSize: 12,
@@ -424,7 +424,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                             side: BorderSide(
-                              color: isSelected ? const Color(0xFFFF5722) : Colors.white10,
+                              color: isSelected ? AppColors.sunsetAmber : Colors.white10,
                             ),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
@@ -441,10 +441,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF00E5FF).withAlpha(20),
+                          color: AppColors.neonCyan.withAlpha(20),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(0xFF00E5FF).withAlpha(80),
+                            color: AppColors.neonCyan.withAlpha(80),
                           ),
                         ),
                         child: Row(
@@ -452,7 +452,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             const Icon(
                               Icons.auto_awesome_rounded,
                               size: 16,
-                              color: Color(0xFF00E5FF),
+                              color: AppColors.neonCyan,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
@@ -525,8 +525,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               children: ['Anime', 'AMOLED', 'Cars', 'Nature', 'Stoic', 'Live'].map((term) {
                                 return ActionChip(
                                   label: Text(term),
-                                  backgroundColor: const Color(0xFF1E1E22),
-                                  labelStyle: const TextStyle(color: Color(0xFFFF5722), fontSize: 12, fontWeight: FontWeight.w700),
+                                  backgroundColor: AppColors.cardSurface,
+                                  labelStyle: const TextStyle(color: AppColors.sunsetAmber, fontSize: 12, fontWeight: FontWeight.w700),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                     side: const BorderSide(color: Colors.white12),
@@ -588,14 +588,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFF5722).withValues(alpha: 0.2),
+                                  color: AppColors.sunsetAmber.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: const Color(0xFFFF5722), width: 0.8),
+                                  border: Border.all(color: AppColors.sunsetAmber, width: 0.8),
                                 ),
                                 child: Text(
                                   '${state.filteredShorts.length}',
                                   style: const TextStyle(
-                                    color: Color(0xFFFF5722),
+                                    color: AppColors.sunsetAmber,
                                     fontSize: 11,
                                     fontWeight: FontWeight.w800,
                                   ),
@@ -656,9 +656,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                 context.read<WallpaperBloc>().add(ResetSmartFilterIntent());
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF1E1E22),
-                                foregroundColor: const Color(0xFF00E5FF),
-                                side: const BorderSide(color: Color(0xFF00E5FF)),
+                                backgroundColor: AppColors.cardSurface,
+                                foregroundColor: AppColors.neonCyan,
+                                side: const BorderSide(color: AppColors.neonCyan),
                               ),
                               icon: const Icon(Icons.refresh_rounded, size: 16),
                               label: const Text('Reset Smart Filters'),
@@ -693,7 +693,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         children: [
                           const Row(
                             children: [
-                              Icon(Icons.whatshot_rounded, color: Color(0xFFFF5722), size: 18),
+                              Icon(Icons.whatshot_rounded, color: AppColors.sunsetAmber, size: 18),
                               SizedBox(width: 6),
                               Text(
                                 'TRENDING LIVE WALLPAPERS',
@@ -711,7 +711,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             child: const Text(
                               'Watch All ➔',
                               style: TextStyle(
-                                color: Color(0xFFFF5722),
+                                color: AppColors.sunsetAmber,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -747,7 +747,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                           const Row(
                             children: [
                               Icon(Icons.collections_bookmark_rounded,
-                                  color: Color(0xFFD500F9), size: 18),
+                                  color: AppColors.auroraViolet, size: 18),
                               SizedBox(width: 6),
                               Text(
                                 'CURATED COLLECTIONS',
@@ -796,7 +796,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         child: Row(
                           children: [
                             Icon(Icons.history_rounded,
-                                color: Color(0xFFFFD600), size: 18),
+                                color: AppColors.solarGold, size: 18),
                             SizedBox(width: 6),
                             Text(
                               'RECENTLY VIEWED',
@@ -836,17 +836,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF2A163B), Color(0xFF14141E)],
+                            colors: [AppColors.deepPurple, AppColors.cardSurface],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: const Color(0xFFD500F9).withValues(alpha: 0.3),
+                            color: AppColors.auroraViolet.withValues(alpha: 0.3),
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFD500F9).withValues(alpha: 0.15),
+                              color: AppColors.auroraViolet.withValues(alpha: 0.15),
                               blurRadius: 18,
                               offset: const Offset(0, 6),
                             ),
@@ -858,7 +858,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFFFFD600), Color(0xFFFF5722)],
+                                  colors: [AppColors.solarGold, AppColors.sunsetAmber],
                                 ),
                                 borderRadius: BorderRadius.circular(16),
                               ),
@@ -876,7 +876,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                   const Text(
                                     'CREATOR STUDIO',
                                     style: TextStyle(
-                                      color: Color(0xFFFFD600),
+                                      color: AppColors.solarGold,
                                       fontSize: 10,
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: 1.0,
@@ -909,7 +909,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                 CustomWallpaperImportSheet.show(context);
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFFD600),
+                                backgroundColor: AppColors.solarGold,
                                 foregroundColor: Colors.black,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 14, vertical: 10),
@@ -940,17 +940,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF101935), Color(0xFF1A0E2A)],
+                            colors: [AppColors.cardHighlight, AppColors.cardSurface],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+                            color: AppColors.neonCyan.withValues(alpha: 0.35),
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                              color: AppColors.neonCyan.withValues(alpha: 0.15),
                               blurRadius: 18,
                               offset: const Offset(0, 6),
                             ),
@@ -962,7 +962,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                                  colors: [AppColors.neonCyan, AppColors.auroraViolet],
                                 ),
                                 borderRadius: BorderRadius.circular(16),
                               ),
@@ -980,7 +980,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                   const Text(
                                     'COMMUNITY EXCHANGE',
                                     style: TextStyle(
-                                      color: Color(0xFF00E5FF),
+                                      color: AppColors.neonCyan,
                                       fontSize: 10,
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: 1.0,
@@ -1013,7 +1013,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                 CommunityExchangeSheet.show(context);
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF00E5FF),
+                                backgroundColor: AppColors.neonCyan,
                                 foregroundColor: Colors.black,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 14, vertical: 10),
@@ -1044,17 +1044,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF0B1B2B), Color(0xFF1F0D2B)],
+                            colors: [AppColors.cardHighlight, AppColors.cardSurface],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+                            color: AppColors.neonCyan.withValues(alpha: 0.35),
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                              color: AppColors.neonCyan.withValues(alpha: 0.15),
                               blurRadius: 18,
                               offset: const Offset(0, 6),
                             ),
@@ -1066,7 +1066,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                                  colors: [AppColors.neonCyan, AppColors.auroraViolet],
                                 ),
                                 borderRadius: BorderRadius.circular(16),
                               ),
@@ -1084,7 +1084,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                   const Text(
                                     'WALLAZA CLOUD DISCOVERY',
                                     style: TextStyle(
-                                      color: Color(0xFF00E5FF),
+                                      color: AppColors.neonCyan,
                                       fontSize: 10,
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: 1.0,
@@ -1117,7 +1117,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                 WallazaCloudDiscoverySheet.show(context);
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF00E5FF),
+                                backgroundColor: AppColors.neonCyan,
                                 foregroundColor: Colors.black,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 14, vertical: 10),
@@ -1147,7 +1147,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       child: Row(
                         children: [
                           Icon(Icons.photo_size_select_actual_rounded,
-                              color: Color(0xFF00E5FF), size: 18),
+                              color: AppColors.neonCyan, size: 18),
                           SizedBox(width: 6),
                           Text(
                             'STATIC & 4K AMOLED WALLPAPERS',
@@ -1477,14 +1477,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               color: Colors.black.withValues(alpha: 0.75),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: const Color(0xFF00E676).withValues(alpha: 0.5),
+                                color: AppColors.auroraEmerald.withValues(alpha: 0.5),
                                 width: 0.6,
                               ),
                             ),
                             child: Text(
                               '${item.trueBlackPercentage}% OLED',
                               style: const TextStyle(
-                                color: Color(0xFF00E676),
+                                color: AppColors.auroraEmerald,
                                 fontSize: 8,
                                 fontWeight: FontWeight.w800,
                               ),

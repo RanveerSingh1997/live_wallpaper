@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
 
@@ -89,7 +90,7 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF0D0D11),
+                color: AppColors.modalBackground,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: Column(
@@ -118,17 +119,17 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
                             Container(
                               padding: const EdgeInsets.all(7),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                                color: AppColors.neonCyan.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: const Color(0xFF00E5FF),
+                                  color: AppColors.neonCyan,
                                   width: 0.8,
                                 ),
                               ),
                               child: const Icon(
                                 Icons.view_in_ar_rounded,
                                 size: 18,
-                                color: Color(0xFF00E5FF),
+                                color: AppColors.neonCyan,
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -237,7 +238,7 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
   Widget _buildInteractive3DMockup(MotivationalShort? wallpaper, WallpaperState state) {
     final colors = wallpaper != null
         ? [wallpaper.accentColor.withValues(alpha: 0.85), Colors.black]
-        : const [Color(0xFF00E5FF), Color(0xFF0A0A10)];
+        : const [AppColors.neonCyan, AppColors.darkBackground];
 
     final maxRad = _draftConfig.maxAngleDegrees * (math.pi / 180.0);
     final pitchSign = _draftConfig.invertPitch ? -1.0 : 1.0;
@@ -276,12 +277,12 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(
-                    color: const Color(0xFF00E5FF).withValues(alpha: 0.45),
+                    color: AppColors.neonCyan.withValues(alpha: 0.45),
                     width: 2.2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF00E5FF).withValues(alpha: 0.22),
+                      color: AppColors.neonCyan.withValues(alpha: 0.22),
                       blurRadius: 30,
                       spreadRadius: -4,
                       offset: Offset(effectiveRoll * 20, effectivePitch * 20),
@@ -331,7 +332,7 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
                               center: Alignment.center,
                               radius: 0.75,
                               colors: [
-                                (wallpaper?.accentColor ?? const Color(0xFF00E5FF))
+                                (wallpaper?.accentColor ?? AppColors.neonCyan)
                                     .withValues(alpha: 0.35),
                                 Colors.transparent,
                               ],
@@ -357,20 +358,20 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
                                   color: Colors.black.withValues(alpha: 0.6),
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: const Color(0xFF00E5FF).withValues(alpha: 0.5),
+                                    color: AppColors.neonCyan.withValues(alpha: 0.5),
                                     width: 0.8,
                                   ),
                                 ),
                                 child: const Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.spatial_audio_off_rounded, size: 10, color: Color(0xFF00E5FF)),
+                                    Icon(Icons.spatial_audio_off_rounded, size: 10, color: AppColors.neonCyan),
                                     SizedBox(width: 4),
                                     Flexible(
                                       child: Text(
                                         '3D SPATIAL PLANE',
                                         style: TextStyle(
-                                          color: Color(0xFF00E5FF),
+                                          color: AppColors.neonCyan,
                                           fontSize: 8,
                                           fontWeight: FontWeight.w900,
                                           letterSpacing: 0.6,
@@ -463,7 +464,7 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF16161B),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white10),
       ),
@@ -472,7 +473,7 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
         children: [
           Row(
             children: [
-              const Icon(Icons.screen_rotation_rounded, size: 14, color: Color(0xFF00E5FF)),
+              const Icon(Icons.screen_rotation_rounded, size: 14, color: AppColors.neonCyan),
               const SizedBox(width: 8),
               Text(
                 'Pitch: $pitchDeg°  •  Roll: $rollDeg°',
@@ -489,7 +490,7 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
               color: _draftConfig.isEnabled
-                  ? const Color(0xFF00E676).withValues(alpha: 0.15)
+                  ? AppColors.auroraEmerald.withValues(alpha: 0.15)
                   : Colors.white10,
               borderRadius: BorderRadius.circular(8),
             ),
@@ -498,7 +499,7 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
               style: TextStyle(
                 fontSize: 9.5,
                 fontWeight: FontWeight.w800,
-                color: _draftConfig.isEnabled ? const Color(0xFF00E676) : Colors.white38,
+                color: _draftConfig.isEnabled ? AppColors.auroraEmerald : Colors.white38,
                 letterSpacing: 0.5,
               ),
             ),
@@ -550,12 +551,12 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
         fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
         color: isSelected ? Colors.black : Colors.white,
       ),
-      selectedColor: const Color(0xFF00E5FF),
-      backgroundColor: const Color(0xFF1B1B22),
+      selectedColor: AppColors.neonCyan,
+      backgroundColor: AppColors.cardHighlight,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
         side: BorderSide(
-          color: isSelected ? const Color(0xFF00E5FF) : Colors.white10,
+          color: isSelected ? AppColors.neonCyan : Colors.white10,
         ),
       ),
       onSelected: (_) {
@@ -570,7 +571,7 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF16161B),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white10),
       ),
@@ -652,7 +653,7 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
               displayValue,
               style: const TextStyle(
                 fontSize: 12,
-                color: Color(0xFF00E5FF),
+                color: AppColors.neonCyan,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -660,7 +661,7 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
         ),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            activeTrackColor: const Color(0xFF00E5FF),
+            activeTrackColor: AppColors.neonCyan,
             inactiveTrackColor: Colors.white12,
             thumbColor: Colors.white,
             trackHeight: 3.5,
@@ -681,7 +682,7 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF16161B),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white10),
       ),
@@ -709,8 +710,8 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
               ),
               Switch.adaptive(
                 value: _draftConfig.isEnabled,
-                activeThumbColor: const Color(0xFF00E5FF),
-                activeTrackColor: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+                activeThumbColor: AppColors.neonCyan,
+                activeTrackColor: AppColors.neonCyan.withValues(alpha: 0.35),
                 onChanged: (val) {
                   setState(() {
                     _draftConfig = _draftConfig.copyWith(isEnabled: val);
@@ -729,8 +730,8 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
               ),
               Switch.adaptive(
                 value: _draftConfig.invertPitch,
-                activeThumbColor: const Color(0xFF00E5FF),
-                activeTrackColor: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+                activeThumbColor: AppColors.neonCyan,
+                activeTrackColor: AppColors.neonCyan.withValues(alpha: 0.35),
                 onChanged: (val) {
                   setState(() {
                     _draftConfig = _draftConfig.copyWith(invertPitch: val);
@@ -749,8 +750,8 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
               ),
               Switch.adaptive(
                 value: _draftConfig.invertRoll,
-                activeThumbColor: const Color(0xFF00E5FF),
-                activeTrackColor: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+                activeThumbColor: AppColors.neonCyan,
+                activeTrackColor: AppColors.neonCyan.withValues(alpha: 0.35),
                 onChanged: (val) {
                   setState(() {
                     _draftConfig = _draftConfig.copyWith(invertRoll: val);
@@ -770,7 +771,7 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
       height: 48,
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF00E5FF),
+          backgroundColor: AppColors.neonCyan,
           foregroundColor: Colors.black,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           elevation: 0,

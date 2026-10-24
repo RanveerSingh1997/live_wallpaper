@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../data/curated_shorts_data.dart';
 import 'day_night_schedule_sheet.dart';
 
@@ -30,7 +31,7 @@ class AutoRotationSheet extends StatelessWidget {
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF101014),
+                color: AppColors.modalBackground,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: Column(
@@ -59,14 +60,14 @@ class AutoRotationSheet extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.all(7),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFF5722).withValues(alpha: 0.15),
+                                color: AppColors.sunsetAmber.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: const Color(0xFFFF5722), width: 0.8),
+                                border: Border.all(color: AppColors.sunsetAmber, width: 0.8),
                               ),
                               child: const Icon(
                                 Icons.autorenew_rounded,
                                 size: 18,
-                                color: Color(0xFFFF5722),
+                                color: AppColors.sunsetAmber,
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -96,7 +97,11 @@ class AutoRotationSheet extends StatelessWidget {
                         ),
                         IconButton(
                           icon: const Icon(Icons.close_rounded, color: Colors.white70),
-                          onPressed: () => Navigator.of(context).pop(),
+                          onPressed: () {
+                            if (context.mounted && Navigator.of(context).canPop()) {
+                              Navigator.of(context).pop();
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -118,26 +123,26 @@ class AutoRotationSheet extends StatelessWidget {
                             gradient: LinearGradient(
                               colors: state.isAutoRotationEnabled
                                   ? [
-                                      const Color(0xFF1B0B2E),
-                                      const Color(0xFF311B92),
-                                      const Color(0xFF0D061A),
+                                      AppColors.modalBackground,
+                                      AppColors.deepPurple,
+                                      AppColors.darkBackground,
                                     ]
                                   : [
-                                      const Color(0xFF18181C),
-                                      const Color(0xFF131316),
+                                      AppColors.cardSurface,
+                                      AppColors.darkBackground,
                                     ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             border: Border.all(
                               color: state.isAutoRotationEnabled
-                                  ? const Color(0xFF7C4DFF).withValues(alpha: 0.6)
+                                  ? AppColors.deepPurple.withValues(alpha: 0.6)
                                   : Colors.white12,
                             ),
                             boxShadow: state.isAutoRotationEnabled
                                 ? [
                                     BoxShadow(
-                                      color: const Color(0xFF7C4DFF).withValues(alpha: 0.3),
+                                      color: AppColors.deepPurple.withValues(alpha: 0.3),
                                       blurRadius: 18,
                                       offset: const Offset(0, 6),
                                     ),
@@ -150,7 +155,7 @@ class AutoRotationSheet extends StatelessWidget {
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: state.isAutoRotationEnabled
-                                      ? const Color(0xFF7C4DFF).withValues(alpha: 0.25)
+                                      ? AppColors.deepPurple.withValues(alpha: 0.25)
                                       : Colors.white10,
                                   shape: BoxShape.circle,
                                 ),
@@ -159,7 +164,7 @@ class AutoRotationSheet extends StatelessWidget {
                                       ? Icons.sync_rounded
                                       : Icons.sync_disabled_rounded,
                                   color: state.isAutoRotationEnabled
-                                      ? const Color(0xFF7C4DFF)
+                                      ? AppColors.deepPurple
                                       : Colors.white38,
                                   size: 26,
                                 ),
@@ -194,8 +199,8 @@ class AutoRotationSheet extends StatelessWidget {
                               ),
                               Switch.adaptive(
                                 value: state.isAutoRotationEnabled,
-                                activeThumbColor: const Color(0xFFFF5722),
-                                activeTrackColor: const Color(0xFFFF5722).withValues(alpha: 0.4),
+                                activeThumbColor: AppColors.sunsetAmber,
+                                activeTrackColor: AppColors.sunsetAmber.withValues(alpha: 0.4),
                                 onChanged: (val) {
                                   HapticFeedback.mediumImpact();
                                   context.read<WallpaperBloc>().add(
@@ -211,12 +216,14 @@ class AutoRotationSheet extends StatelessWidget {
 
                         // Solar Day & Night Schedule Quick Link
                         Material(
-                          color: const Color(0xFF161622),
+                          color: AppColors.cardSurface,
                           borderRadius: BorderRadius.circular(16),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(16),
                             onTap: () {
-                              Navigator.of(context).pop();
+                              if (context.mounted && Navigator.of(context).canPop()) {
+                                Navigator.of(context).pop();
+                              }
                               DayNightScheduleSheet.show(context);
                             },
                             child: Container(
@@ -224,7 +231,7 @@ class AutoRotationSheet extends StatelessWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: const Color(0xFF00E5FF).withValues(alpha: 0.25),
+                                  color: AppColors.neonCyan.withValues(alpha: 0.25),
                                   width: 0.8,
                                 ),
                               ),
@@ -233,13 +240,13 @@ class AutoRotationSheet extends StatelessWidget {
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF00E5FF).withValues(alpha: 0.12),
+                                      color: AppColors.neonCyan.withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: const Icon(
                                       Icons.wb_twilight_rounded,
                                       size: 18,
-                                      color: Color(0xFF00E5FF),
+                                      color: AppColors.neonCyan,
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -322,7 +329,7 @@ class AutoRotationSheet extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFFFF5722),
+                                color: AppColors.sunsetAmber,
                               ),
                             ),
                           ],
@@ -336,7 +343,7 @@ class AutoRotationSheet extends StatelessWidget {
                           title: 'My Favorites',
                           subtitle: '${state.favoriteIds.length} favorited canvases',
                           icon: Icons.favorite_rounded,
-                          accentColor: const Color(0xFFFF1744),
+                          accentColor: AppColors.favoriteRed,
                           isSelected: state.autoRotationSource == 'favorites',
                         ),
                         const SizedBox(height: 8),
@@ -350,7 +357,7 @@ class AutoRotationSheet extends StatelessWidget {
                               fontSize: 10,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 0.8,
-                              color: Color(0xFF00E5FF),
+                              color: AppColors.neonCyan,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -401,7 +408,7 @@ class AutoRotationSheet extends StatelessWidget {
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            const Icon(Icons.cloud_download_rounded, color: Color(0xFF00E5FF), size: 16),
+                            const Icon(Icons.cloud_download_rounded, color: AppColors.neonCyan, size: 16),
                             const SizedBox(width: 6),
                             const Text(
                               'WALLAZA 4K CLOUD STREAMS',
@@ -409,21 +416,21 @@ class AutoRotationSheet extends StatelessWidget {
                                 fontSize: 10,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 0.8,
-                                color: Color(0xFF00E5FF),
+                                color: AppColors.neonCyan,
                               ),
                             ),
                             const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                                color: AppColors.neonCyan.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: const Color(0xFF00E5FF), width: 0.6),
+                                border: Border.all(color: AppColors.neonCyan, width: 0.6),
                               ),
                               child: const Text(
                                 'PROXY STREAM',
                                 style: TextStyle(
-                                  color: Color(0xFF00E5FF),
+                                  color: AppColors.neonCyan,
                                   fontSize: 8,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: 0.5,
@@ -440,7 +447,7 @@ class AutoRotationSheet extends StatelessWidget {
                           title: 'Wallaza 4K Cloud Feed',
                           subtitle: 'Auto-cycles fresh 4K & Ultra-HD cloud wallpapers',
                           icon: Icons.cloud_sync_rounded,
-                          accentColor: const Color(0xFF00E5FF),
+                          accentColor: AppColors.neonCyan,
                           isSelected: state.autoRotationSource == 'wallaza_cloud',
                         ),
                         const SizedBox(height: 8),
@@ -451,7 +458,7 @@ class AutoRotationSheet extends StatelessWidget {
                           title: 'Wallaza Cyberpunk 4K',
                           subtitle: 'Neon nightscapes & futuristic metropolis streams',
                           icon: Icons.bolt_rounded,
-                          accentColor: const Color(0xFF00E5FF),
+                          accentColor: AppColors.neonCyan,
                           isSelected: state.autoRotationSource == 'cloud_cat_cyberpunk',
                         ),
                         const SizedBox(height: 8),
@@ -462,7 +469,7 @@ class AutoRotationSheet extends StatelessWidget {
                           title: 'Wallaza AMOLED True-Black',
                           subtitle: 'Zero-nit deep black OLED preservation stream',
                           icon: Icons.dark_mode_rounded,
-                          accentColor: const Color(0xFF00E676),
+                          accentColor: AppColors.auroraEmerald,
                           isSelected: state.autoRotationSource == 'cloud_cat_amoled',
                         ),
                         const SizedBox(height: 8),
@@ -473,7 +480,7 @@ class AutoRotationSheet extends StatelessWidget {
                           title: 'Wallaza Cosmic Space 4K',
                           subtitle: 'Nebulae, star clusters & deep telescopic captures',
                           icon: Icons.blur_circular_rounded,
-                          accentColor: const Color(0xFFD500F9),
+                          accentColor: AppColors.auroraViolet,
                           isSelected: state.autoRotationSource == 'cloud_cat_space',
                         ),
                         const SizedBox(height: 8),
@@ -484,7 +491,7 @@ class AutoRotationSheet extends StatelessWidget {
                           title: 'Wallaza Alpine Nature 4K',
                           subtitle: 'Mountain ridges, pine valleys & morning mist',
                           icon: Icons.landscape_rounded,
-                          accentColor: const Color(0xFF00E676),
+                          accentColor: AppColors.auroraEmerald,
                           isSelected: state.autoRotationSource == 'cloud_cat_nature',
                         ),
                         const SizedBox(height: 8),
@@ -496,7 +503,7 @@ class AutoRotationSheet extends StatelessWidget {
                           title: 'Complete Wallora Catalog',
                           subtitle: 'All ${state.allShorts.length} static & live wallpapers',
                           icon: Icons.auto_awesome_rounded,
-                          accentColor: const Color(0xFFFF5722),
+                          accentColor: AppColors.sunsetAmber,
                           isSelected: state.autoRotationSource == 'all',
                         ),
 
@@ -539,7 +546,7 @@ class AutoRotationSheet extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF18181C),
+                            color: AppColors.cardSurface,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: Colors.white10),
                           ),
@@ -573,7 +580,7 @@ class AutoRotationSheet extends StatelessWidget {
                                   ),
                                   Switch.adaptive(
                                     value: state.autoRotationWifiOnly,
-                                    activeThumbColor: const Color(0xFFFF5722),
+                                    activeThumbColor: AppColors.sunsetAmber,
                                     onChanged: (val) {
                                       HapticFeedback.selectionClick();
                                       context.read<WallpaperBloc>().add(
@@ -586,7 +593,7 @@ class AutoRotationSheet extends StatelessWidget {
                               const Divider(color: Colors.white10, height: 20),
                               const Row(
                                 children: [
-                                  Icon(Icons.battery_charging_full_rounded, color: Color(0xFF69F0AE), size: 18),
+                                  Icon(Icons.battery_charging_full_rounded, color: AppColors.auroraEmerald, size: 18),
                                   SizedBox(width: 10),
                                   Expanded(
                                     child: Column(
@@ -626,7 +633,7 @@ class AutoRotationSheet extends StatelessWidget {
                                   );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFF5722),
+                              backgroundColor: AppColors.sunsetAmber,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -674,15 +681,15 @@ class AutoRotationSheet extends StatelessWidget {
               );
         }
       },
-      selectedColor: const Color(0xFFFF5722).withValues(alpha: 0.2),
-      backgroundColor: const Color(0xFF1E1E22),
+      selectedColor: AppColors.sunsetAmber.withValues(alpha: 0.2),
+      backgroundColor: AppColors.cardSurface,
       labelStyle: TextStyle(
-        color: isSelected ? const Color(0xFFFF5722) : Colors.white70,
+        color: isSelected ? AppColors.sunsetAmber : Colors.white70,
         fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
         fontSize: 12,
       ),
       side: BorderSide(
-        color: isSelected ? const Color(0xFFFF5722) : Colors.white12,
+        color: isSelected ? AppColors.sunsetAmber : Colors.white12,
       ),
     );
   }
@@ -707,7 +714,7 @@ class AutoRotationSheet extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? accentColor.withValues(alpha: 0.12) : const Color(0xFF18181C),
+          color: isSelected ? accentColor.withValues(alpha: 0.12) : AppColors.cardSurface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? accentColor : Colors.white10,
@@ -779,11 +786,11 @@ class AutoRotationSheet extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             color: isSelected
-                ? const Color(0xFFFF5722).withValues(alpha: 0.15)
-                : const Color(0xFF18181C),
+                ? AppColors.sunsetAmber.withValues(alpha: 0.15)
+                : AppColors.cardSurface,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: isSelected ? const Color(0xFFFF5722) : Colors.white10,
+              color: isSelected ? AppColors.sunsetAmber : Colors.white10,
               width: isSelected ? 1.2 : 1,
             ),
           ),
@@ -793,7 +800,7 @@ class AutoRotationSheet extends StatelessWidget {
               Icon(
                 icon,
                 size: 18,
-                color: isSelected ? const Color(0xFFFF5722) : Colors.white60,
+                color: isSelected ? AppColors.sunsetAmber : Colors.white60,
               ),
               const SizedBox(height: 6),
               Text(

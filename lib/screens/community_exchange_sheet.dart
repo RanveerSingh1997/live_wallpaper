@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/wallora_screen_blueprint.dart';
 
 /// Modal bottom sheet for exploring, liking, inspecting, and 1-tap applying
@@ -57,7 +58,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle_rounded, color: Color(0xFF00E676)),
+            const Icon(Icons.check_circle_rounded, color: AppColors.auroraEmerald),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -67,7 +68,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF1E2028),
+        backgroundColor: AppColors.cardSurface,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -113,10 +114,10 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
               child: Container(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
                 decoration: const BoxDecoration(
-                  color: Color(0xFF12131A),
+                  color: AppColors.modalBackground,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                   border: Border(
-                    top: BorderSide(color: Color(0xFF00E5FF), width: 1.5),
+                    top: BorderSide(color: AppColors.neonCyan, width: 1.5),
                   ),
                 ),
                 child: SingleChildScrollView(
@@ -141,7 +142,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                                colors: [AppColors.neonCyan, AppColors.auroraViolet],
                               ),
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -156,7 +157,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                                 Text(
                                   'PUBLISH BLUEPRINT',
                                   style: TextStyle(
-                                    color: Color(0xFF00E5FF),
+                                    color: AppColors.neonCyan,
                                     fontSize: 11,
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: 1.2,
@@ -194,7 +195,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                           hintText: 'e.g. Cyberpunk Neon Ronin',
                           hintStyle: const TextStyle(color: Colors.white38),
                           filled: true,
-                          fillColor: const Color(0xFF1E2028),
+                          fillColor: AppColors.cardSurface,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -222,7 +223,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                           hintText: 'e.g. NeonArtist',
                           hintStyle: const TextStyle(color: Colors.white38),
                           filled: true,
-                          fillColor: const Color(0xFF1E2028),
+                          fillColor: AppColors.cardSurface,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -251,7 +252,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                           hintText: 'Describe your visual theme and mood...',
                           hintStyle: const TextStyle(color: Colors.white38),
                           filled: true,
-                          fillColor: const Color(0xFF1E2028),
+                          fillColor: AppColors.cardSurface,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -289,13 +290,13 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                                 }
                               });
                             },
-                            backgroundColor: const Color(0xFF1E2028),
+                            backgroundColor: AppColors.cardSurface,
                             selectedColor:
-                                const Color(0xFF00E5FF).withValues(alpha: 0.25),
-                            checkmarkColor: const Color(0xFF00E5FF),
+                                AppColors.neonCyan.withValues(alpha: 0.25),
+                            checkmarkColor: AppColors.neonCyan,
                             labelStyle: TextStyle(
                               color: isSelected
-                                  ? const Color(0xFF00E5FF)
+                                  ? AppColors.neonCyan
                                   : Colors.white70,
                               fontSize: 12,
                               fontWeight: isSelected
@@ -306,7 +307,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                               borderRadius: BorderRadius.circular(10),
                               side: BorderSide(
                                 color: isSelected
-                                    ? const Color(0xFF00E5FF)
+                                    ? AppColors.neonCyan
                                     : Colors.white12,
                               ),
                             ),
@@ -345,7 +346,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF00E5FF),
+                            backgroundColor: AppColors.neonCyan,
                             foregroundColor: Colors.black,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
@@ -390,10 +391,10 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
         return Container(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
           decoration: const BoxDecoration(
-            color: Color(0xFF10121A),
+            color: AppColors.modalBackground,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             border: Border(
-              top: BorderSide(color: Color(0xFFD500F9), width: 1.5),
+              top: BorderSide(color: AppColors.auroraViolet, width: 1.5),
             ),
           ),
           child: SingleChildScrollView(
@@ -446,7 +447,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                           Text(
                             'Curated by ${blueprint.creatorName}',
                             style: const TextStyle(
-                              color: Color(0xFF00E5FF),
+                              color: AppColors.neonCyan,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -459,21 +460,21 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFD600).withValues(alpha: 0.15),
+                          color: AppColors.solarGold.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: const Color(0xFFFFD600), width: 0.8),
+                              color: AppColors.solarGold, width: 0.8),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.star_rounded,
-                                color: Color(0xFFFFD600), size: 14),
+                                color: AppColors.solarGold, size: 14),
                             SizedBox(width: 4),
                             Text(
                               'STAFF PICK',
                               style: TextStyle(
-                                color: Color(0xFFFFD600),
+                                color: AppColors.solarGold,
                                 fontSize: 9,
                                 fontWeight: FontWeight.w900,
                               ),
@@ -506,14 +507,14 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                 const SizedBox(height: 10),
                 _buildDimensionTile(
                   icon: Icons.image_rounded,
-                  accentColor: const Color(0xFF00E5FF),
+                  accentColor: AppColors.neonCyan,
                   title: 'Wallpaper Asset',
                   subtitle:
                       '${blueprint.wallpaper.title} (${blueprint.wallpaper.isLive ? "Live Wallpaper" : "Ultra-HD Static"})',
                 ),
                 _buildDimensionTile(
                   icon: Icons.format_quote_rounded,
-                  accentColor: const Color(0xFFFFD600),
+                  accentColor: AppColors.solarGold,
                   title: 'Custom Kinetic Quote',
                   subtitle: blueprint.customQuote.isNotEmpty
                       ? '"${blueprint.customQuote}"'
@@ -521,28 +522,28 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                 ),
                 _buildDimensionTile(
                   icon: Icons.blur_on_rounded,
-                  accentColor: const Color(0xFFD500F9),
+                  accentColor: AppColors.auroraViolet,
                   title: 'Chromatic Aura Palette',
                   subtitle:
                       '${blueprint.auraConfig.preset.displayName} • ${blueprint.auraConfig.isDynamicThemingEnabled ? "Dynamic" : "Static"}',
                 ),
                 _buildDimensionTile(
                   icon: Icons.grain_rounded,
-                  accentColor: const Color(0xFFFF5722),
+                  accentColor: AppColors.sunsetAmber,
                   title: 'Interactive Particle Physics',
                   subtitle:
                       '${blueprint.particleConfig.preset.displayName} • ${blueprint.particleConfig.particleCount} particles',
                 ),
                 _buildDimensionTile(
                   icon: Icons.layers_rounded,
-                  accentColor: const Color(0xFF00E676),
+                  accentColor: AppColors.auroraEmerald,
                   title: '3D Parallax Gyro Depth',
                   subtitle:
                       '${blueprint.parallaxConfig.sensitivity.toStringAsFixed(1)}x Sensitivity • ${blueprint.parallaxConfig.preset.label}',
                 ),
                 _buildDimensionTile(
                   icon: Icons.waves_rounded,
-                  accentColor: const Color(0xFF00E5FF),
+                  accentColor: AppColors.neonCyan,
                   title: 'Procedural Aurora Synthesizer',
                   subtitle:
                       '${blueprint.auroraConfig.waveStyle.displayName} • ${blueprint.auroraConfig.colorMode.displayName}',
@@ -560,7 +561,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00E5FF),
+                      backgroundColor: AppColors.neonCyan,
                       foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -602,7 +603,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF181A22),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
@@ -658,14 +659,14 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
 
         return Container(
           height: screenHeight * 0.90,
-          decoration: const BoxDecoration(
-            color: Color(0xFF0D0E15),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          decoration: BoxDecoration(
+            color: AppColors.darkBackground,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             boxShadow: [
               BoxShadow(
-                color: Color(0x6600E5FF),
+                color: AppColors.neonCyan.withValues(alpha: 0.4),
                 blurRadius: 30,
-                offset: Offset(0, -4),
+                offset: const Offset(0, -4),
               ),
             ],
           ),
@@ -693,14 +694,14 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                       padding: const EdgeInsets.all(9),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                          colors: [AppColors.neonCyan, AppColors.auroraViolet],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+                            color: AppColors.neonCyan.withValues(alpha: 0.35),
                             blurRadius: 10,
                           ),
                         ],
@@ -716,7 +717,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                           Text(
                             'AESTHETIC BLUEPRINT EXCHANGE',
                             style: TextStyle(
-                              color: Color(0xFF00E5FF),
+                              color: AppColors.neonCyan,
                               fontSize: 11,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 1.2,
@@ -750,13 +751,13 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF1A1A2E), Color(0xFF13141F)],
+                      colors: [AppColors.cardSurface, AppColors.cardHighlight],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+                      color: AppColors.neonCyan.withValues(alpha: 0.3),
                       width: 1.0,
                     ),
                   ),
@@ -765,11 +766,11 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                          color: AppColors.neonCyan.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.palette_rounded,
-                            color: Color(0xFF00E5FF), size: 20),
+                            color: AppColors.neonCyan, size: 20),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -779,7 +780,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                             const Text(
                               'YOUR ACTIVE SETUP',
                               style: TextStyle(
-                                color: Color(0xFF00E5FF),
+                                color: AppColors.neonCyan,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: 0.8,
@@ -810,7 +811,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                               fontSize: 12, fontWeight: FontWeight.w800),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00E5FF),
+                          backgroundColor: AppColors.neonCyan,
                           foregroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 8),
@@ -855,12 +856,12 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                             horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? const Color(0xFF00E5FF)
-                              : const Color(0xFF171822),
+                              ? AppColors.neonCyan
+                              : AppColors.cardSurface,
                           borderRadius: BorderRadius.circular(18),
                           border: Border.all(
                             color: isSelected
-                                ? const Color(0xFF00E5FF)
+                                ? AppColors.neonCyan
                                 : Colors.white12,
                             width: 0.8,
                           ),
@@ -908,7 +909,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                                         'All'));
                               },
                               child: const Text('Show All Blueprints',
-                                  style: TextStyle(color: Color(0xFF00E5FF))),
+                                  style: TextStyle(color: AppColors.neonCyan)),
                             ),
                           ],
                         ),
@@ -968,7 +969,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
           ),
           border: Border.all(
             color: blueprint.isStaffPick
-                ? const Color(0xFFFFD600).withValues(alpha: 0.6)
+                ? AppColors.solarGold.withValues(alpha: 0.6)
                 : Colors.white.withValues(alpha: 0.12),
             width: blueprint.isStaffPick ? 1.2 : 0.8,
           ),
@@ -1016,18 +1017,18 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                         color: Colors.black87,
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
-                            color: const Color(0xFFFFD600), width: 0.6),
+                            color: AppColors.solarGold, width: 0.6),
                       ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.star_rounded,
-                              color: Color(0xFFFFD600), size: 10),
+                              color: AppColors.solarGold, size: 10),
                           SizedBox(width: 2),
                           Text(
                             'STAFF',
                             style: TextStyle(
-                              color: Color(0xFFFFD600),
+                              color: AppColors.solarGold,
                               fontSize: 8,
                               fontWeight: FontWeight.w900,
                             ),
@@ -1152,7 +1153,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                                     ? Icons.favorite_rounded
                                     : Icons.favorite_border_rounded,
                                 color: isLiked
-                                    ? const Color(0xFFFF5252)
+                                    ? AppColors.favoriteRed
                                     : Colors.white60,
                                 size: 12,
                               ),
@@ -1161,7 +1162,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                                 '${blueprint.likesCount}',
                                 style: TextStyle(
                                   color: isLiked
-                                      ? const Color(0xFFFF5252)
+                                      ? AppColors.favoriteRed
                                       : Colors.white70,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
@@ -1176,7 +1177,7 @@ class _CommunityExchangeSheetState extends State<CommunityExchangeSheet> {
                         child: ElevatedButton(
                           onPressed: () => _applyBlueprint(blueprint),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF00E5FF),
+                            backgroundColor: AppColors.neonCyan,
                             foregroundColor: Colors.black,
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             minimumSize: Size.zero,

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/wallora_backup_bundle.dart';
 
 /// Modal bottom sheet providing data portability, backup export, and JSON restore.
@@ -53,12 +54,12 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Backup archive copied to clipboard! (${bundle.summary})'),
-        backgroundColor: const Color(0xFF1E1E28),
+        backgroundColor: AppColors.cardSurface,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 3),
         action: SnackBarAction(
           label: 'DISMISS',
-          textColor: const Color(0xFF00E5FF),
+          textColor: AppColors.neonCyan,
           onPressed: () {},
         ),
       ),
@@ -119,7 +120,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Restored: ${bundle.summary}'),
-          backgroundColor: const Color(0xFF00E676),
+          backgroundColor: AppColors.auroraEmerald,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -135,11 +136,11 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A24),
+        backgroundColor: AppColors.modalBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Color(0xFFFF5722)),
+            Icon(Icons.warning_amber_rounded, color: AppColors.sunsetAmber),
             SizedBox(width: 8),
             Text(
               'Factory Reset Data?',
@@ -162,7 +163,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF5722),
+              backgroundColor: AppColors.sunsetAmber,
               foregroundColor: Colors.white,
             ),
             onPressed: () {
@@ -187,7 +188,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
         return Container(
           height: MediaQuery.of(context).size.height * 0.90,
           decoration: const BoxDecoration(
-            color: Color(0xFF0F0F14),
+            color: AppColors.modalBackground,
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             boxShadow: [
               BoxShadow(
@@ -223,14 +224,14 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF00E5FF), Color(0xFF00E676)],
+                            colors: [AppColors.neonCyan, AppColors.auroraEmerald],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(14),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+                              color: AppColors.neonCyan.withValues(alpha: 0.35),
                               blurRadius: 12,
                             ),
                           ],
@@ -289,7 +290,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
                       const Text(
                         'RESTORE & IMPORT SETUP',
                         style: TextStyle(
-                          color: Color(0xFF00E5FF),
+                          color: AppColors.neonCyan,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.1,
@@ -303,7 +304,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
                       const Text(
                         'STORAGE RECLAMATION & RESET',
                         style: TextStyle(
-                          color: Color(0xFF00E5FF),
+                          color: AppColors.neonCyan,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.1,
@@ -327,15 +328,15 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF16161F),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+          color: AppColors.neonCyan.withValues(alpha: 0.35),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF00E5FF).withValues(alpha: 0.1),
+            color: AppColors.neonCyan.withValues(alpha: 0.1),
             blurRadius: 18,
             spreadRadius: 1,
           ),
@@ -349,7 +350,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
               Icon(
                 Icons.inventory_2_rounded,
                 size: 16,
-                color: Color(0xFF00E5FF),
+                color: AppColors.neonCyan,
               ),
               SizedBox(width: 8),
               Flexible(
@@ -377,22 +378,22 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
               _buildMetricChip(
                 icon: Icons.favorite_rounded,
                 label: '${state.favoriteIds.length} Favorites',
-                color: const Color(0xFFFF5252),
+                color: AppColors.favoriteRed,
               ),
               _buildMetricChip(
                 icon: Icons.playlist_play_rounded,
                 label: '${state.customCollections.length} Playlists',
-                color: const Color(0xFF00E5FF),
+                color: AppColors.neonCyan,
               ),
               _buildMetricChip(
                 icon: Icons.format_quote_rounded,
                 label: '${state.customizedQuotes.length} Quotes',
-                color: const Color(0xFFD500F9),
+                color: AppColors.auroraViolet,
               ),
               _buildMetricChip(
                 icon: Icons.tune_rounded,
                 label: '${state.customEffects.length} Effects',
-                color: const Color(0xFFFFD600),
+                color: AppColors.solarGold,
               ),
               _buildMetricChip(
                 icon: Icons.palette_rounded,
@@ -408,7 +409,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00E5FF),
+                backgroundColor: AppColors.neonCyan,
                 foregroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -466,7 +467,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF16161F),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white10),
       ),
@@ -492,7 +493,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
                 icon: const Icon(Icons.paste_rounded, size: 16),
                 label: const Text('Paste from Clipboard'),
                 style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF00E5FF),
+                  foregroundColor: AppColors.neonCyan,
                   padding: EdgeInsets.zero,
                   visualDensity: VisualDensity.compact,
                 ),
@@ -519,7 +520,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
                 fontFamily: 'monospace',
               ),
               filled: true,
-              fillColor: const Color(0xFF101018),
+              fillColor: AppColors.darkBackground,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(color: Colors.white12),
@@ -530,7 +531,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFF00E5FF)),
+                borderSide: const BorderSide(color: AppColors.neonCyan),
               ),
             ),
             onChanged: _validateJson,
@@ -541,7 +542,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
             Text(
               _jsonValidationError!,
               style: const TextStyle(
-                color: Color(0xFFFF5252),
+                color: AppColors.error,
                 fontSize: 11,
               ),
             ),
@@ -551,7 +552,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
 
           // Merge Toggle
           Material(
-            color: const Color(0xFF121218),
+            color: AppColors.cardSurface,
             borderRadius: BorderRadius.circular(12),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -582,9 +583,9 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
                   ),
                   Switch.adaptive(
                     value: _mergeWithExisting,
-                    activeThumbColor: const Color(0xFF00E5FF),
+                    activeThumbColor: AppColors.neonCyan,
                     activeTrackColor:
-                        const Color(0xFF00E5FF).withValues(alpha: 0.35),
+                        AppColors.neonCyan.withValues(alpha: 0.35),
                     onChanged: (val) {
                       setState(() {
                         _mergeWithExisting = val;
@@ -602,7 +603,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00E676),
+                backgroundColor: AppColors.auroraEmerald,
                 foregroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -626,7 +627,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF16161F),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white10),
       ),
@@ -649,7 +650,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
               Text(
                 state.storageFormatted,
                 style: const TextStyle(
-                  color: Color(0xFF00E5FF),
+                  color: AppColors.neonCyan,
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),
@@ -679,8 +680,8 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
           // Factory Reset button
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFFFF5252),
-              side: BorderSide(color: const Color(0xFFFF5252).withValues(alpha: 0.4)),
+              foregroundColor: AppColors.error,
+              side: BorderSide(color: AppColors.error.withValues(alpha: 0.4)),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

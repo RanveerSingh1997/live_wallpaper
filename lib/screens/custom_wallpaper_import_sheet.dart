@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
+import '../core/core.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
 
@@ -47,12 +48,12 @@ class _CustomWallpaperImportSheetState
   String _selectedResolution = '4K Ultra HD (2160x3840)';
 
   static const List<Color> _accentColors = [
-    Color(0xFF00E5FF), // Aurora Cyan
-    Color(0xFFFF5722), // Apex Amber
-    Color(0xFF00E676), // Matrix Green
-    Color(0xFFD500F9), // Neon Violet
-    Color(0xFFFFD600), // Cyber Gold
-    Color(0xFF2979FF), // Electric Blue
+    AppColors.neonCyan, // Aurora Cyan
+    AppColors.sunsetAmber, // Apex Amber
+    AppColors.auroraEmerald, // Matrix Green
+    AppColors.auroraViolet, // Neon Violet
+    AppColors.solarGold, // Cyber Gold
+    AppColors.electricBlue, // Electric Blue
   ];
   int _selectedColorIndex = 0;
 
@@ -162,9 +163,9 @@ class _CustomWallpaperImportSheetState
       fileSizeBytes: _isLive ? 3500000 : 1800000,
       durationSeconds: _isLive ? 15 : 0,
       gradientColors: [
-        const Color(0xFF05050A),
+        AppColors.darkBackground,
         accent.withValues(alpha: 0.6),
-        const Color(0xFF000000),
+        AppColors.obsidianBlack,
       ],
       tags:
           'custom creator imported ${_selectedCategory.toLowerCase()} ${title.toLowerCase()}',
@@ -202,7 +203,7 @@ class _CustomWallpaperImportSheetState
     return Container(
       height: MediaQuery.of(context).size.height * 0.92,
       decoration: const BoxDecoration(
-        color: Color(0xFF141418),
+        color: AppColors.modalBackground,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
@@ -232,7 +233,7 @@ class _CustomWallpaperImportSheetState
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [currentAccent, const Color(0xFFD500F9)],
+                          colors: [currentAccent, AppColors.auroraViolet],
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -268,7 +269,11 @@ class _CustomWallpaperImportSheetState
                 ),
                 IconButton(
                   icon: const Icon(Icons.close_rounded, color: Colors.white54),
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () {
+                    if (mounted && Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    }
+                  },
                 ),
               ],
             ),
@@ -385,7 +390,7 @@ class _CustomWallpaperImportSheetState
                             ),
                             backgroundColor: isSelected
                                 ? currentAccent
-                                : const Color(0xFF1E1E24),
+                                : AppColors.cardSurface,
                             side: BorderSide(
                               color: isSelected
                                   ? currentAccent
@@ -426,7 +431,7 @@ class _CustomWallpaperImportSheetState
                     ),
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: const Color(0xFF1A1A20),
+                      fillColor: AppColors.cardSurface,
                       hintText: '/storage/emulated/0/DCIM/my_video.mp4 or asset path',
                       hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
                       prefixIcon: const Icon(Icons.link_rounded,
@@ -483,7 +488,7 @@ class _CustomWallpaperImportSheetState
                               style: const TextStyle(color: Colors.white, fontSize: 14),
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor: const Color(0xFF1A1A20),
+                                fillColor: AppColors.cardSurface,
                                 hintText: 'e.g. Midnight Apex',
                                 hintStyle: const TextStyle(color: Colors.white24),
                                 border: OutlineInputBorder(
@@ -530,7 +535,7 @@ class _CustomWallpaperImportSheetState
                               style: const TextStyle(color: Colors.white, fontSize: 14),
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor: const Color(0xFF1A1A20),
+                                fillColor: AppColors.cardSurface,
                                 hintText: 'e.g. Studio Vertex',
                                 hintStyle: const TextStyle(color: Colors.white24),
                                 border: OutlineInputBorder(
@@ -577,7 +582,7 @@ class _CustomWallpaperImportSheetState
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1A1A20),
+                                color: AppColors.cardSurface,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(color: Colors.white12),
                               ),
@@ -585,7 +590,7 @@ class _CustomWallpaperImportSheetState
                                 child: DropdownButton<String>(
                                   value: _selectedCategory,
                                   isExpanded: true,
-                                  dropdownColor: const Color(0xFF22222A),
+                                  dropdownColor: AppColors.cardHighlight,
                                   icon: const Icon(Icons.arrow_drop_down_rounded,
                                       color: Colors.white54),
                                   items: CuratedShortsData.availablePreferences
@@ -629,7 +634,7 @@ class _CustomWallpaperImportSheetState
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1A1A20),
+                                color: AppColors.cardSurface,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(color: Colors.white12),
                               ),
@@ -637,7 +642,7 @@ class _CustomWallpaperImportSheetState
                                 child: DropdownButton<String>(
                                   value: _selectedResolution,
                                   isExpanded: true,
-                                  dropdownColor: const Color(0xFF22222A),
+                                  dropdownColor: AppColors.cardHighlight,
                                   icon: const Icon(Icons.arrow_drop_down_rounded,
                                       color: Colors.white54),
                                   items: const [
@@ -782,7 +787,7 @@ class _CustomWallpaperImportSheetState
                       maxLines: 2,
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: const Color(0xFF1A1A20),
+                        fillColor: AppColors.cardSurface,
                         hintText: 'Enter your personal mantra or motivational quote',
                         hintStyle: const TextStyle(color: Colors.white24),
                         border: OutlineInputBorder(
@@ -812,7 +817,7 @@ class _CustomWallpaperImportSheetState
           Container(
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
             decoration: const BoxDecoration(
-              color: Color(0xFF0D0D10),
+              color: AppColors.darkBackground,
               border: Border(top: BorderSide(color: Colors.white10)),
             ),
             child: Row(
@@ -886,7 +891,7 @@ class _CustomWallpaperImportSheetState
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? accent.withValues(alpha: 0.15) : const Color(0xFF1A1A20),
+          color: isSelected ? accent.withValues(alpha: 0.15) : AppColors.cardSurface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isSelected ? accent : Colors.white12,
@@ -968,9 +973,9 @@ class _CustomWallpaperImportSheetState
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      const Color(0xFF05050A),
+                      AppColors.darkBackground,
                       accent.withValues(alpha: 0.45),
-                      const Color(0xFF000000),
+                      AppColors.obsidianBlack,
                     ],
                   ),
                 ),
