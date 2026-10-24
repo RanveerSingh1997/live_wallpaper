@@ -7,6 +7,7 @@ import '../blocs/wallpaper_state.dart';
 import '../core/core.dart';
 import 'wallpaper_preview_sheet.dart';
 import 'wallpaper_quick_actions_sheet.dart';
+import '../widgets/fluid_pressable.dart';
 
 class FavoritesScreen extends StatefulWidget {
   final VoidCallback onBrowseWallpapers;
@@ -143,6 +144,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           : Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: GridView.builder(
+                                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                                padding: const EdgeInsets.only(bottom: 96),
                                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2,
                                   crossAxisSpacing: 12,
@@ -161,7 +164,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                       : _filter == 'Static'
                                           ? favorites.where((s) => !s.isLive).toList()
                                           : favorites)[index];
-                      return GestureDetector(
+                      return FluidPressable(
                         onTap: () {
                           WallpaperPreviewSheet.show(context, item);
                         },

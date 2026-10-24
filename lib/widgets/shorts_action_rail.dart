@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../core/core.dart';
 import '../models/motivational_short.dart';
+import 'fluid_pressable.dart';
 
 class ShortsActionRail extends StatelessWidget {
   final MotivationalShort short;
@@ -95,7 +96,7 @@ class ShortsActionRail extends StatelessWidget {
   }
 
   Widget _buildApplyButton(BuildContext context) {
-    return GestureDetector(
+    return FluidPressable(
       onTap: isApplying
           ? null
           : () {
@@ -165,7 +166,7 @@ class ShortsActionRail extends StatelessWidget {
     required Color accentColor,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return FluidPressable(
       onTap: () {
         HapticFeedback.selectionClick();
         onTap();

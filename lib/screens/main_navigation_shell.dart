@@ -71,28 +71,39 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
         return Scaffold(
           backgroundColor: Colors.black,
+          extendBody: true,
           body: IndexedStack(
             index: currentIndex,
             children: screens,
           ),
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceElevated.withValues(alpha: 0.94),
-              border: const Border(
-                top: BorderSide(color: Colors.white12, width: 0.8),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  blurRadius: 16,
-                  offset: const Offset(0, -4),
+          bottomNavigationBar: SafeArea(
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceElevated.withValues(alpha: 0.88),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.14),
+                  width: 1.2,
                 ),
-              ],
-            ),
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                child: BottomNavigationBar(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.6),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                  BoxShadow(
+                    color: AppColors.neonCyan.withValues(alpha: 0.08),
+                    blurRadius: 16,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(27),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: BottomNavigationBar(
                   currentIndex: currentIndex,
                   onTap: _navigateToTab,
                   type: BottomNavigationBarType.fixed,
@@ -157,7 +168,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
               ),
             ),
           ),
-        );
+        ),
+      );
       },
     );
   }

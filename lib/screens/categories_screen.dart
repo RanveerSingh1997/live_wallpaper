@@ -11,6 +11,7 @@ import 'collection_detail_sheet.dart';
 import 'create_collection_sheet.dart';
 import 'wallpaper_preview_sheet.dart';
 import 'wallpaper_quick_actions_sheet.dart';
+import '../widgets/fluid_pressable.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -272,8 +273,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     List<String> categories,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
       child: GridView.builder(
+        physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 14,
@@ -287,7 +289,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           final color = _getCategoryColor(category);
           final icon = _getCategoryIcon(category);
 
-          return GestureDetector(
+          return FluidPressable(
             onTap: () {
               HapticFeedback.selectionClick();
               _showCategoryItemsSheet(context, category, color);
@@ -356,10 +358,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   Widget _buildPlaylistsTab(BuildContext context, WallpaperState state) {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 36),
+      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
       children: [
         // Create Playlist Hero Button
-        GestureDetector(
+        FluidPressable(
           onTap: () {
             HapticFeedback.selectionClick();
             CreateCollectionSheet.show(context);
@@ -571,7 +574,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     WallpaperCollection col, {
     required bool isUserCreated,
   }) {
-    return GestureDetector(
+    return FluidPressable(
       onTap: () {
         HapticFeedback.selectionClick();
         CollectionDetailSheet.show(context, col);

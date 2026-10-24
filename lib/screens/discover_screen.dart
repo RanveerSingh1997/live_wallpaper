@@ -22,6 +22,8 @@ import 'wallpaper_quick_actions_sheet.dart';
 import 'weather_atmosphere_sheet.dart';
 import 'wallaza_cloud_discovery_sheet.dart';
 import '../models/smart_filter_config.dart';
+import '../widgets/fluid_pressable.dart';
+import '../widgets/shimmer_loading.dart';
 
 class DiscoverScreen extends StatefulWidget {
   final VoidCallback onOpenLiveFeed;
@@ -89,10 +91,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         if (state.allShorts.isEmpty) {
           return const Scaffold(
             backgroundColor: Colors.black,
-            body: Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.sunsetAmber),
-              ),
+            body: SafeArea(
+              child: ShimmerDiscoverSkeleton(),
             ),
           );
         }
@@ -109,6 +109,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           body: SafeArea(
             bottom: false,
             child: CustomScrollView(
+              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
               slivers: [
                 // Top App Bar
                 SliverToBoxAdapter(
@@ -1169,7 +1170,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ),
 
                   const SliverToBoxAdapter(
-                    child: SizedBox(height: 32),
+                    child: SizedBox(height: 100),
                   ),
                 ],
               ],
@@ -1181,7 +1182,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   Widget _buildFeaturedCard(MotivationalShort featured) {
-    return GestureDetector(
+    return FluidPressable(
       onTap: () {
         WallpaperPreviewSheet.show(context, featured);
       },
@@ -1324,7 +1325,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   Widget _buildHorizontalLiveCard(MotivationalShort item) {
-    return GestureDetector(
+    return FluidPressable(
       onTap: () {
         WallpaperPreviewSheet.show(context, item);
       },
@@ -1436,7 +1437,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       delegate: SliverChildBuilderDelegate(
         (context, index) {
           final item = wallpapers[index];
-          return GestureDetector(
+          return FluidPressable(
             onTap: () {
               WallpaperPreviewSheet.show(context, item);
             },
@@ -1559,7 +1560,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   Widget _buildRecentlyViewedCard(MotivationalShort item) {
-    return GestureDetector(
+    return FluidPressable(
       onTap: () {
         WallpaperPreviewSheet.show(context, item);
       },
@@ -1651,7 +1652,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   Widget _buildCollectionCard(WallpaperCollection col) {
-    return GestureDetector(
+    return FluidPressable(
       onTap: () {
         HapticFeedback.selectionClick();
         CollectionDetailSheet.show(context, col);

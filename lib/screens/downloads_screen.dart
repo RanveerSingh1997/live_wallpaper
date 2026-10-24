@@ -199,7 +199,8 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                   ),
                 )
               : ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
                   children: [
                     // Storage meter header
                     Container(
