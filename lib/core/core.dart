@@ -1,6 +1,7 @@
 export 'cache/cache.dart';
 export 'constants/constants.dart';
 export 'di/service_locator.dart';
+export 'diagnostics/diagnostics.dart';
 export 'localization/localization.dart';
 export 'network/network.dart';
 export 'platform/app_platform.dart';

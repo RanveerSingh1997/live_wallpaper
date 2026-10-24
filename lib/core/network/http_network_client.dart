@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'interceptors/diagnostic_interceptor.dart';
 import 'interceptors/header_interceptor.dart';
 import 'interceptors/network_interceptor.dart';
 import 'network_client.dart';
@@ -35,6 +36,7 @@ class HttpNetworkClient implements NetworkClient {
           'User-Agent': 'Wallora-Flutter-Client/1.0',
         };
     _interceptors.add(HeaderInterceptor(headers));
+    _interceptors.add(const DiagnosticNetworkInterceptor());
 
     if (interceptors != null) {
       _interceptors.addAll(interceptors);

@@ -1,4 +1,5 @@
 export 'http_network_client.dart';
+export 'interceptors/diagnostic_interceptor.dart';
 export 'interceptors/header_interceptor.dart';
 export 'interceptors/logging_interceptor.dart';
 export 'interceptors/network_interceptor.dart';

@@ -12,6 +12,7 @@ import 'battery_telemetry_sheet.dart';
 import 'community_exchange_sheet.dart';
 import 'data_portability_sheet.dart';
 import 'day_night_schedule_sheet.dart';
+import 'diagnostic_logs_sheet.dart';
 import 'gesture_control_sheet.dart';
 import 'lock_screen_studio_sheet.dart';
 import 'onboarding_sheet.dart';
@@ -488,6 +489,21 @@ class SettingsSheet extends StatelessWidget {
                     subtitle: 'Export, restore & manage playlists, quotes & setups',
                     onTap: () {
                       DataPortabilitySheet.show(context);
+                    },
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // SECTION: Diagnostics & Observability
+                  _buildSectionHeader('OBSERVABILITY & DIAGNOSTICS'),
+                  const SizedBox(height: 10),
+                  _buildSettingTile(
+                    icon: Icons.bug_report_rounded,
+                    iconColor: AppColors.neonCyan,
+                    title: 'System Diagnostics & Logs',
+                    subtitle: 'Inspect runtime telemetry, error boundaries & export support report',
+                    onTap: () {
+                      DiagnosticLogsSheet.show(context);
                     },
                   ),
 

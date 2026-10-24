@@ -17,6 +17,21 @@ abstract final class AppDimensions {
   static const double space40 = 40.0;
   static const double space48 = 48.0;
 
+  // Spacing Aliases
+  static const double spacing4 = space4;
+  static const double spacing6 = space6;
+  static const double spacing8 = space8;
+  static const double spacing10 = space10;
+  static const double spacing12 = space12;
+  static const double spacing14 = space14;
+  static const double spacing16 = space16;
+  static const double spacing20 = space20;
+  static const double spacing24 = space24;
+  static const double spacing28 = space28;
+  static const double spacing32 = space32;
+  static const double spacing40 = space40;
+  static const double spacing48 = space48;
+
   // Standard EdgeInsets
   static const EdgeInsets paddingZero = EdgeInsets.zero;
   static const EdgeInsets paddingAll4 = EdgeInsets.all(space4);
@@ -40,6 +55,7 @@ abstract final class AppDimensions {
   static const double radius16 = 16.0;
   static const double radius20 = 20.0;
   static const double radius24 = 24.0;
+  static const double radius28 = 28.0;
   static const double radiusFull = 999.0;
 
   static const BorderRadius borderRadius6 = BorderRadius.all(Radius.circular(radius6));
@@ -49,6 +65,7 @@ abstract final class AppDimensions {
   static const BorderRadius borderRadius16 = BorderRadius.all(Radius.circular(radius16));
   static const BorderRadius borderRadius20 = BorderRadius.all(Radius.circular(radius20));
   static const BorderRadius borderRadius24 = BorderRadius.all(Radius.circular(radius24));
+  static const BorderRadius borderRadius28 = BorderRadius.all(Radius.circular(radius28));
   static const BorderRadius borderRadiusFull = BorderRadius.all(Radius.circular(radiusFull));
 
   // Icon Sizes

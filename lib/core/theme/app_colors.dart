@@ -10,6 +10,7 @@ abstract final class AppColors {
   static const Color auroraAmber = sunsetAmber;
   static const Color cyberEmerald = Color(0xFF00E676);
   static const Color auroraEmerald = cyberEmerald;
+  static const Color emeraldGreen = auroraEmerald;
   static const Color cyberTeal = Color(0xFF1DE9B6);
   static const Color solarGold = Color(0xFFFFD600);
   static const Color electricBlue = Color(0xFF00B0FF);

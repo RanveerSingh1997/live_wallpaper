@@ -13,6 +13,9 @@ import 'screens/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize production diagnostics, observability ring buffer, and error boundaries
+  AppDiagnostics.init();
+
   // Set immersive status bar colors for full-screen video experience
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(

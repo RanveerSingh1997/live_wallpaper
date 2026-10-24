@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:live_wallpaper/core/core.dart';
 import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
@@ -26,6 +27,7 @@ import 'package:live_wallpaper/screens/auto_rotation_sheet.dart';
 import 'package:live_wallpaper/widgets/aurora_synthesizer_canvas.dart';
 import 'package:live_wallpaper/screens/battery_telemetry_sheet.dart';
 import 'package:live_wallpaper/screens/data_portability_sheet.dart';
+import 'package:live_wallpaper/screens/diagnostic_logs_sheet.dart';
 import 'package:live_wallpaper/screens/gesture_control_sheet.dart';
 import 'package:live_wallpaper/screens/particle_effect_sheet.dart';
 import 'package:live_wallpaper/screens/categories_screen.dart';
@@ -813,6 +815,8 @@ void main() {
 
       expect(find.text('STORAGE & OFFLINE CACHE'), findsOneWidget);
       expect(find.text('BATTERY & HARDWARE INTEGRITY'), findsOneWidget);
+      expect(find.text('OBSERVABILITY & DIAGNOSTICS'), findsOneWidget);
+      expect(find.text('System Diagnostics & Logs'), findsOneWidget);
       expect(find.text('5.0 MB'), findsOneWidget);
       expect(find.text('Replay Onboarding Tour'), findsOneWidget);
 
@@ -3896,6 +3900,40 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(bloc.state.activeWallpaperId, 'cloud_wlz_live_cyber_07');
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('DiagnosticLogsSheet renders event breadcrumbs and action controls',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      AppDiagnostics.clear();
+      AppDiagnostics.record('BOOT', 'Test boot breadcrumb');
+      AppDiagnostics.record('NETWORK', 'HTTP 200 GET /feed');
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: DiagnosticLogsSheet(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('System Diagnostics'), findsOneWidget);
+      expect(find.text('Test boot breadcrumb'), findsOneWidget);
+      expect(find.text('HTTP 200 GET /feed'), findsOneWidget);
+      expect(find.text('BOOT'), findsOneWidget);
+      expect(find.text('NETWORK'), findsOneWidget);
+      expect(find.byIcon(Icons.copy_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.delete_outline_rounded), findsOneWidget);
 
       await tester.pumpWidget(const SizedBox.shrink());
     });

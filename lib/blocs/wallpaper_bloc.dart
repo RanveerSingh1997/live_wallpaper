@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../core/core.dart';
 import '../repositories/wallpaper_repository.dart';
 import 'handlers/auto_rotation_handlers.dart';
 import 'handlers/cloud_handlers.dart';
@@ -134,5 +135,20 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState>
     on<ClearCloudSearchIntent>(onClearCloudSearch);
     on<UpdateCloudSortIntent>(onUpdateCloudSort);
     on<FilterCloudByAuthorIntent>(onFilterCloudByAuthor);
+  }
+
+  @override
+  void onTransition(Transition<WallpaperIntent, WallpaperState> transition) {
+    super.onTransition(transition);
+    AppDiagnostics.record('BLOC', 'State transition', {
+      'event': transition.event.runtimeType.toString(),
+      'actionStatus': transition.nextState.actionStatus.name,
+    });
+  }
+
+  @override
+  void onError(Object error, StackTrace stackTrace) {
+    super.onError(error, stackTrace);
+    AppDiagnostics.recordError(error, stackTrace, category: 'BLOC_ERROR');
   }
 }
