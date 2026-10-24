@@ -1,0 +1,47 @@
+default_platform(:android)
+
+platform :android do
+  before_all do
+    ENV["FLUTTER_ROOT"] ||= `which flutter`.strip
+  end
+
+  desc "Run Flutter static analysis and tests"
+  lane :test do
+    sh("cd ../.. && flutter analyze --fatal-infos --fatal-warnings")
+    sh("cd ../.. && flutter test")
+  end
+
+  desc "Build production release App Bundle (.aab)"
+  lane :build_aab do
+    test
+    sh("cd ../.. && flutter build appbundle --release")
+  end
+
+  desc "Build production release APKs (.apk split per ABI)"
+  lane :build_apk do
+    test
+    sh("cd ../.. && flutter build apk --release --split-per-abi")
+  end
+
+  desc "Deploy App Bundle to Google Play Internal Testing track"
+  lane :deploy_internal do
+    build_aab
+    upload_to_play_store(
+      track: "internal",
+      aab: "../../build/app/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Deploy App Bundle to Google Play Production track"
+  lane :deploy_production do
+    build_aab
+    upload_to_play_store(
+      track: "production",
+      aab: "../../build/app/outputs/bundle/release/app-release.aab",
+      metadata_path: "../../store_metadata/google_play"
+    )
+  end
+end

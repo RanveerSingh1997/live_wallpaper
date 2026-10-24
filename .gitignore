@@ -53,3 +53,12 @@ backend/target/
 key.properties
 *.jks
 *.keystore
+play-store-credentials.json
+*.aab
+*.ipa
+
+# Fastlane
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output

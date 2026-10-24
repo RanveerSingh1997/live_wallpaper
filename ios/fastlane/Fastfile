@@ -1,0 +1,41 @@
+default_platform(:ios)
+
+platform :ios do
+  before_all do
+    ENV["FLUTTER_ROOT"] ||= `which flutter`.strip
+  end
+
+  desc "Run Flutter static analysis and tests"
+  lane :test do
+    sh("cd ../.. && flutter analyze --fatal-infos --fatal-warnings")
+    sh("cd ../.. && flutter test")
+  end
+
+  desc "Build release iOS archive (.ipa)"
+  lane :build_ipa do
+    test
+    sh("cd ../.. && flutter build ipa --release")
+  end
+
+  desc "Distribute build to Apple TestFlight"
+  lane :beta do
+    build_ipa
+    upload_to_testflight(
+      ipa: "../../build/ios/ipa/live_wallpaper.ipa",
+      skip_waiting_for_build_processing: true
+    )
+  end
+
+  desc "Submit build to Apple App Store for review"
+  lane :release do
+    build_ipa
+    deliver(
+      ipa: "../../build/ios/ipa/live_wallpaper.ipa",
+      description: File.read("../../store_metadata/app_store/description.txt"),
+      promotional_text: File.read("../../store_metadata/app_store/promotional_text.txt"),
+      keywords: File.read("../../store_metadata/app_store/keywords.txt").strip.split(","),
+      submit_for_review: false,
+      automatic_release: true
+    )
+  end
+end
