@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import '../core/core.dart';
 import 'motivational_short.dart';
 
 /// Representation of a cloud-streamed wallpaper entity from the Wallaza API.
@@ -194,25 +195,25 @@ class WallazaCloudWallpaper extends Equatable {
     switch (category.toLowerCase()) {
       case 'live':
       case 'cyberpunk':
-        accent = const Color(0xFF00E5FF); // Neon Cyan
+        accent = AppColors.neonCyan;
         break;
       case 'nature':
-        accent = const Color(0xFF00E676); // Neon Emerald
+        accent = AppColors.auroraEmerald;
         break;
       case 'space':
       case 'galaxy':
-        accent = const Color(0xFFD500F9); // Neon Violet
+        accent = AppColors.auroraViolet;
         break;
       case 'amoled':
       case 'minimalist':
-        accent = const Color(0xFFFFFFFF); // Pure White
+        accent = AppColors.textPrimary;
         break;
       case 'anime':
-        accent = const Color(0xFFFF4081); // Vibrant Rose
+        accent = AppColors.plasmaPink;
         break;
       case 'abstract':
       default:
-        accent = const Color(0xFFFF5722); // Vibrant Amber
+        accent = AppColors.sunsetAmber;
         break;
     }
 
@@ -235,7 +236,7 @@ class WallazaCloudWallpaper extends Equatable {
       trueBlackPercentage: isAmoled ? 85 : 15,
       gradientColors: [
         accent.withAlpha(200),
-        const Color(0xFF000000),
+        AppColors.obsidianBlack,
       ],
     );
   }

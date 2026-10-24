@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import '../core/core.dart';
 
 /// Available interactive particle visual styles.
 enum ParticlePreset {
@@ -7,31 +8,31 @@ enum ParticlePreset {
     label: 'Neon Stardust',
     description: 'Luminous ambient particles floating and scattering on touch',
     icon: Icons.auto_awesome_rounded,
-    accentColor: Color(0xFF00E5FF),
+    accentColor: AppColors.neonCyan,
   ),
   electricSparks(
     label: 'Electric Sparks',
     description: 'High-energy cyber sparks snapping from contact points',
     icon: Icons.bolt_rounded,
-    accentColor: Color(0xFFFF5722),
+    accentColor: AppColors.sunsetAmber,
   ),
   fluidRipples(
     label: 'Fluid Ripples',
     description: 'Concentric liquid wave rings dispersing outwards on touch',
     icon: Icons.waves_rounded,
-    accentColor: Color(0xFF00E676),
+    accentColor: AppColors.auroraEmerald,
   ),
   sakuraDrift(
     label: 'Sakura Petal Drift',
     description: 'Soft ethereal blossom petals dancing in ambient air',
     icon: Icons.spa_rounded,
-    accentColor: Color(0xFFD500F9),
+    accentColor: AppColors.auroraViolet,
   ),
   auroraVortex(
     label: 'Aurora Vortex',
     description: 'Swirling Northern Lights ribbon trails following gestures',
     icon: Icons.blur_circular_rounded,
-    accentColor: Color(0xFF00E5FF),
+    accentColor: AppColors.neonCyan,
   ),
   none(
     label: 'Clean Canvas (Off)',

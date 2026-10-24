@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import '../core/core.dart';
 
 /// Available actions triggered by touch gestures on Wallora wallpapers.
 enum GestureAction {
@@ -147,32 +148,32 @@ enum TouchColorMode {
   auraSync(
     label: 'Dynamic Aura Sync',
     description: 'Inherits active Aura Chromatic Harmonizer neon primary color',
-    color: Color(0xFF00E5FF),
+    color: AppColors.neonCyan,
   ),
   electricCyan(
     label: 'Electric Cyan',
     description: 'High-contrast cyber neon cyan (#00E5FF)',
-    color: Color(0xFF00E5FF),
+    color: AppColors.neonCyan,
   ),
   auroraViolet(
     label: 'Aurora Violet',
     description: 'Deep celestial electric violet (#D500F9)',
-    color: Color(0xFFD500F9),
+    color: AppColors.auroraViolet,
   ),
   solarAmber(
     label: 'Solar Amber',
     description: 'Warm energetic twilight amber (#FF5722)',
-    color: Color(0xFFFF5722),
+    color: AppColors.sunsetAmber,
   ),
   emeraldNeon(
     label: 'Emerald Neon',
     description: 'Vivid biometric emerald glow (#00E676)',
-    color: Color(0xFF00E676),
+    color: AppColors.auroraEmerald,
   ),
   pureWhite(
     label: 'Pure White',
     description: 'Bright obsidian starlight (#FFFFFF)',
-    color: Color(0xFFFFFFFF),
+    color: AppColors.textPrimary,
   );
 
   final String label;

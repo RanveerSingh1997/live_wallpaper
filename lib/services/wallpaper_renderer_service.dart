@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import '../core/core.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_effect_config.dart';
 
@@ -60,7 +61,7 @@ class WallpaperRendererServiceImpl implements WallpaperRendererService {
         ? wallpaper.gradientColors
         : [
             wallpaper.accentColor.withValues(alpha: 0.35),
-            const Color(0xFF141418),
+            AppColors.darkSurface,
             Colors.black,
           ];
 
@@ -85,28 +86,28 @@ class WallpaperRendererServiceImpl implements WallpaperRendererService {
       } else if (effectConfig.colorFilterPreset == 'cyber_cyan') {
         final tintPaint = Paint()
           ..colorFilter =
-              const ColorFilter.mode(Color(0xFF00E5FF), BlendMode.color);
+              const ColorFilter.mode(AppColors.neonCyan, BlendMode.color);
         canvas.drawRect(
             Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
             tintPaint);
       } else if (effectConfig.colorFilterPreset == 'sunset_amber') {
         final tintPaint = Paint()
           ..colorFilter =
-              const ColorFilter.mode(Color(0xFFFF5722), BlendMode.color);
+              const ColorFilter.mode(AppColors.sunsetAmber, BlendMode.color);
         canvas.drawRect(
             Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
             tintPaint);
       } else if (effectConfig.colorFilterPreset == 'matrix_emerald') {
         final tintPaint = Paint()
           ..colorFilter =
-              const ColorFilter.mode(Color(0xFF00E676), BlendMode.color);
+              const ColorFilter.mode(AppColors.auroraEmerald, BlendMode.color);
         canvas.drawRect(
             Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
             tintPaint);
       } else if (effectConfig.colorFilterPreset == 'aurora_violet') {
         final tintPaint = Paint()
           ..colorFilter =
-              const ColorFilter.mode(Color(0xFFD500F9), BlendMode.color);
+              const ColorFilter.mode(AppColors.auroraViolet, BlendMode.color);
         canvas.drawRect(
             Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
             tintPaint);

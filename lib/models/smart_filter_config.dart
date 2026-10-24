@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import '../core/core.dart';
 import 'motivational_short.dart';
 
 /// Media format filter options.
@@ -36,12 +37,12 @@ enum SmartMood {
 /// Dominant color harmony palette filter options.
 enum SmartPaletteColor {
   all('All Colors', null),
-  neonCyan('Neon Cyan', Color(0xFF00E5FF)),
-  auroraViolet('Aurora Violet', Color(0xFFD500F9)),
-  sunsetAmber('Sunset Amber', Color(0xFFFF5722)),
-  cyberEmerald('Cyber Emerald', Color(0xFF00E676)),
-  solarGold('Solar Gold', Color(0xFFFFD600)),
-  amoledBlack('AMOLED Black', Color(0xFF000000));
+  neonCyan('Neon Cyan', AppColors.neonCyan),
+  auroraViolet('Aurora Violet', AppColors.auroraViolet),
+  sunsetAmber('Sunset Amber', AppColors.sunsetAmber),
+  cyberEmerald('Cyber Emerald', AppColors.auroraEmerald),
+  solarGold('Solar Gold', AppColors.solarGold),
+  amoledBlack('AMOLED Black', AppColors.obsidianBlack);
 
   final String label;
   final Color? color;

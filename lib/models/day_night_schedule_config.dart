@@ -1,11 +1,12 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import '../core/core.dart';
 
 enum DayNightSlot {
-  morning('Morning / Dawn', Icons.wb_twilight_rounded, Color(0xFF00E5FF)),
-  afternoon('Afternoon / Focus', Icons.wb_sunny_rounded, Color(0xFFFFD600)),
-  evening('Sunset / Twilight', Icons.nights_stay_rounded, Color(0xFFFF5722)),
-  night('Night / AMOLED Black', Icons.bedtime_rounded, Color(0xFF00E676));
+  morning('Morning / Dawn', Icons.wb_twilight_rounded, AppColors.neonCyan),
+  afternoon('Afternoon / Focus', Icons.wb_sunny_rounded, AppColors.solarGold),
+  evening('Sunset / Twilight', Icons.nights_stay_rounded, AppColors.sunsetAmber),
+  night('Night / AMOLED Black', Icons.bedtime_rounded, AppColors.auroraEmerald);
 
   final String label;
   final IconData icon;

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import '../core/core.dart';
 
 /// Available atmospheric weather and climate particle effects.
 enum WeatherEffectType {
@@ -13,7 +14,7 @@ enum WeatherEffectType {
     label: 'Cyberpunk Rain & Drizzle',
     description: 'Slanted luminous cyan rainfall streaks with ambient ripple dispersion',
     icon: Icons.water_drop_rounded,
-    accentColor: Color(0xFF00E5FF),
+    accentColor: AppColors.neonCyan,
   ),
   cosmicSnow(
     label: 'Cosmic Snow & Blizzard',
@@ -25,25 +26,25 @@ enum WeatherEffectType {
     label: 'Neon Thunderstorm',
     description: 'Dynamic precipitation with dramatic atmospheric lightning glow pulses',
     icon: Icons.thunderstorm_rounded,
-    accentColor: Color(0xFFD500F9),
+    accentColor: AppColors.auroraViolet,
   ),
   solarSunbeams(
     label: 'Solar God Rays',
     description: 'Warm volumetric sunbeam shafts gently sweeping across the screen',
     icon: Icons.wb_sunny_rounded,
-    accentColor: Color(0xFFFFD600),
+    accentColor: AppColors.solarGold,
   ),
   etherealMist(
     label: 'Ethereal Nebula Mist',
     description: 'Rolling atmospheric vapor drifts and deep celestial cloud curtains',
     icon: Icons.cloud_rounded,
-    accentColor: Color(0xFF00E676),
+    accentColor: AppColors.auroraEmerald,
   ),
   meteorShower(
     label: 'Meteor Shower & Starfall',
     description: 'High-speed incandescent shooting stars streaking across the cosmos',
     icon: Icons.auto_awesome_rounded,
-    accentColor: Color(0xFFFF5722),
+    accentColor: AppColors.sunsetAmber,
   );
 
   final String label;

@@ -100,13 +100,13 @@ class _AuroraSynthesizerCanvasState extends State<AuroraSynthesizerCanvas>
           AppColors.sunsetAmber,
           AppColors.auroraEmerald,
           AppColors.solarGold,
-          Color(0xFF1DE9B6),
+          AppColors.cyberTeal,
         ];
       case AuroraColorMode.pureOledRed:
         return const [
           AppColors.nightCrimson,
           AppColors.sunsetAmber,
-          Color(0xFFD50000),
+          AppColors.crimsonAccent,
           AppColors.favoriteRed,
         ];
     }

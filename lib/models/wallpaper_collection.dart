@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import '../core/core.dart';
 
 class WallpaperCollection extends Equatable {
   final String id;
@@ -114,7 +115,7 @@ class WallpaperCollection extends Equatable {
       gradientColors: (json['gradientColors'] as List<dynamic>?)
               ?.map((c) => Color(c as int))
               .toList() ??
-          const [Color(0xFF1B0B2E), Color(0xFF7C4DFF), Color(0xFF0D061A)],
+          const [Color(0xFF1B0B2E), AppColors.deepPurple, Color(0xFF0D061A)],
       isUserCreated: json['isUserCreated'] as bool? ?? true,
     );
   }

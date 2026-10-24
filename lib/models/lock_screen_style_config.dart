@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import '../core/core.dart';
 
 /// Typography fonts available for the lock screen clock simulation.
 enum LockScreenClockFont {
@@ -84,7 +85,7 @@ class LockScreenStyleConfig extends Equatable {
     clockLayout: LockScreenClockLayout.stacked,
     widgetType: LockScreenWidgetType.batteryGlance,
     useWallpaperAccentColor: false,
-    customColor: Color(0xFF00E676),
+    customColor: AppColors.auroraEmerald,
     clockSize: 84.0,
   );
 
@@ -93,7 +94,7 @@ class LockScreenStyleConfig extends Equatable {
     clockLayout: LockScreenClockLayout.horizontal,
     widgetType: LockScreenWidgetType.circadianSlot,
     useWallpaperAccentColor: false,
-    customColor: Color(0xFF00E5FF),
+    customColor: AppColors.neonCyan,
     clockSize: 80.0,
   );
 

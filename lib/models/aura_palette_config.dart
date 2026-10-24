@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import '../core/core.dart';
 import 'motivational_short.dart';
 
 /// Predefined chromatic Aura theme presets for Wallora.
@@ -65,15 +66,15 @@ enum AuraThemePreset {
   Color get primaryAccent {
     switch (this) {
       case AuraThemePreset.wallpaperDynamic:
-        return const Color(0xFF00E5FF);
+        return AppColors.neonCyan;
       case AuraThemePreset.cyberAurora:
-        return const Color(0xFF00E5FF);
+        return AppColors.neonCyan;
       case AuraThemePreset.solarEclipse:
-        return const Color(0xFFFF5722);
+        return AppColors.sunsetAmber;
       case AuraThemePreset.emeraldMatrix:
-        return const Color(0xFF00E676);
+        return AppColors.auroraEmerald;
       case AuraThemePreset.velvetTwilight:
-        return const Color(0xFF7C4DFF);
+        return AppColors.deepPurple;
       case AuraThemePreset.obsidianMonochrome:
         return const Color(0xFFE0E0E0);
     }
@@ -82,15 +83,15 @@ enum AuraThemePreset {
   Color get secondaryAccent {
     switch (this) {
       case AuraThemePreset.wallpaperDynamic:
-        return const Color(0xFFD500F9);
+        return AppColors.auroraViolet;
       case AuraThemePreset.cyberAurora:
-        return const Color(0xFFD500F9);
+        return AppColors.auroraViolet;
       case AuraThemePreset.solarEclipse:
-        return const Color(0xFFFFD600);
+        return AppColors.solarGold;
       case AuraThemePreset.emeraldMatrix:
-        return const Color(0xFF00B0FF);
+        return AppColors.electricBlue;
       case AuraThemePreset.velvetTwilight:
-        return const Color(0xFFFF4081);
+        return AppColors.plasmaPink;
       case AuraThemePreset.obsidianMonochrome:
         return const Color(0xFF90A4AE);
     }
@@ -173,9 +174,9 @@ class AuraPaletteConfig extends Equatable {
             ? currentWallpaper.gradientColors[2]
             : _generateComplement(baseVibrant);
       } else {
-        baseDominant = const Color(0xFF00E5FF);
-        baseVibrant = const Color(0xFFD500F9);
-        baseSecondary = const Color(0xFFFF5722);
+        baseDominant = AppColors.neonCyan;
+        baseVibrant = AppColors.auroraViolet;
+        baseSecondary = AppColors.sunsetAmber;
       }
     } else {
       baseDominant = customPrimaryColor ?? preset.primaryAccent;
