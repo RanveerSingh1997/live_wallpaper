@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import 'aura_palette_sheet.dart';
 import 'aurora_synthesizer_sheet.dart';
 import 'auto_rotation_sheet.dart';
@@ -43,7 +44,7 @@ class SettingsSheet extends StatelessWidget {
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF101014),
+                color: AppColors.darkSurface,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: ListView(
@@ -70,7 +71,7 @@ class SettingsSheet extends StatelessWidget {
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFFFF5722), Color(0xFFD500F9)],
+                            colors: [AppColors.sunsetAmber, AppColors.auroraViolet],
                           ),
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -101,7 +102,7 @@ class SettingsSheet extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFFFF5722),
+                                  color: AppColors.sunsetAmber,
                                 ),
                               ),
                             ],
@@ -128,7 +129,7 @@ class SettingsSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF16161C),
+                      color: AppColors.cardSurface,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: Colors.white10),
                     ),
@@ -140,7 +141,7 @@ class SettingsSheet extends StatelessWidget {
                           children: [
                             const Row(
                               children: [
-                                Icon(Icons.storage_rounded, color: Color(0xFF00E5FF), size: 20),
+                                Icon(Icons.storage_rounded, color: AppColors.neonCyan, size: 20),
                                 SizedBox(width: 10),
                                 Text(
                                   'Offline Wallpaper Cache',
@@ -155,7 +156,7 @@ class SettingsSheet extends StatelessWidget {
                             Text(
                               state.storageFormatted,
                               style: const TextStyle(
-                                color: Color(0xFF00E5FF),
+                                color: AppColors.neonCyan,
                                 fontWeight: FontWeight.w800,
                                 fontSize: 13,
                               ),
@@ -175,11 +176,11 @@ class SettingsSheet extends StatelessWidget {
                                 ? null
                                 : () => _confirmClearCache(context),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFFFF5252),
+                              foregroundColor: AppColors.error,
                               side: BorderSide(
                                 color: state.downloadedIds.isEmpty
                                     ? Colors.white12
-                                    : const Color(0xFFFF5252).withValues(alpha: 0.5),
+                                    : AppColors.error.withValues(alpha: 0.5),
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -203,11 +204,13 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 10),
                   _buildSettingTile(
                     icon: Icons.tune_rounded,
-                    iconColor: const Color(0xFFFF5722),
+                    iconColor: AppColors.sunsetAmber,
                     title: 'Aesthetic Preferences',
                     subtitle: '${state.userPreferences.length} categories prioritized in feed',
                     onTap: () {
-                      Navigator.of(context).pop();
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      }
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
@@ -221,7 +224,7 @@ class SettingsSheet extends StatelessWidget {
                   ),
                   _buildSettingTile(
                     icon: Icons.autorenew_rounded,
-                    iconColor: const Color(0xFF00E5FF),
+                    iconColor: AppColors.neonCyan,
                     title: 'Aurora Auto-Rotation',
                     subtitle: state.isAutoRotationEnabled
                         ? 'Active • Every ${state.autoRotationIntervalMinutes >= 60 ? "${state.autoRotationIntervalMinutes ~/ 60}h" : "${state.autoRotationIntervalMinutes}m"}'
@@ -233,7 +236,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildSettingTile(
                     icon: Icons.brightness_auto_rounded,
-                    iconColor: const Color(0xFFFFD600),
+                    iconColor: AppColors.solarGold,
                     title: 'Day & Night Solar Schedule',
                     subtitle: state.dayNightSchedule.isEnabled
                         ? 'Active • Slot: ${state.activeScheduleSlot.label}'
@@ -245,7 +248,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildSettingTile(
                     icon: Icons.lock_clock_rounded,
-                    iconColor: const Color(0xFFD500F9),
+                    iconColor: AppColors.auroraViolet,
                     title: 'Lock Screen Clock & Widgets',
                     subtitle: '${state.lockScreenStyle.clockFont.label} • ${state.lockScreenStyle.clockLayout.label}',
                     onTap: () {
@@ -255,7 +258,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildSettingTile(
                     icon: Icons.view_in_ar_rounded,
-                    iconColor: const Color(0xFF00E5FF),
+                    iconColor: AppColors.neonCyan,
                     title: '3D Spatial Parallax Studio',
                     subtitle: state.parallaxConfig.isEnabled
                         ? '${state.parallaxConfig.preset.label} (${state.parallaxConfig.sensitivity.toStringAsFixed(1)}x)'
@@ -272,7 +275,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildSettingTile(
                     icon: Icons.grain_rounded,
-                    iconColor: const Color(0xFF00E5FF),
+                    iconColor: AppColors.neonCyan,
                     title: 'Interactive Particle FX Studio',
                     subtitle: state.particleConfig.isEnabled
                         ? '${state.particleConfig.preset.label} • ${state.particleConfig.particleCount} particles'
@@ -284,7 +287,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildSettingTile(
                     icon: Icons.palette_rounded,
-                    iconColor: const Color(0xFFD500F9),
+                    iconColor: AppColors.auroraViolet,
                     title: 'Aura Chromatic Harmonizer',
                     subtitle:
                         '${state.auraConfig.preset.displayName} • Dynamic color sync',
@@ -295,7 +298,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildSettingTile(
                     icon: Icons.touch_app_rounded,
-                    iconColor: const Color(0xFF00E5FF),
+                    iconColor: AppColors.neonCyan,
                     title: 'Interactive Gesture Controls',
                     subtitle: state.gestureConfig.isGesturesEnabled
                         ? '${state.gestureConfig.doubleTapAction.displayName} • ${state.gestureConfig.hapticProfile.displayName} Haptics'
@@ -307,7 +310,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildSettingTile(
                     icon: Icons.desktop_windows_rounded,
-                    iconColor: const Color(0xFF00E5FF),
+                    iconColor: AppColors.neonCyan,
                     title: 'Horizon Standby & Desk Dock Studio',
                     subtitle:
                         '${state.standbyDockConfig.layoutMode.displayName} • ${state.standbyDockConfig.clockStyle.displayName}',
@@ -318,7 +321,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildSettingTile(
                     icon: Icons.waves_rounded,
-                    iconColor: const Color(0xFF00E5FF),
+                    iconColor: AppColors.neonCyan,
                     title: 'Aurora Wave Synthesizer Studio',
                     subtitle:
                         '${state.auroraSynthesizerConfig.waveStyle.displayName} • ${state.auroraSynthesizerConfig.colorMode.displayName}',
@@ -329,7 +332,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildSettingTile(
                     icon: Icons.hub_rounded,
-                    iconColor: const Color(0xFF00E5FF),
+                    iconColor: AppColors.neonCyan,
                     title: 'Community Blueprint Showcase & Exchange',
                     subtitle:
                         '${state.communityBlueprints.length} blueprints • Explore, like & publish complete aesthetics',
@@ -340,7 +343,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildSettingTile(
                     icon: Icons.cloud_sync_rounded,
-                    iconColor: const Color(0xFF00E5FF),
+                    iconColor: AppColors.neonCyan,
                     title: 'Atmospheric Weather & Climate FX Studio',
                     subtitle: state.weatherConfig.isEnabled
                         ? '${state.weatherConfig.effectType.displayName} • Gyro & lightning active'
@@ -352,11 +355,13 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildSettingTile(
                     icon: Icons.auto_awesome_motion_rounded,
-                    iconColor: const Color(0xFFD500F9),
+                    iconColor: AppColors.auroraViolet,
                     title: 'Replay Onboarding Tour',
                     subtitle: 'Re-run the first-time setup experience & intro',
                     onTap: () {
-                      Navigator.of(context).pop();
+                      if (context.mounted && Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      }
                       OnboardingSheet.show(context);
                     },
                   ),
@@ -368,7 +373,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 10),
                   _buildSettingTile(
                     icon: Icons.bolt_rounded,
-                    iconColor: const Color(0xFF00E676),
+                    iconColor: AppColors.auroraEmerald,
                     title: 'Battery & Display Hub',
                     subtitle:
                         '${state.batteryTelemetry.targetFps.displayName} • ${state.batteryTelemetry.isEcoModeEnabled ? "Adaptive Eco Active" : "Full Performance"}',
@@ -380,7 +385,7 @@ class SettingsSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF16161C),
+                      color: AppColors.cardSurface,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: Colors.white10),
                     ),
@@ -391,12 +396,12 @@ class SettingsSheet extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF00E676).withValues(alpha: 0.15),
+                                color: AppColors.auroraEmerald.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(
                                 Icons.energy_savings_leaf_rounded,
-                                color: Color(0xFF00E676),
+                                color: AppColors.auroraEmerald,
                                 size: 20,
                               ),
                             ),
@@ -428,8 +433,8 @@ class SettingsSheet extends StatelessWidget {
                             ),
                             Switch.adaptive(
                               value: state.isAmoledSaverModeEnabled,
-                              activeThumbColor: const Color(0xFF00E676),
-                              activeTrackColor: const Color(0xFF00E676).withValues(alpha: 0.35),
+                              activeThumbColor: AppColors.auroraEmerald,
+                              activeTrackColor: AppColors.auroraEmerald.withValues(alpha: 0.35),
                               onChanged: (val) {
                                 HapticFeedback.selectionClick();
                                 context.read<WallpaperBloc>().add(
@@ -444,28 +449,28 @@ class SettingsSheet extends StatelessWidget {
                           title: 'Live Engine Status',
                           value: state.isLiveWallpaperActiveOnDevice ? 'ACTIVE' : 'STANDBY',
                           valueColor: state.isLiveWallpaperActiveOnDevice
-                              ? const Color(0xFF00E676)
+                              ? AppColors.auroraEmerald
                               : Colors.white54,
                         ),
                         const Divider(color: Colors.white10, height: 20),
                         _buildStatusRow(
                           title: 'Sleep Power Consumption',
                           value: '0% (Decoders Paused)',
-                          valueColor: const Color(0xFF00E676),
+                          valueColor: AppColors.auroraEmerald,
                         ),
                         const Divider(color: Colors.white10, height: 20),
                         _buildStatusRow(
                           title: 'OLED Sub-Pixel Power',
                           value: state.isAmoledSaverModeEnabled ? 'OPTIMIZED (Zero Draw)' : 'STANDARD',
                           valueColor: state.isAmoledSaverModeEnabled
-                              ? const Color(0xFF00E676)
+                              ? AppColors.auroraEmerald
                               : Colors.white54,
                         ),
                         const Divider(color: Colors.white10, height: 20),
                         _buildStatusRow(
                           title: 'Local Privacy',
                           value: '100% On-Device',
-                          valueColor: const Color(0xFF00E5FF),
+                          valueColor: AppColors.neonCyan,
                         ),
                       ],
                     ),
@@ -478,7 +483,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 10),
                   _buildSettingTile(
                     icon: Icons.cloud_sync_rounded,
-                    iconColor: const Color(0xFF00E5FF),
+                    iconColor: AppColors.neonCyan,
                     title: 'Data Portability & Backup Hub',
                     subtitle: 'Export, restore & manage playlists, quotes & setups',
                     onTap: () {
@@ -493,7 +498,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 10),
                   _buildSettingTile(
                     icon: Icons.privacy_tip_outlined,
-                    iconColor: const Color(0xFF00E5FF),
+                    iconColor: AppColors.neonCyan,
                     title: 'Privacy Policy',
                     subtitle: 'Wallora does not collect or transmit personal identifying data',
                     onTap: () => _showPrivacyDialog(context),
@@ -501,7 +506,7 @@ class SettingsSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildSettingTile(
                     icon: Icons.verified_outlined,
-                    iconColor: const Color(0xFFFFC107),
+                    iconColor: AppColors.solarGold,
                     title: 'Content & Licensing Guarantee',
                     subtitle: 'All assets are licensed or curated for personalization',
                     onTap: () => _showLicensingDialog(context),
@@ -543,7 +548,7 @@ class SettingsSheet extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: const Color(0xFF16161C),
+      color: AppColors.cardSurface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: () {
@@ -627,7 +632,7 @@ class SettingsSheet extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E24),
+        backgroundColor: AppColors.modalBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: const Text('Clear Offline Cache?', style: TextStyle(color: Colors.white)),
         content: const Text(
@@ -636,16 +641,22 @@ class SettingsSheet extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
+            onPressed: () {
+              if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                Navigator.of(ctx).pop();
+              }
+            },
             child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(ctx).pop();
+              if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                Navigator.of(ctx).pop();
+              }
               context.read<WallpaperBloc>().add(ClearAllDownloadsIntent());
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF5252),
+              backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
             ),
             child: const Text('Clear Cache'),
@@ -659,7 +670,7 @@ class SettingsSheet extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E24),
+        backgroundColor: AppColors.modalBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: const Text('Privacy & Security', style: TextStyle(color: Colors.white)),
         content: const SingleChildScrollView(
@@ -673,9 +684,13 @@ class SettingsSheet extends StatelessWidget {
         ),
         actions: [
           ElevatedButton(
-            onPressed: () => Navigator.of(ctx).pop(),
+            onPressed: () {
+              if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                Navigator.of(ctx).pop();
+              }
+            },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF5722),
+              backgroundColor: AppColors.sunsetAmber,
               foregroundColor: Colors.white,
             ),
             child: const Text('Understood'),
@@ -689,7 +704,7 @@ class SettingsSheet extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E24),
+        backgroundColor: AppColors.modalBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: const Text('Content Integrity & Attribution', style: TextStyle(color: Colors.white)),
         content: const SingleChildScrollView(
@@ -702,9 +717,13 @@ class SettingsSheet extends StatelessWidget {
         ),
         actions: [
           ElevatedButton(
-            onPressed: () => Navigator.of(ctx).pop(),
+            onPressed: () {
+              if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                Navigator.of(ctx).pop();
+              }
+            },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF5722),
+              backgroundColor: AppColors.sunsetAmber,
               foregroundColor: Colors.white,
             ),
             child: const Text('Close'),

@@ -111,13 +111,13 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                   icon: Badge(
                     isLabelVisible: state.favoriteIds.isNotEmpty,
                     label: Text('${state.favoriteIds.length}'),
-                    backgroundColor: const Color(0xFFFF1744),
+                    backgroundColor: AppColors.favoriteRed,
                     child: const Icon(Icons.favorite_border_rounded),
                   ),
                   activeIcon: Badge(
                     isLabelVisible: state.favoriteIds.isNotEmpty,
                     label: Text('${state.favoriteIds.length}'),
-                    backgroundColor: const Color(0xFFFF1744),
+                    backgroundColor: AppColors.favoriteRed,
                     child: const Icon(Icons.favorite_rounded),
                   ),
                   label: AppStrings.navFavorites,

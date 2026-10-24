@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/motivational_short.dart';
 import 'create_collection_sheet.dart';
 
@@ -37,7 +38,7 @@ class AddToCollectionSheet extends StatelessWidget {
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF101014),
+                color: AppColors.darkBackground,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: Column(
@@ -67,7 +68,7 @@ class AddToCollectionSheet extends StatelessWidget {
                             gradient: LinearGradient(
                               colors: short.gradientColors.isNotEmpty
                                   ? short.gradientColors
-                                  : [const Color(0xFF2A163B), Colors.black],
+                                  : [AppColors.deepPurple, Colors.black],
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                             ),
@@ -114,17 +115,17 @@ class AddToCollectionSheet extends StatelessWidget {
                               initialWallpaperId: short.id,
                             );
                           },
-                          icon: const Icon(Icons.add_rounded, size: 16, color: Color(0xFF00E5FF)),
+                          icon: const Icon(Icons.add_rounded, size: 16, color: AppColors.neonCyan),
                           label: const Text(
                             'NEW',
                             style: TextStyle(
-                              color: Color(0xFF00E5FF),
+                              color: AppColors.neonCyan,
                               fontSize: 12,
                               fontWeight: FontWeight.w900,
                             ),
                           ),
                           style: TextButton.styleFrom(
-                            backgroundColor: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                            backgroundColor: AppColors.neonCyan.withValues(alpha: 0.15),
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -151,7 +152,7 @@ class AddToCollectionSheet extends StatelessWidget {
                               final isIncluded = col.wallpaperIds.contains(short.id);
 
                               return Material(
-                                color: const Color(0xFF16161C),
+                                color: AppColors.cardSurface,
                                 borderRadius: BorderRadius.circular(16),
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(16),
@@ -216,12 +217,12 @@ class AddToCollectionSheet extends StatelessWidget {
                                           height: 28,
                                           decoration: BoxDecoration(
                                             color: isIncluded
-                                                ? const Color(0xFF00E5FF)
+                                                ? AppColors.neonCyan
                                                 : Colors.transparent,
                                             shape: BoxShape.circle,
                                             border: Border.all(
                                               color: isIncluded
-                                                  ? const Color(0xFF00E5FF)
+                                                  ? AppColors.neonCyan
                                                   : Colors.white30,
                                               width: 1.5,
                                             ),
@@ -251,12 +252,12 @@ class AddToCollectionSheet extends StatelessWidget {
                       height: 48,
                       child: ElevatedButton(
                         onPressed: () {
-                          if (mounted(context) && Navigator.of(context).canPop()) {
+                          if (context.mounted && Navigator.of(context).canPop()) {
                             Navigator.of(context).pop();
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF22222A),
+                          backgroundColor: AppColors.cardSurface,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -282,14 +283,6 @@ class AddToCollectionSheet extends StatelessWidget {
     );
   }
 
-  bool mounted(BuildContext context) {
-    try {
-      return Navigator.of(context).context.mounted;
-    } catch (_) {
-      return true;
-    }
-  }
-
   Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
@@ -300,15 +293,15 @@ class AddToCollectionSheet extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF00E5FF).withValues(alpha: 0.1),
+                color: AppColors.neonCyan.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+                  color: AppColors.neonCyan.withValues(alpha: 0.3),
                 ),
               ),
               child: const Icon(
                 Icons.playlist_add_rounded,
-                color: Color(0xFF00E5FF),
+                color: AppColors.neonCyan,
                 size: 36,
               ),
             ),
@@ -341,7 +334,7 @@ class AddToCollectionSheet extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00E5FF),
+                backgroundColor: AppColors.neonCyan,
                 foregroundColor: Colors.black,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),

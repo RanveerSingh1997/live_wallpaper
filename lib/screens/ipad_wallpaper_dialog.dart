@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
+import '../core/core.dart';
 import '../models/motivational_short.dart';
 
 class IPadWallpaperDialog extends StatelessWidget {
@@ -26,7 +27,7 @@ class IPadWallpaperDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF141416),
+        color: AppColors.modalBackground,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
@@ -94,7 +95,11 @@ class IPadWallpaperDialog extends StatelessWidget {
               ),
               IconButton(
                 icon: const Icon(Icons.close_rounded, color: Colors.white54),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  if (context.mounted && Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
+                },
               ),
             ],
           ),
@@ -105,7 +110,7 @@ class IPadWallpaperDialog extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E22),
+              color: AppColors.cardSurface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
             ),
@@ -114,12 +119,12 @@ class IPadWallpaperDialog extends StatelessWidget {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.touch_app_rounded, color: Color(0xFFFFD600), size: 18),
+                    Icon(Icons.touch_app_rounded, color: AppColors.solarGold, size: 18),
                     SizedBox(width: 8),
                     Text(
                       'HOW TO APPLY ON IPADOS',
                       style: TextStyle(
-                        color: Color(0xFFFFD600),
+                        color: AppColors.solarGold,
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.0,
@@ -159,13 +164,15 @@ class IPadWallpaperDialog extends StatelessWidget {
               onPressed: () {
                 HapticFeedback.mediumImpact();
                 final bloc = context.read<WallpaperBloc>();
-                Navigator.of(context).pop();
+                if (context.mounted && Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
                 Future.delayed(const Duration(milliseconds: 250), () {
                   bloc.add(ShareVideoIntent(short));
                 });
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFFD600),
+                backgroundColor: AppColors.solarGold,
                 foregroundColor: Colors.black,
                 elevation: 4,
                 shape: RoundedRectangleBorder(
@@ -200,7 +207,9 @@ class IPadWallpaperDialog extends StatelessWidget {
               onPressed: () {
                 HapticFeedback.selectionClick();
                 final bloc = context.read<WallpaperBloc>();
-                Navigator.of(context).pop();
+                if (context.mounted && Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
                 Future.delayed(const Duration(milliseconds: 250), () {
                   bloc.add(
                     ApplyLiveWallpaperIntent(short: short, isMuted: true),

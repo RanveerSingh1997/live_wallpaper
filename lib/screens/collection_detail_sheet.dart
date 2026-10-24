@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
 import 'wallpaper_preview_sheet.dart';
@@ -30,7 +31,7 @@ class CollectionDetailSheet extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A22),
+        backgroundColor: AppColors.modalBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text(
           'Delete Playlist?',
@@ -42,19 +43,25 @@ class CollectionDetailSheet extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
+            onPressed: () {
+              if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                Navigator.of(ctx).pop();
+              }
+            },
             child: const Text('CANCEL', style: TextStyle(color: Colors.white54)),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(ctx).pop();
+              if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                Navigator.of(ctx).pop();
+              }
               context.read<WallpaperBloc>().add(DeleteCustomCollectionIntent(col.id));
-              if (Navigator.of(context).canPop()) {
+              if (context.mounted && Navigator.of(context).canPop()) {
                 Navigator.of(context).pop();
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF1744),
+              backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -90,7 +97,7 @@ class CollectionDetailSheet extends StatelessWidget {
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF101014),
+                color: AppColors.darkBackground,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: ListView(
@@ -215,12 +222,12 @@ class CollectionDetailSheet extends StatelessWidget {
                                       horizontal: 10, vertical: 6),
                                   decoration: BoxDecoration(
                                     color: isCurrentRotationPool
-                                        ? const Color(0xFF00E676).withValues(alpha: 0.25)
+                                        ? AppColors.auroraEmerald.withValues(alpha: 0.25)
                                         : Colors.black.withValues(alpha: 0.5),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
                                       color: isCurrentRotationPool
-                                          ? const Color(0xFF00E676)
+                                          ? AppColors.auroraEmerald
                                           : Colors.white24,
                                     ),
                                   ),
@@ -233,7 +240,7 @@ class CollectionDetailSheet extends StatelessWidget {
                                             : Icons.sync_rounded,
                                         size: 14,
                                         color: isCurrentRotationPool
-                                            ? const Color(0xFF00E676)
+                                            ? AppColors.auroraEmerald
                                             : Colors.white70,
                                       ),
                                       const SizedBox(width: 6),
@@ -245,7 +252,7 @@ class CollectionDetailSheet extends StatelessWidget {
                                           fontSize: 10,
                                           fontWeight: FontWeight.w800,
                                           color: isCurrentRotationPool
-                                              ? const Color(0xFF00E676)
+                                              ? AppColors.auroraEmerald
                                               : Colors.white,
                                         ),
                                       ),

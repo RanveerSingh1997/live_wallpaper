@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/motivational_short.dart';
 
@@ -33,7 +34,7 @@ class DayNightScheduleSheet extends StatelessWidget {
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF101014),
+                color: AppColors.darkBackground,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: Column(
@@ -62,17 +63,17 @@ class DayNightScheduleSheet extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.all(7),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                                color: AppColors.neonCyan.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: const Color(0xFF00E5FF),
+                                  color: AppColors.neonCyan,
                                   width: 0.8,
                                 ),
                               ),
                               child: const Icon(
                                 Icons.brightness_auto_rounded,
                                 size: 18,
-                                color: Color(0xFF00E5FF),
+                                color: AppColors.neonCyan,
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -103,7 +104,7 @@ class DayNightScheduleSheet extends StatelessWidget {
                         IconButton(
                           icon: const Icon(Icons.close_rounded, color: Colors.white70),
                           onPressed: () {
-                            if (Navigator.of(context).canPop()) {
+                            if (context.mounted && Navigator.of(context).canPop()) {
                               Navigator.of(context).pop();
                             }
                           },
@@ -230,11 +231,11 @@ class DayNightScheduleSheet extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF161622),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: schedule.isEnabled
-              ? const Color(0xFF00E5FF).withValues(alpha: 0.5)
+              ? AppColors.neonCyan.withValues(alpha: 0.5)
               : Colors.white10,
           width: schedule.isEnabled ? 1.2 : 0.8,
         ),
@@ -257,7 +258,7 @@ class DayNightScheduleSheet extends StatelessWidget {
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: schedule.isEnabled
-                                ? const Color(0xFF00E5FF)
+                                ? AppColors.neonCyan
                                 : Colors.white,
                           ),
                         ),
@@ -278,8 +279,8 @@ class DayNightScheduleSheet extends StatelessWidget {
               const SizedBox(width: 12),
               Switch.adaptive(
                 value: schedule.isEnabled,
-                activeThumbColor: const Color(0xFF00E5FF),
-                activeTrackColor: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+                activeThumbColor: AppColors.neonCyan,
+                activeTrackColor: AppColors.neonCyan.withValues(alpha: 0.3),
                 onChanged: (_) {
                   context.read<WallpaperBloc>().add(const ToggleDayNightScheduleIntent());
                 },
@@ -337,7 +338,7 @@ class DayNightScheduleSheet extends StatelessWidget {
         );
 
     return Material(
-      color: const Color(0xFF14141E),
+      color: AppColors.cardSurface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -473,11 +474,11 @@ class DayNightScheduleSheet extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF14141E),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: schedule.autoAmoledAtNight
-              ? const Color(0xFF00E676).withValues(alpha: 0.35)
+              ? AppColors.auroraEmerald.withValues(alpha: 0.35)
               : Colors.white10,
           width: 0.8,
         ),
@@ -487,13 +488,13 @@ class DayNightScheduleSheet extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF00E676).withValues(alpha: 0.12),
+              color: AppColors.auroraEmerald.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
               Icons.energy_savings_leaf_rounded,
               size: 20,
-              color: Color(0xFF00E676),
+              color: AppColors.auroraEmerald,
             ),
           ),
           const SizedBox(width: 12),
@@ -524,8 +525,8 @@ class DayNightScheduleSheet extends StatelessWidget {
           const SizedBox(width: 8),
           Switch.adaptive(
             value: schedule.autoAmoledAtNight,
-            activeThumbColor: const Color(0xFF00E676),
-            activeTrackColor: const Color(0xFF00E676).withValues(alpha: 0.3),
+            activeThumbColor: AppColors.auroraEmerald,
+            activeTrackColor: AppColors.auroraEmerald.withValues(alpha: 0.3),
             onChanged: (val) {
               final updated = schedule.copyWith(autoAmoledAtNight: val);
               context.read<WallpaperBloc>().add(UpdateDayNightScheduleIntent(updated));
@@ -545,7 +546,7 @@ class DayNightScheduleSheet extends StatelessWidget {
       height: 48,
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF00E5FF),
+          backgroundColor: AppColors.neonCyan,
           foregroundColor: Colors.black,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           elevation: 0,
@@ -587,7 +588,7 @@ class DayNightScheduleSheet extends StatelessWidget {
         return Container(
           height: MediaQuery.of(pickerContext).size.height * 0.75,
           decoration: const BoxDecoration(
-            color: Color(0xFF14141E),
+            color: AppColors.modalBackground,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -628,7 +629,7 @@ class DayNightScheduleSheet extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.close_rounded, color: Colors.white60),
                       onPressed: () {
-                        if (Navigator.of(pickerContext).canPop()) {
+                        if (pickerContext.mounted && Navigator.of(pickerContext).canPop()) {
                           Navigator.of(pickerContext).pop();
                         }
                       },
@@ -653,7 +654,7 @@ class DayNightScheduleSheet extends StatelessWidget {
                     return Material(
                       color: isSelected
                           ? slot.accentColor.withValues(alpha: 0.15)
-                          : const Color(0xFF1C1C2A),
+                          : AppColors.cardSurface,
                       borderRadius: BorderRadius.circular(12),
                       child: ListTile(
                         leading: _buildWallpaperThumbnail(item, width: 44, height: 56),
@@ -677,7 +678,7 @@ class DayNightScheduleSheet extends StatelessWidget {
                             : const Icon(Icons.circle_outlined, color: Colors.white24),
                         onTap: () {
                           onSelected(item.id);
-                          if (Navigator.of(pickerContext).canPop()) {
+                          if (pickerContext.mounted && Navigator.of(pickerContext).canPop()) {
                             Navigator.of(pickerContext).pop();
                           }
                         },

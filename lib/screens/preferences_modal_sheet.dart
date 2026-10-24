@@ -193,7 +193,7 @@ class _PreferencesModalSheetState extends State<PreferencesModalSheet> {
                     child: const Text(
                       'All',
                       style: TextStyle(
-                        color: Color(0xFFFFD600),
+                        color: AppColors.solarGold,
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                       ),

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_effect_config.dart';
 
@@ -98,13 +99,13 @@ class _WallpaperEffectsSheetState extends State<WallpaperEffectsSheet> {
       case 'noir':
         return const ColorFilter.mode(Colors.black, BlendMode.saturation);
       case 'cyber_cyan':
-        return const ColorFilter.mode(Color(0xFF00E5FF), BlendMode.color);
+        return const ColorFilter.mode(AppColors.neonCyan, BlendMode.color);
       case 'sunset_amber':
-        return const ColorFilter.mode(Color(0xFFFF5722), BlendMode.color);
+        return const ColorFilter.mode(AppColors.sunsetAmber, BlendMode.color);
       case 'matrix_emerald':
-        return const ColorFilter.mode(Color(0xFF00E676), BlendMode.color);
+        return const ColorFilter.mode(AppColors.auroraEmerald, BlendMode.color);
       case 'aurora_violet':
-        return const ColorFilter.mode(Color(0xFFD500F9), BlendMode.color);
+        return const ColorFilter.mode(AppColors.auroraViolet, BlendMode.color);
       default:
         return null;
     }
@@ -121,7 +122,7 @@ class _WallpaperEffectsSheetState extends State<WallpaperEffectsSheet> {
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF101014),
+                color: AppColors.darkBackground,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: ListView(
@@ -150,12 +151,12 @@ class _WallpaperEffectsSheetState extends State<WallpaperEffectsSheet> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                              color: AppColors.neonCyan.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
                               Icons.auto_fix_high_rounded,
-                              color: Color(0xFF00E5FF),
+                              color: AppColors.neonCyan,
                               size: 20,
                             ),
                           ),
@@ -364,7 +365,7 @@ class _WallpaperEffectsSheetState extends State<WallpaperEffectsSheet> {
                     min: 0.0,
                     max: 16.0,
                     value: _blurSigma,
-                    activeColor: const Color(0xFF00E5FF),
+                    activeColor: AppColors.neonCyan,
                     onChanged: (val) => setState(() => _blurSigma = val),
                   ),
 
@@ -378,7 +379,7 @@ class _WallpaperEffectsSheetState extends State<WallpaperEffectsSheet> {
                     min: 0.0,
                     max: 0.9,
                     value: _vignetteStrength,
-                    activeColor: const Color(0xFFD500F9),
+                    activeColor: AppColors.auroraViolet,
                     onChanged: (val) => setState(() => _vignetteStrength = val),
                   ),
 
@@ -392,7 +393,7 @@ class _WallpaperEffectsSheetState extends State<WallpaperEffectsSheet> {
                     min: 0.7,
                     max: 1.5,
                     value: _contrast,
-                    activeColor: const Color(0xFFFF5722),
+                    activeColor: AppColors.sunsetAmber,
                     onChanged: (val) => setState(() => _contrast = val),
                   ),
 
@@ -443,7 +444,7 @@ class _WallpaperEffectsSheetState extends State<WallpaperEffectsSheet> {
       onSelected: (val) {
         if (val) _applyPreset(preset);
       },
-      backgroundColor: const Color(0xFF18181E),
+      backgroundColor: AppColors.cardSurface,
       selectedColor: widget.wallpaper.accentColor.withValues(alpha: 0.25),
       labelStyle: TextStyle(
         color: isSelected ? Colors.white : Colors.white70,

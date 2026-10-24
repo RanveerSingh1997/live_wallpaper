@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
+import '../core/core.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
 
@@ -90,28 +91,28 @@ class _QuoteStudioSheetState extends State<QuoteStudioSheet> {
   static const List<StudioGlowPalette> _glowPalettes = [
     StudioGlowPalette(
       name: 'Aurora Neon',
-      primaryColor: Color(0xFF00E5FF),
-      glowColor: Color(0xFF7C4DFF),
+      primaryColor: AppColors.neonCyan,
+      glowColor: AppColors.auroraViolet,
     ),
     StudioGlowPalette(
       name: 'Solar Flare',
-      primaryColor: Color(0xFFFF5722),
-      glowColor: Color(0xFFFFD600),
+      primaryColor: AppColors.sunsetAmber,
+      glowColor: AppColors.solarGold,
     ),
     StudioGlowPalette(
       name: 'Pure Gold',
-      primaryColor: Color(0xFFFFD700),
-      glowColor: Color(0xFFFFA000),
+      primaryColor: AppColors.solarGold,
+      glowColor: AppColors.sunsetAmber,
     ),
     StudioGlowPalette(
       name: 'Cyber Emerald',
-      primaryColor: Color(0xFF00E676),
-      glowColor: Color(0xFF1DE9B6),
+      primaryColor: AppColors.auroraEmerald,
+      glowColor: AppColors.cyberEmerald,
     ),
     StudioGlowPalette(
       name: 'Arctic Ice',
       primaryColor: Colors.white,
-      glowColor: Color(0xFF80D8FF),
+      glowColor: AppColors.electricBlue,
     ),
   ];
 
@@ -194,11 +195,13 @@ class _QuoteStudioSheetState extends State<QuoteStudioSheet> {
               newQuote: text,
             ),
           );
-      Navigator.of(context).pop();
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Kinetic typography saved for ${_selectedShort.title}'),
-          backgroundColor: const Color(0xFF1E1E22),
+          backgroundColor: AppColors.modalBackground,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -215,7 +218,9 @@ class _QuoteStudioSheetState extends State<QuoteStudioSheet> {
               newQuote: text,
             ),
           );
-      Navigator.of(context).pop();
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
 
       if (_selectedShort.isLive) {
         context.read<WallpaperBloc>().add(
@@ -259,7 +264,7 @@ class _QuoteStudioSheetState extends State<QuoteStudioSheet> {
       builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF101014),
+            color: AppColors.darkBackground,
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
           ),
           child: Column(
@@ -435,11 +440,11 @@ class _QuoteStudioSheetState extends State<QuoteStudioSheet> {
                         ),
                         TextButton.icon(
                           onPressed: _randomizeQuote,
-                          icon: const Icon(Icons.casino_rounded, size: 14, color: Color(0xFFFF5722)),
+                          icon: const Icon(Icons.casino_rounded, size: 14, color: AppColors.sunsetAmber),
                           label: const Text(
                             'Surprise Me',
                             style: TextStyle(
-                              color: Color(0xFFFF5722),
+                              color: AppColors.sunsetAmber,
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
@@ -460,7 +465,7 @@ class _QuoteStudioSheetState extends State<QuoteStudioSheet> {
                       ),
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: const Color(0xFF1A1A1E),
+                        fillColor: AppColors.cardSurface,
                         hintText: 'Enter your custom motivational mantra...',
                         hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
                         contentPadding: const EdgeInsets.all(14),
@@ -487,7 +492,7 @@ class _QuoteStudioSheetState extends State<QuoteStudioSheet> {
                       style: const TextStyle(fontSize: 13, color: Colors.white),
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: const Color(0xFF1A1A1E),
+                        fillColor: AppColors.cardSurface,
                         prefixIcon: const Icon(Icons.person_outline_rounded, size: 16, color: Colors.white38),
                         hintText: 'Author attribution or signature...',
                         hintStyle: const TextStyle(color: Colors.white38, fontSize: 12),
@@ -529,7 +534,7 @@ class _QuoteStudioSheetState extends State<QuoteStudioSheet> {
                             }
                           },
                           selectedColor: activePalette.primaryColor.withValues(alpha: 0.2),
-                          backgroundColor: const Color(0xFF1E1E22),
+                          backgroundColor: AppColors.modalBackground,
                           labelStyle: TextStyle(
                             color: isSelected ? activePalette.primaryColor : Colors.white70,
                             fontSize: 12,
@@ -564,7 +569,7 @@ class _QuoteStudioSheetState extends State<QuoteStudioSheet> {
                               const SizedBox(height: 8),
                               Container(
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF1A1A1E),
+                                  color: AppColors.cardSurface,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(color: Colors.white10),
                                 ),

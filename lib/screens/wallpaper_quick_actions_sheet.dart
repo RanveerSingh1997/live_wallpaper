@@ -43,7 +43,7 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
       builder: (ctx) {
         return Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF16161C),
+            color: AppColors.cardSurface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
@@ -107,13 +107,13 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
     required MotivationalShort short,
   }) {
     return Material(
-      color: const Color(0xFF22222A),
+      color: AppColors.cardSurface,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
         onTap: () {
           HapticFeedback.selectionClick();
-          if (Navigator.of(context).canPop()) {
+          if (context.mounted && Navigator.of(context).canPop()) {
             Navigator.of(context).pop();
           }
           context.read<WallpaperBloc>().add(
@@ -157,7 +157,7 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
 
         return Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF101014),
+            color: AppColors.darkBackground,
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
           ),
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 36),
@@ -180,7 +180,7 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF18181F),
+                  color: AppColors.cardSurface,
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(color: Colors.white12),
                 ),
@@ -239,10 +239,10 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF00E676).withValues(alpha: 0.15),
+                                color: AppColors.auroraEmerald.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(
-                                  color: const Color(0xFF00E676).withValues(alpha: 0.4),
+                                  color: AppColors.auroraEmerald.withValues(alpha: 0.4),
                                   width: 0.8,
                                 ),
                               ),
@@ -251,7 +251,7 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
                                     ? 'AMOLED ${wallpaper.trueBlackPercentage}% BLACK'
                                     : 'AMOLED TRUE BLACK',
                                 style: const TextStyle(
-                                  color: Color(0xFF00E676),
+                                  color: AppColors.auroraEmerald,
                                   fontSize: 8,
                                   fontWeight: FontWeight.w800,
                                 ),
@@ -276,7 +276,7 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
                 title: 'Apply to Device',
                 subtitle: wallpaper.isLive ? 'Continuous 60 FPS motion loop' : 'Ultra-HD static canvas',
                 onTap: () {
-                  if (Navigator.of(context).canPop()) {
+                  if (context.mounted && Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
                   }
                   if (AppPlatform.isIOS) {
@@ -300,11 +300,11 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
               _buildActionTile(
                 context: context,
                 icon: Icons.screenshot_monitor_rounded,
-                iconColor: const Color(0xFF00E5FF),
+                iconColor: AppColors.neonCyan,
                 title: 'Interactive Screen Simulator',
                 subtitle: 'Preview behind Lock Screen clock & Home Screen icons',
                 onTap: () {
-                  if (Navigator.of(context).canPop()) {
+                  if (context.mounted && Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
                   }
                   FullScreenWallpaperViewer.open(
@@ -321,11 +321,11 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
               _buildActionTile(
                 context: context,
                 icon: Icons.tune_rounded,
-                iconColor: const Color(0xFF00E5FF),
+                iconColor: AppColors.neonCyan,
                 title: 'Canvas Effects & Filters Studio',
                 subtitle: 'Tune OLED Noir, depth blur, Obsidian vignette & contrast',
                 onTap: () {
-                  if (Navigator.of(context).canPop()) {
+                  if (context.mounted && Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
                   }
                   WallpaperEffectsSheet.show(context, wallpaper);
@@ -338,11 +338,11 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
               _buildActionTile(
                 context: context,
                 icon: Icons.lock_clock_rounded,
-                iconColor: const Color(0xFFD500F9),
+                iconColor: AppColors.auroraViolet,
                 title: 'Lock Screen Style & Widgets',
                 subtitle: 'Customize clock font, stacked layouts & glanceable widgets',
                 onTap: () {
-                  if (Navigator.of(context).canPop()) {
+                  if (context.mounted && Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
                   }
                   LockScreenStudioSheet.show(context, wallpaper: wallpaper);
@@ -355,11 +355,11 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
               _buildActionTile(
                 context: context,
                 icon: Icons.view_in_ar_rounded,
-                iconColor: const Color(0xFF00E5FF),
+                iconColor: AppColors.neonCyan,
                 title: '3D Spatial Parallax Studio',
                 subtitle: 'Sensor-driven 3D depth tilt & holographic layer separation',
                 onTap: () {
-                  if (Navigator.of(context).canPop()) {
+                  if (context.mounted && Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
                   }
                   showModalBottomSheet(
@@ -377,11 +377,11 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
               _buildActionTile(
                 context: context,
                 icon: Icons.ios_share_rounded,
-                iconColor: const Color(0xFFFF5722),
+                iconColor: AppColors.sunsetAmber,
                 title: 'Export Story & Poster',
                 subtitle: 'Generate 9:16 high-res posters with typography templates',
                 onTap: () {
-                  if (Navigator.of(context).canPop()) {
+                  if (context.mounted && Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
                   }
                   WallpaperExportSheet.show(context, wallpaper);
@@ -394,11 +394,11 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
               _buildActionTile(
                 context: context,
                 icon: Icons.playlist_add_rounded,
-                iconColor: const Color(0xFFD500F9),
+                iconColor: AppColors.auroraViolet,
                 title: 'Add to Playlist',
                 subtitle: 'Organize into your custom rotation collections',
                 onTap: () {
-                  if (Navigator.of(context).canPop()) {
+                  if (context.mounted && Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
                   }
                   AddToCollectionSheet.show(context, wallpaper);
@@ -411,11 +411,11 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
               _buildActionTile(
                 context: context,
                 icon: Icons.edit_note_rounded,
-                iconColor: const Color(0xFFFFD600),
+                iconColor: AppColors.solarGold,
                 title: 'Customize in Quote Studio',
                 subtitle: 'Personalize quotes, typography, and neon glows',
                 onTap: () {
-                  if (Navigator.of(context).canPop()) {
+                  if (context.mounted && Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
                   }
                   final customQuote = state.customizedQuotes[wallpaper.id] ?? wallpaper.quote;
@@ -437,12 +437,12 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
               _buildActionTile(
                 context: context,
                 icon: isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                iconColor: isFav ? const Color(0xFFFF1744) : Colors.white70,
+                iconColor: isFav ? AppColors.favoriteRed : Colors.white70,
                 title: isFav ? 'Remove from Favorites' : 'Save to Favorites',
                 subtitle: isFav ? 'Currently in your favorites collection' : 'Add to favorites for quick access',
                 onTap: () {
                   context.read<WallpaperBloc>().add(ToggleFavoriteIntent(wallpaper.id));
-                  if (Navigator.of(context).canPop()) {
+                  if (context.mounted && Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
                   }
                 },
@@ -454,14 +454,14 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
               _buildActionTile(
                 context: context,
                 icon: isDownloaded ? Icons.check_circle_rounded : Icons.file_download_outlined,
-                iconColor: isDownloaded ? const Color(0xFF00E676) : Colors.white70,
+                iconColor: isDownloaded ? AppColors.auroraEmerald : Colors.white70,
                 title: isDownloaded ? 'Downloaded for Offline' : 'Download for Offline',
                 subtitle: isDownloaded ? 'Stored on device cache' : 'Save full-resolution video to local cache',
                 onTap: () {
                   if (!isDownloaded) {
                     context.read<WallpaperBloc>().add(DownloadWallpaperIntent(wallpaper));
                   }
-                  if (Navigator.of(context).canPop()) {
+                  if (context.mounted && Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
                   }
                 },
@@ -483,7 +483,7 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: const Color(0xFF16161E),
+      color: AppColors.cardSurface,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
