@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/aura_palette_config.dart';
 import '../models/motivational_short.dart';
 
@@ -59,7 +60,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Copied $label ($hex) to clipboard!'),
-        backgroundColor: const Color(0xFF1E1E28),
+        backgroundColor: AppColors.surfaceMedium,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
       ),
@@ -76,7 +77,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
         return Container(
           height: MediaQuery.of(context).size.height * 0.90,
           decoration: const BoxDecoration(
-            color: Color(0xFF0F0F14),
+            color: AppColors.backgroundDark,
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             boxShadow: [
               BoxShadow(
@@ -112,14 +113,14 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                            colors: [AppColors.auroraCyan, AppColors.auroraViolet],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(14),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+                              color: AppColors.auroraCyan.withValues(alpha: 0.35),
                               blurRadius: 12,
                             ),
                           ],
@@ -178,7 +179,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
                       const Text(
                         'AURA THEME PRESETS',
                         style: TextStyle(
-                          color: Color(0xFF00E5FF),
+                          color: AppColors.auroraCyan,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.1,
@@ -193,7 +194,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
                       const Text(
                         'CHROMATIC TUNING & SHIFT',
                         style: TextStyle(
-                          color: Color(0xFF00E5FF),
+                          color: AppColors.auroraCyan,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.1,
@@ -238,7 +239,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
                       const Text(
                         'HARMONIZATION TARGETS',
                         style: TextStyle(
-                          color: Color(0xFF00E5FF),
+                          color: AppColors.auroraCyan,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.1,
@@ -293,7 +294,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: const BoxDecoration(
-                    color: Color(0xFF14141B),
+                    color: AppColors.surfaceMedium,
                     border: Border(
                       top: BorderSide(color: Colors.white10),
                     ),
@@ -319,7 +320,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
                       // Apply button
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00E5FF),
+                          backgroundColor: AppColors.auroraCyan,
                           foregroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
@@ -367,7 +368,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF16161F),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: palette.vibrantNeon.withValues(alpha: 0.35),
@@ -527,7 +528,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Material(
-        color: isSelected ? const Color(0xFF1E1E2A) : const Color(0xFF15151D),
+        color: isSelected ? AppColors.cardHighlight : AppColors.cardSurface,
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
@@ -543,7 +544,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isSelected
-                    ? const Color(0xFF00E5FF)
+                    ? AppColors.auroraCyan
                     : Colors.white.withValues(alpha: 0.08),
                 width: isSelected ? 1.5 : 1.0,
               ),
@@ -555,13 +556,13 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? const Color(0xFF00E5FF).withValues(alpha: 0.15)
+                        ? AppColors.auroraCyan.withValues(alpha: 0.15)
                         : Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     preset.icon,
-                    color: isSelected ? const Color(0xFF00E5FF) : Colors.white70,
+                    color: isSelected ? AppColors.auroraCyan : Colors.white70,
                     size: 20,
                   ),
                 ),
@@ -618,7 +619,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
                 if (isSelected)
                   const Icon(
                     Icons.check_circle_rounded,
-                    color: Color(0xFF00E5FF),
+                    color: AppColors.auroraCyan,
                     size: 20,
                   ),
               ],
@@ -641,7 +642,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF15151D),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white10),
       ),
@@ -662,7 +663,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
               Text(
                 valueDisplay,
                 style: const TextStyle(
-                  color: Color(0xFF00E5FF),
+                  color: AppColors.auroraCyan,
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),
@@ -671,10 +672,10 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
           ),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: const Color(0xFF00E5FF),
+              activeTrackColor: AppColors.auroraCyan,
               inactiveTrackColor: Colors.white12,
-              thumbColor: const Color(0xFF00E5FF),
-              overlayColor: const Color(0xFF00E5FF).withValues(alpha: 0.2),
+              thumbColor: AppColors.auroraCyan,
+              overlayColor: AppColors.auroraCyan.withValues(alpha: 0.2),
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
               trackHeight: 3,
             ),
@@ -699,7 +700,7 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
     required ValueChanged<bool> onChanged,
   }) {
     return Material(
-      color: const Color(0xFF15151D),
+      color: AppColors.cardSurface,
       borderRadius: BorderRadius.circular(16),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -739,8 +740,8 @@ class _AuraPaletteSheetState extends State<AuraPaletteSheet> {
             ),
             Switch.adaptive(
               value: value,
-              activeThumbColor: const Color(0xFF00E5FF),
-              activeTrackColor: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+              activeThumbColor: AppColors.auroraCyan,
+              activeTrackColor: AppColors.auroraCyan.withValues(alpha: 0.35),
               onChanged: onChanged,
             ),
           ],

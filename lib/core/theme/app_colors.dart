@@ -17,14 +17,19 @@ abstract final class AppColors {
 
   // Obsidian & Dark Surface Palette
   static const Color obsidianBlack = Color(0xFF000000);
+  static const Color surfacePureBlack = obsidianBlack;
   static const Color darkBackground = Color(0xFF0A0A0E);
+  static const Color backgroundDark = darkBackground;
   static const Color darkSurface = Color(0xFF101018);
   static const Color obsidianSurface = darkSurface;
   static const Color surfaceElevated = Color(0xFF121214);
   static const Color cardBackground = Color(0xFF161622);
+  static const Color cardSurface = cardBackground;
   static const Color obsidianCard = cardBackground;
   static const Color modalBackground = Color(0xFF1A1A24);
+  static const Color surfaceMedium = modalBackground;
   static const Color sheetBackground = Color(0xFF1E1E28);
+  static const Color cardHighlight = Color(0xFF222630);
 
   // Text & Neutral Shades
   static const Color textPrimary = Color(0xFFFFFFFF);
@@ -40,6 +45,7 @@ abstract final class AppColors {
   // Status & Semantic Colors
   static const Color error = Color(0xFFFF5252);
   static const Color favoriteRed = Color(0xFFFF1744);
+  static const Color nightCrimson = Color(0xFFFF3B30);
   static const Color warning = Color(0xFFFFB74D);
   static const Color success = Color(0xFF00E676);
   static const Color info = Color(0xFF00E5FF);

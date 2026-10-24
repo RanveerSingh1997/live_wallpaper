@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/standby_dock_config.dart';
 import 'standby_dock_screen.dart';
 
@@ -67,7 +68,7 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
       },
       builder: (context, state) {
         return Material(
-          color: const Color(0xFF10121A),
+          color: AppColors.backgroundDark,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           child: SafeArea(
             top: false,
@@ -98,16 +99,16 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                          color: AppColors.auroraCyan.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+                            color: AppColors.auroraCyan.withValues(alpha: 0.3),
                             width: 1,
                           ),
                         ),
                         child: const Icon(
                           Icons.desktop_windows_rounded,
-                          color: Color(0xFF00E5FF),
+                          color: AppColors.auroraCyan,
                           size: 22,
                         ),
                       ),
@@ -248,12 +249,12 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
                     height: 52,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                        colors: [AppColors.auroraCyan, AppColors.auroraViolet],
                       ),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+                          color: AppColors.auroraCyan.withValues(alpha: 0.3),
                           blurRadius: 16,
                           offset: const Offset(0, 4),
                         ),
@@ -297,7 +298,7 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
     return Text(
       title,
       style: TextStyle(
-        color: const Color(0xFF00E5FF).withValues(alpha: 0.8),
+        color: AppColors.auroraCyan.withValues(alpha: 0.8),
         fontSize: 11,
         fontWeight: FontWeight.w800,
         letterSpacing: 1.2,
@@ -313,8 +314,8 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
           padding: const EdgeInsets.only(bottom: 8),
           child: Material(
             color: isSelected
-                ? const Color(0xFF00E5FF).withValues(alpha: 0.12)
-                : const Color(0xFF161924),
+                ? AppColors.auroraCyan.withValues(alpha: 0.12)
+                : AppColors.cardSurface,
             borderRadius: BorderRadius.circular(14),
             child: InkWell(
               borderRadius: BorderRadius.circular(14),
@@ -327,7 +328,7 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: isSelected
-                        ? const Color(0xFF00E5FF)
+                        ? AppColors.auroraCyan
                         : Colors.white.withValues(alpha: 0.08),
                     width: isSelected ? 1.5 : 1,
                   ),
@@ -337,7 +338,7 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
                     Icon(
                       style.icon,
                       color: isSelected
-                          ? const Color(0xFF00E5FF)
+                          ? AppColors.auroraCyan
                           : Colors.white70,
                       size: 22,
                     ),
@@ -350,7 +351,7 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
                             style.displayName,
                             style: TextStyle(
                               color: isSelected
-                                  ? const Color(0xFF00E5FF)
+                                  ? AppColors.auroraCyan
                                   : Colors.white,
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -370,7 +371,7 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
                     if (isSelected)
                       const Icon(
                         Icons.check_circle_rounded,
-                        color: Color(0xFF00E5FF),
+                        color: AppColors.auroraCyan,
                         size: 20,
                       ),
                   ],
@@ -392,8 +393,8 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Material(
               color: isSelected
-                  ? const Color(0xFFD500F9).withValues(alpha: 0.15)
-                  : const Color(0xFF161924),
+                  ? AppColors.auroraViolet.withValues(alpha: 0.15)
+                  : AppColors.cardSurface,
               borderRadius: BorderRadius.circular(14),
               child: InkWell(
                 borderRadius: BorderRadius.circular(14),
@@ -407,7 +408,7 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isSelected
-                          ? const Color(0xFFD500F9)
+                          ? AppColors.auroraViolet
                           : Colors.white.withValues(alpha: 0.08),
                       width: isSelected ? 1.5 : 1,
                     ),
@@ -417,7 +418,7 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
                       Icon(
                         mode.icon,
                         color: isSelected
-                            ? const Color(0xFFD500F9)
+                            ? AppColors.auroraViolet
                             : Colors.white70,
                         size: 24,
                       ),
@@ -429,7 +430,7 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: isSelected
-                              ? const Color(0xFFD500F9)
+                              ? AppColors.auroraViolet
                               : Colors.white,
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -448,7 +449,7 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
 
   Widget _buildBurnInProtectionTile() {
     return Material(
-      color: const Color(0xFF161924),
+      color: AppColors.cardSurface,
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.all(14),
@@ -464,12 +465,12 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF00E676).withValues(alpha: 0.15),
+                color: AppColors.auroraEmerald.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
                 Icons.shield_rounded,
-                color: Color(0xFF00E676),
+                color: AppColors.auroraEmerald,
                 size: 20,
               ),
             ),
@@ -499,8 +500,8 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
             ),
             Switch.adaptive(
               value: _config.isBurnInProtectionEnabled,
-              activeThumbColor: const Color(0xFF00E676),
-              activeTrackColor: const Color(0xFF00E676).withValues(alpha: 0.35),
+              activeThumbColor: AppColors.auroraEmerald,
+              activeTrackColor: AppColors.auroraEmerald.withValues(alpha: 0.35),
               onChanged: (val) {
                 _updateConfig(
                     _config.copyWith(isBurnInProtectionEnabled: val));
@@ -514,7 +515,7 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
 
   Widget _buildNightStandbyTile() {
     return Material(
-      color: const Color(0xFF161924),
+      color: AppColors.cardSurface,
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.all(14),
@@ -530,12 +531,12 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFFF3B30).withValues(alpha: 0.15),
+                color: AppColors.nightCrimson.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
                 Icons.bedtime_rounded,
-                color: Color(0xFFFF3B30),
+                color: AppColors.nightCrimson,
                 size: 20,
               ),
             ),
@@ -565,8 +566,8 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
             ),
             Switch.adaptive(
               value: _config.isNightModeEnabled,
-              activeThumbColor: const Color(0xFFFF3B30),
-              activeTrackColor: const Color(0xFFFF3B30).withValues(alpha: 0.35),
+              activeThumbColor: AppColors.nightCrimson,
+              activeTrackColor: AppColors.nightCrimson.withValues(alpha: 0.35),
               onChanged: (val) {
                 _updateConfig(_config.copyWith(isNightModeEnabled: val));
               },
@@ -579,7 +580,7 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
 
   Widget _buildAutoNightModeTile() {
     return Material(
-      color: const Color(0xFF161924),
+      color: AppColors.cardSurface,
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.all(14),
@@ -595,12 +596,12 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFFF5722).withValues(alpha: 0.15),
+                color: AppColors.auroraAmber.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
                 Icons.timelapse_rounded,
-                color: Color(0xFFFF5722),
+                color: AppColors.auroraAmber,
                 size: 20,
               ),
             ),
@@ -630,8 +631,8 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
             ),
             Switch.adaptive(
               value: _config.isAutoNightModeEnabled,
-              activeThumbColor: const Color(0xFFFF5722),
-              activeTrackColor: const Color(0xFFFF5722).withValues(alpha: 0.35),
+              activeThumbColor: AppColors.auroraAmber,
+              activeTrackColor: AppColors.auroraAmber.withValues(alpha: 0.35),
               onChanged: (val) {
                 _updateConfig(
                     _config.copyWith(isAutoNightModeEnabled: val));
@@ -651,7 +652,7 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
     required ValueChanged<bool> onChanged,
   }) {
     return Material(
-      color: const Color(0xFF161924),
+      color: AppColors.cardSurface,
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -691,8 +692,8 @@ class _StandbyDockSheetState extends State<StandbyDockSheet> {
             ),
             Switch.adaptive(
               value: value,
-              activeThumbColor: const Color(0xFF00E5FF),
-              activeTrackColor: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+              activeThumbColor: AppColors.auroraCyan,
+              activeTrackColor: AppColors.auroraCyan.withValues(alpha: 0.35),
               onChanged: onChanged,
             ),
           ],

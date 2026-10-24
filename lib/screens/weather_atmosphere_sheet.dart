@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/weather_atmosphere_config.dart';
 import '../widgets/weather_atmosphere_canvas.dart';
 
@@ -85,12 +86,12 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
       SnackBar(
         content: const Row(
           children: [
-            Icon(Icons.restore_rounded, color: Color(0xFF00E5FF)),
+            Icon(Icons.restore_rounded, color: AppColors.auroraCyan),
             SizedBox(width: 10),
             Text('Weather Atmosphere FX restored to defaults.'),
           ],
         ),
-        backgroundColor: const Color(0xFF1E2028),
+        backgroundColor: AppColors.surfaceMedium,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -108,12 +109,12 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
       ),
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
-        color: Color(0xFF101216),
+        color: AppColors.backgroundDark,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         border: Border(
-          top: BorderSide(color: Color(0xFF262A34), width: 1.5),
-          left: BorderSide(color: Color(0xFF262A34), width: 1.0),
-          right: BorderSide(color: Color(0xFF262A34), width: 1.0),
+          top: BorderSide(color: AppColors.cardHighlight, width: 1.5),
+          left: BorderSide(color: AppColors.cardHighlight, width: 1.0),
+          right: BorderSide(color: AppColors.cardHighlight, width: 1.0),
         ),
         boxShadow: [
           BoxShadow(
@@ -148,15 +149,15 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                    color: AppColors.auroraCyan.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+                      color: AppColors.auroraCyan.withValues(alpha: 0.3),
                     ),
                   ),
                   child: const Icon(
                     Icons.cloud_sync_rounded,
-                    color: Color(0xFF00E5FF),
+                    color: AppColors.auroraCyan,
                     size: 20,
                   ),
                 ),
@@ -193,7 +194,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
             ),
           ),
 
-          const Divider(color: Color(0xFF222630), height: 1),
+          const Divider(color: AppColors.cardHighlight, height: 1),
 
           // Scrollable body
           Expanded(
@@ -212,7 +213,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.2,
-                    color: Color(0xFF00E5FF),
+                    color: AppColors.auroraCyan,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -230,7 +231,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.2,
-                      color: Color(0xFFD500F9),
+                      color: AppColors.auroraViolet,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -243,7 +244,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                     max: 1.0,
                     divisions: 18,
                     displayValue: '${(_config.intensity * 100).toInt()}%',
-                    activeColor: const Color(0xFF00E5FF),
+                    activeColor: AppColors.auroraCyan,
                     onChanged: (val) {
                       _updateConfig(_config.copyWith(intensity: val));
                     },
@@ -258,7 +259,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                     max: 2.5,
                     divisions: 22,
                     displayValue: '${_config.speedMultiplier.toStringAsFixed(1)}x',
-                    activeColor: const Color(0xFFD500F9),
+                    activeColor: AppColors.auroraViolet,
                     onChanged: (val) {
                       _updateConfig(_config.copyWith(speedMultiplier: val));
                     },
@@ -273,7 +274,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                     max: 90.0,
                     divisions: 14,
                     displayValue: '${_config.windAngleDegrees.toInt()}°',
-                    activeColor: const Color(0xFFFF5722),
+                    activeColor: AppColors.auroraAmber,
                     onChanged: (val) {
                       _updateConfig(_config.copyWith(windAngleDegrees: val));
                     },
@@ -288,7 +289,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.2,
-                      color: Color(0xFF00E676),
+                      color: AppColors.auroraEmerald,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -298,7 +299,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                     title: 'Gyroscopic Tilt Adaptation',
                     subtitle: 'Particles slant organically with phone orientation',
                     value: _config.isGyroTiltEnabled,
-                    accentColor: const Color(0xFF00E5FF),
+                    accentColor: AppColors.auroraCyan,
                     onChanged: (val) {
                       _updateConfig(_config.copyWith(isGyroTiltEnabled: val));
                     },
@@ -310,7 +311,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                     title: 'Lightning & Luminous Bursts',
                     subtitle: 'Periodic high-contrast aurora flash illuminations',
                     value: _config.isLightningEnabled,
-                    accentColor: const Color(0xFFD500F9),
+                    accentColor: AppColors.auroraViolet,
                     onChanged: (val) {
                       _updateConfig(_config.copyWith(isLightningEnabled: val));
                     },
@@ -322,7 +323,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                     title: 'Zero Sleep Overhead & Battery Guard',
                     subtitle: 'Clamps particles and sleeps completely when display off',
                     value: _config.isBatteryGuardEnabled,
-                    accentColor: const Color(0xFF00E676),
+                    accentColor: AppColors.auroraEmerald,
                     onChanged: (val) {
                       _updateConfig(_config.copyWith(isBatteryGuardEnabled: val));
                     },
@@ -341,7 +342,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                         label: const Text('Reset Defaults'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.white70,
-                          side: const BorderSide(color: Color(0xFF333845)),
+                          side: const BorderSide(color: AppColors.cardHighlight),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -355,11 +356,11 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(14),
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                            colors: [AppColors.auroraCyan, AppColors.auroraViolet],
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+                              color: AppColors.auroraCyan.withValues(alpha: 0.3),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
@@ -412,7 +413,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
             border: Border.all(
               color: _config.isEnabled
                   ? _config.effectType.accentColor.withValues(alpha: 0.4)
-                  : const Color(0xFF282C37),
+                  : AppColors.cardHighlight,
               width: 1.5,
             ),
             boxShadow: [
@@ -435,9 +436,9 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: current?.gradientColors ?? const [
-                      Color(0xFF14161D),
-                      Color(0xFF0D0E12),
-                      Color(0xFF000000),
+                      AppColors.darkSurface,
+                      AppColors.darkBackground,
+                      AppColors.obsidianBlack,
                     ],
                   ),
                 ),
@@ -510,7 +511,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                             _config.isBatteryGuardEnabled
                                 ? Icons.energy_savings_leaf_rounded
                                 : Icons.bolt_rounded,
-                            color: const Color(0xFF00E676),
+                            color: AppColors.auroraEmerald,
                             size: 12,
                           ),
                           const SizedBox(width: 4),
@@ -568,7 +569,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
           child: Material(
             color: isSelected
                 ? type.accentColor.withValues(alpha: 0.12)
-                : const Color(0xFF181B22),
+                : AppColors.cardSurface,
             borderRadius: BorderRadius.circular(14),
             child: InkWell(
               onTap: () => _applyPreset(type),
@@ -580,7 +581,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
                   border: Border.all(
                     color: isSelected
                         ? type.accentColor.withValues(alpha: 0.6)
-                        : const Color(0xFF262B35),
+                        : AppColors.surfaceMedium,
                     width: isSelected ? 1.5 : 1.0,
                   ),
                 ),
@@ -656,9 +657,9 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF181B22),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF262B35)),
+        border: Border.all(color: AppColors.surfaceMedium),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -708,7 +709,7 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: activeColor,
-              inactiveTrackColor: const Color(0xFF282C37),
+              inactiveTrackColor: AppColors.cardHighlight,
               thumbColor: activeColor,
               overlayColor: activeColor.withValues(alpha: 0.2),
               trackHeight: 3.5,
@@ -738,9 +739,9 @@ class _WeatherAtmosphereSheetState extends State<WeatherAtmosphereSheet> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF181B22),
+        color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF262B35)),
+        border: Border.all(color: AppColors.surfaceMedium),
       ),
       child: Row(
         children: [

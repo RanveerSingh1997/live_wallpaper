@@ -104,10 +104,20 @@ flowchart TD
     State --> View
 ```
 
-1. **`lib/blocs/` (Intent-Driven State Management)**:
+1. **`lib/blocs/` (Intent-Driven State Management & Domain Mixins)**:
    - **`WallpaperIntent`**: Immutable events representing user intentions or system lifecycle events. All intent classes extend `Equatable`.
    - **`WallpaperState`**: Completely immutable state snapshot. Exposes computed selectors (e.g., `sortedCloudWallpapers`, `rotationPoolShorts`) and uses `copyWith()` for atomic transitions.
-   - **`WallpaperBloc`**: Pure business logic orchestrator. Maps incoming intents to asynchronous repository operations and emits updated state snapshots.
+   - **`WallpaperBloc`**: Pure business logic orchestrator, modularized via domain mixins (`with FeedHandlers, PlaylistHandlers, WallpaperActionHandlers, AutoRotationHandlers, StudioHandlers, CommunityHandlers, PortabilityHandlers, CloudHandlers`).
+   - **`lib/blocs/handlers/`**: Focused SRP domain handlers and pure filtering logic:
+     - `feed_handlers.dart`: Feed loading, search, category filtering, user preferences, onboarding.
+     - `playlist_handlers.dart`: Favorites, custom collections, catalog import.
+     - `wallpaper_action_handlers.dart`: Live and static wallpaper application, video downloads, sharing, quotes.
+     - `auto_rotation_handlers.dart`: Aurora auto-rotation timers, sources, Wi-Fi constraints, rotate now.
+     - `studio_handlers.dart`: 12 studio engine configurations (Aura, Parallax, Particles, Weather, Standby, etc.).
+     - `community_handlers.dart`: Blueprint publishing, likes counter, showcase filters.
+     - `portability_handlers.dart`: Backup bundle export, restore, factory reset.
+     - `cloud_handlers.dart`: Wallaza cloud feed fetching, search, pagination, and cloud import.
+     - `wallpaper_feed_filter.dart`: Pure functional recommendation and smart filter algorithms.
 
 2. **`lib/models/` (Domain Entities & Value Objects)**:
    - All models implement `Equatable` for value equality and deterministic state emission.

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/aurora_synthesizer_config.dart';
 import '../models/motivational_short.dart';
 import '../widgets/aurora_synthesizer_canvas.dart';
@@ -62,15 +63,15 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
       author: 'Wallora Synthesizer',
       category: 'Anime & Gaming',
       videoAssetPath: 'assets/videos/ippo_hard_work.mp4',
-      accentColor: const Color(0xFF00E5FF),
+      accentColor: AppColors.auroraCyan,
       tags: '#aurora #procedural #synthesizer #glow',
       mood: 'Energizing',
       isLive: false,
       resolution: 'Procedural Wave Canvas',
       gradientColors: const [
-        Color(0xFF00E5FF),
-        Color(0xFFD500F9),
-        Color(0xFF000000),
+        AppColors.auroraCyan,
+        AppColors.auroraViolet,
+        AppColors.surfacePureBlack,
       ],
       trueBlackPercentage: 45,
     );
@@ -81,7 +82,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle_rounded, color: Color(0xFF00E676)),
+            const Icon(Icons.check_circle_rounded, color: AppColors.auroraEmerald),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -91,7 +92,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF1E2028),
+        backgroundColor: AppColors.surfaceMedium,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -110,7 +111,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
       },
       builder: (context, state) {
         return Material(
-          color: const Color(0xFF0D0F18),
+          color: AppColors.backgroundDark,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           child: SafeArea(
             top: false,
@@ -141,16 +142,16 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                          color: AppColors.auroraCyan.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+                            color: AppColors.auroraCyan.withValues(alpha: 0.3),
                             width: 1,
                           ),
                         ),
                         child: const Icon(
                           Icons.auto_awesome_rounded,
-                          color: Color(0xFF00E5FF),
+                          color: AppColors.auroraCyan,
                           size: 22,
                         ),
                       ),
@@ -243,12 +244,12 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
                           height: 50,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                              colors: [AppColors.auroraCyan, AppColors.auroraViolet],
                             ),
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF00E5FF).withValues(alpha: 0.25),
+                                color: AppColors.auroraCyan.withValues(alpha: 0.25),
                                 blurRadius: 16,
                                 offset: const Offset(0, 4),
                               ),
@@ -319,7 +320,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
     return Text(
       title,
       style: TextStyle(
-        color: const Color(0xFF00E5FF).withValues(alpha: 0.85),
+        color: AppColors.auroraCyan.withValues(alpha: 0.85),
         fontSize: 11,
         fontWeight: FontWeight.w800,
         letterSpacing: 1.2,
@@ -334,12 +335,12 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+            color: AppColors.auroraCyan.withValues(alpha: 0.3),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+              color: AppColors.auroraCyan.withValues(alpha: 0.15),
               blurRadius: 24,
               spreadRadius: 2,
             ),
@@ -378,7 +379,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
                           Icon(
                             _config.waveStyle.icon,
                             size: 14,
-                            color: const Color(0xFF00E5FF),
+                            color: AppColors.auroraCyan,
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -437,8 +438,8 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
           padding: const EdgeInsets.only(bottom: 8),
           child: Material(
             color: isSelected
-                ? const Color(0xFF00E5FF).withValues(alpha: 0.12)
-                : const Color(0xFF141724),
+                ? AppColors.auroraCyan.withValues(alpha: 0.12)
+                : AppColors.cardSurface,
             borderRadius: BorderRadius.circular(14),
             child: InkWell(
               borderRadius: BorderRadius.circular(14),
@@ -451,7 +452,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: isSelected
-                        ? const Color(0xFF00E5FF)
+                        ? AppColors.auroraCyan
                         : Colors.white.withValues(alpha: 0.08),
                     width: isSelected ? 1.5 : 1,
                   ),
@@ -461,7 +462,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
                     Icon(
                       style.icon,
                       color: isSelected
-                          ? const Color(0xFF00E5FF)
+                          ? AppColors.auroraCyan
                           : Colors.white70,
                       size: 22,
                     ),
@@ -474,7 +475,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
                             style.displayName,
                             style: TextStyle(
                               color: isSelected
-                                  ? const Color(0xFF00E5FF)
+                                  ? AppColors.auroraCyan
                                   : Colors.white,
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -494,7 +495,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
                     if (isSelected)
                       const Icon(
                         Icons.check_circle_rounded,
-                        color: Color(0xFF00E5FF),
+                        color: AppColors.auroraCyan,
                         size: 20,
                       ),
                   ],
@@ -515,8 +516,8 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
           padding: const EdgeInsets.only(bottom: 8),
           child: Material(
             color: isSelected
-                ? const Color(0xFFD500F9).withValues(alpha: 0.12)
-                : const Color(0xFF141724),
+                ? AppColors.auroraViolet.withValues(alpha: 0.12)
+                : AppColors.cardSurface,
             borderRadius: BorderRadius.circular(14),
             child: InkWell(
               borderRadius: BorderRadius.circular(14),
@@ -529,7 +530,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: isSelected
-                        ? const Color(0xFFD500F9)
+                        ? AppColors.auroraViolet
                         : Colors.white.withValues(alpha: 0.08),
                     width: isSelected ? 1.5 : 1,
                   ),
@@ -539,7 +540,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
                     Icon(
                       mode.icon,
                       color: isSelected
-                          ? const Color(0xFFD500F9)
+                          ? AppColors.auroraViolet
                           : Colors.white70,
                       size: 22,
                     ),
@@ -552,7 +553,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
                             mode.displayName,
                             style: TextStyle(
                               color: isSelected
-                                  ? const Color(0xFFD500F9)
+                                  ? AppColors.auroraViolet
                                   : Colors.white,
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -572,7 +573,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
                     if (isSelected)
                       const Icon(
                         Icons.check_circle_rounded,
-                        color: Color(0xFFD500F9),
+                        color: AppColors.auroraViolet,
                         size: 20,
                       ),
                   ],
@@ -587,7 +588,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
 
   Widget _buildWavePhysicsCard() {
     return Material(
-      color: const Color(0xFF141724),
+      color: AppColors.cardSurface,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -695,7 +696,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
             Text(
               displayValue,
               style: const TextStyle(
-                color: Color(0xFF00E5FF),
+                color: AppColors.auroraCyan,
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
               ),
@@ -704,10 +705,10 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
         ),
         SliderTheme(
           data: SliderThemeData(
-            activeTrackColor: const Color(0xFF00E5FF),
+            activeTrackColor: AppColors.auroraCyan,
             inactiveTrackColor: Colors.white12,
-            thumbColor: const Color(0xFF00E5FF),
-            overlayColor: const Color(0xFF00E5FF).withValues(alpha: 0.2),
+            thumbColor: AppColors.auroraCyan,
+            overlayColor: AppColors.auroraCyan.withValues(alpha: 0.2),
             trackHeight: 3,
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
           ),
@@ -731,7 +732,7 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
     required ValueChanged<bool> onChanged,
   }) {
     return Material(
-      color: const Color(0xFF141724),
+      color: AppColors.cardSurface,
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -771,8 +772,8 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
             ),
             Switch.adaptive(
               value: value,
-              activeThumbColor: const Color(0xFF00E5FF),
-              activeTrackColor: const Color(0xFF00E5FF).withValues(alpha: 0.35),
+              activeThumbColor: AppColors.auroraCyan,
+              activeTrackColor: AppColors.auroraCyan.withValues(alpha: 0.35),
               onChanged: onChanged,
             ),
           ],
