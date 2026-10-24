@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 
@@ -45,7 +46,7 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
                 ) ??
             (state.allShorts.isNotEmpty ? state.allShorts.first : null);
 
-        final accentColor = targetWallpaper?.accentColor ?? const Color(0xFFD500F9);
+        final accentColor = targetWallpaper?.accentColor ?? AppColors.auroraViolet;
         final effectiveClockColor = _draftConfig.resolveClockColor(accentColor);
 
         return DraggableScrollableSheet(
@@ -55,7 +56,7 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF101014),
+                color: AppColors.darkSurface,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: Column(
@@ -84,17 +85,17 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
                             Container(
                               padding: const EdgeInsets.all(7),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFD500F9).withValues(alpha: 0.15),
+                                color: AppColors.auroraViolet.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: const Color(0xFFD500F9),
+                                  color: AppColors.auroraViolet,
                                   width: 0.8,
                                 ),
                               ),
                               child: const Icon(
                                 Icons.lock_clock_rounded,
                                 size: 18,
-                                color: Color(0xFFD500F9),
+                                color: AppColors.auroraViolet,
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -223,7 +224,7 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
     final colors = wallpaper?.gradientColors.isNotEmpty == true
         ? wallpaper!.gradientColors
         : [
-            wallpaper?.accentColor.withValues(alpha: 0.6) ?? const Color(0xFF1B0B2E),
+            wallpaper?.accentColor.withValues(alpha: 0.6) ?? AppColors.modalBackground,
             Colors.black87,
           ];
 
@@ -460,7 +461,7 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.format_quote_rounded, size: 11, color: Color(0xFF00E5FF)),
+              const Icon(Icons.format_quote_rounded, size: 11, color: AppColors.neonCyan),
               const SizedBox(width: 5),
               Flexible(
                 child: Text(
@@ -483,18 +484,18 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.45),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF00E676).withValues(alpha: 0.4), width: 0.8),
+            border: Border.all(color: AppColors.auroraEmerald.withValues(alpha: 0.4), width: 0.8),
           ),
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.bolt_rounded, size: 11, color: Color(0xFF00E676)),
+              Icon(Icons.bolt_rounded, size: 11, color: AppColors.auroraEmerald),
               SizedBox(width: 4),
               Flexible(
                 child: Text(
                   '98% • Power Saver',
                   style: TextStyle(
-                    color: Color(0xFF00E676),
+                    color: AppColors.auroraEmerald,
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
                     overflow: TextOverflow.ellipsis,
@@ -510,18 +511,18 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.45),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFFFD600).withValues(alpha: 0.4), width: 0.8),
+            border: Border.all(color: AppColors.solarGold.withValues(alpha: 0.4), width: 0.8),
           ),
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.wb_sunny_rounded, size: 11, color: Color(0xFFFFD600)),
+              Icon(Icons.wb_sunny_rounded, size: 11, color: AppColors.solarGold),
               SizedBox(width: 4),
               Flexible(
                 child: Text(
                   '72°F • Clear Sky',
                   style: TextStyle(
-                    color: Color(0xFFFFD600),
+                    color: AppColors.solarGold,
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
                     overflow: TextOverflow.ellipsis,
@@ -567,13 +568,13 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
     return ChoiceChip(
       label: Text(title),
       selected: isSelected,
-      selectedColor: const Color(0xFFD500F9).withValues(alpha: 0.2),
-      backgroundColor: const Color(0xFF18181C),
+      selectedColor: AppColors.auroraViolet.withValues(alpha: 0.2),
+      backgroundColor: AppColors.cardSurface,
       side: BorderSide(
-        color: isSelected ? const Color(0xFFD500F9) : Colors.white12,
+        color: isSelected ? AppColors.auroraViolet : Colors.white12,
       ),
       labelStyle: TextStyle(
-        color: isSelected ? const Color(0xFFD500F9) : Colors.white70,
+        color: isSelected ? AppColors.auroraViolet : Colors.white70,
         fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
         fontSize: 11,
       ),
@@ -600,17 +601,17 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
               avatar: Icon(
                 font.icon,
                 size: 14,
-                color: isSelected ? const Color(0xFFD500F9) : Colors.white54,
+                color: isSelected ? AppColors.auroraViolet : Colors.white54,
               ),
               label: Text(font.label),
               selected: isSelected,
-              selectedColor: const Color(0xFFD500F9).withValues(alpha: 0.2),
-              backgroundColor: const Color(0xFF18181C),
+              selectedColor: AppColors.auroraViolet.withValues(alpha: 0.2),
+              backgroundColor: AppColors.cardSurface,
               side: BorderSide(
-                color: isSelected ? const Color(0xFFD500F9) : Colors.white12,
+                color: isSelected ? AppColors.auroraViolet : Colors.white12,
               ),
               labelStyle: TextStyle(
-                color: isSelected ? const Color(0xFFD500F9) : Colors.white70,
+                color: isSelected ? AppColors.auroraViolet : Colors.white70,
                 fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
                 fontSize: 11,
               ),
@@ -640,8 +641,8 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Material(
                   color: isSelected
-                      ? const Color(0xFFD500F9).withValues(alpha: 0.15)
-                      : const Color(0xFF18181C),
+                      ? AppColors.auroraViolet.withValues(alpha: 0.15)
+                      : AppColors.cardSurface,
                   borderRadius: BorderRadius.circular(12),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(12),
@@ -655,7 +656,7 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSelected ? const Color(0xFFD500F9) : Colors.white10,
+                          color: isSelected ? AppColors.auroraViolet : Colors.white10,
                           width: isSelected ? 1.2 : 0.8,
                         ),
                       ),
@@ -664,7 +665,7 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
                           Icon(
                             layout.icon,
                             size: 18,
-                            color: isSelected ? const Color(0xFFD500F9) : Colors.white54,
+                            color: isSelected ? AppColors.auroraViolet : Colors.white54,
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -691,11 +692,11 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
   Widget _buildColorHarmonizerSection(Color wallpaperAccent) {
     const customColors = [
       Colors.white,
-      Color(0xFF00E5FF), // Cyan
-      Color(0xFFD500F9), // Violet
-      Color(0xFFFFD600), // Amber
-      Color(0xFF00E676), // Emerald
-      Color(0xFFFF5252), // Crimson
+      AppColors.neonCyan,
+      AppColors.auroraViolet,
+      AppColors.solarGold,
+      AppColors.auroraEmerald,
+      AppColors.error,
     ];
 
     return Column(
@@ -706,7 +707,7 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFF18181C),
+            color: AppColors.cardSurface,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: Colors.white10),
           ),
@@ -738,8 +739,8 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
                   ),
                   Switch.adaptive(
                     value: _draftConfig.useWallpaperAccentColor,
-                    activeThumbColor: const Color(0xFFD500F9),
-                    activeTrackColor: const Color(0xFFD500F9).withValues(alpha: 0.3),
+                    activeThumbColor: AppColors.auroraViolet,
+                    activeTrackColor: AppColors.auroraViolet.withValues(alpha: 0.3),
                     onChanged: (val) {
                       setState(() {
                         _draftConfig = _draftConfig.copyWith(useWallpaperAccentColor: val);
@@ -805,17 +806,17 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
               style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFFD500F9),
+                color: AppColors.auroraViolet,
               ),
             ),
           ],
         ),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            activeTrackColor: const Color(0xFFD500F9),
+            activeTrackColor: AppColors.auroraViolet,
             inactiveTrackColor: Colors.white10,
-            thumbColor: const Color(0xFFD500F9),
-            overlayColor: const Color(0xFFD500F9).withValues(alpha: 0.2),
+            thumbColor: AppColors.auroraViolet,
+            overlayColor: AppColors.auroraViolet.withValues(alpha: 0.2),
           ),
           child: Slider(
             value: _draftConfig.clockSize,
@@ -844,15 +845,15 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
             padding: const EdgeInsets.only(bottom: 8),
             child: Material(
               color: isSelected
-                  ? const Color(0xFFD500F9).withValues(alpha: 0.12)
-                  : const Color(0xFF18181C),
+                  ? AppColors.auroraViolet.withValues(alpha: 0.12)
+                  : AppColors.cardSurface,
               borderRadius: BorderRadius.circular(12),
               child: ListTile(
                 dense: true,
                 leading: Icon(
                   wType.icon,
                   size: 18,
-                  color: isSelected ? const Color(0xFFD500F9) : Colors.white54,
+                  color: isSelected ? AppColors.auroraViolet : Colors.white54,
                 ),
                 title: Text(
                   wType.label,
@@ -863,7 +864,7 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
                   ),
                 ),
                 trailing: isSelected
-                    ? const Icon(Icons.check_circle_rounded, color: Color(0xFFD500F9), size: 18)
+                    ? const Icon(Icons.check_circle_rounded, color: AppColors.auroraViolet, size: 18)
                     : const Icon(Icons.circle_outlined, color: Colors.white24, size: 18),
                 onTap: () {
                   setState(() {
@@ -887,7 +888,7 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: const Color(0xFF18181C),
+            color: AppColors.cardSurface,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: Colors.white10),
           ),
@@ -906,8 +907,8 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
                   ),
                   Switch.adaptive(
                     value: _draftConfig.showDate,
-                    activeThumbColor: const Color(0xFFD500F9),
-                    activeTrackColor: const Color(0xFFD500F9).withValues(alpha: 0.3),
+                    activeThumbColor: AppColors.auroraViolet,
+                    activeTrackColor: AppColors.auroraViolet.withValues(alpha: 0.3),
                     onChanged: (val) {
                       setState(() {
                         _draftConfig = _draftConfig.copyWith(showDate: val);
@@ -930,8 +931,8 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
                   ),
                   Switch.adaptive(
                     value: _draftConfig.showShortcuts,
-                    activeThumbColor: const Color(0xFFD500F9),
-                    activeTrackColor: const Color(0xFFD500F9).withValues(alpha: 0.3),
+                    activeThumbColor: AppColors.auroraViolet,
+                    activeTrackColor: AppColors.auroraViolet.withValues(alpha: 0.3),
                     onChanged: (val) {
                       setState(() {
                         _draftConfig = _draftConfig.copyWith(showShortcuts: val);
@@ -953,7 +954,7 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
       height: 48,
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFD500F9),
+          backgroundColor: AppColors.auroraViolet,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           elevation: 0,

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../core/core.dart';
 import '../models/aura_palette_config.dart';
 import '../models/aurora_synthesizer_config.dart';
 
@@ -88,25 +89,25 @@ class _AuroraSynthesizerCanvasState extends State<AuroraSynthesizerCanvas>
           resolved.etherealGlow,
         ];
       case AuroraColorMode.cyanViolet:
-        return [
-          const Color(0xFF00E5FF),
-          const Color(0xFFD500F9),
-          const Color(0xFF7C4DFF),
-          const Color(0xFF00B0FF),
+        return const [
+          AppColors.neonCyan,
+          AppColors.auroraViolet,
+          AppColors.deepPurple,
+          AppColors.electricBlue,
         ];
       case AuroraColorMode.amberEmerald:
-        return [
-          const Color(0xFFFF5722),
-          const Color(0xFF00E676),
-          const Color(0xFFFFD600),
-          const Color(0xFF1DE9B6),
+        return const [
+          AppColors.sunsetAmber,
+          AppColors.auroraEmerald,
+          AppColors.solarGold,
+          Color(0xFF1DE9B6),
         ];
       case AuroraColorMode.pureOledRed:
-        return [
-          const Color(0xFFFF3B30),
-          const Color(0xFFFF5722),
-          const Color(0xFFD50000),
-          const Color(0xFFFF1744),
+        return const [
+          AppColors.nightCrimson,
+          AppColors.sunsetAmber,
+          Color(0xFFD50000),
+          AppColors.favoriteRed,
         ];
     }
   }
@@ -167,7 +168,7 @@ class _AuroraWavePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final bgPaint = Paint()..color = const Color(0xFF000000);
+    final bgPaint = Paint()..color = AppColors.obsidianBlack;
     canvas.drawRect(Offset.zero & size, bgPaint);
 
     if (!config.isEnabled || config.waveCount <= 0) return;
@@ -367,7 +368,7 @@ class _AuroraWavePainter extends CustomPainter {
         radius: 1.1,
         colors: [
           color.withValues(alpha: 0.45),
-          const Color(0xFFFF5722).withValues(alpha: 0.20),
+          AppColors.sunsetAmber.withValues(alpha: 0.20),
           Colors.transparent,
         ],
       ).createShader(Offset.zero & size)
@@ -406,7 +407,7 @@ class _AuroraWavePainter extends CustomPainter {
         end: Alignment.bottomCenter,
         colors: [
           color.withValues(alpha: 0.40),
-          const Color(0xFF00E5FF).withValues(alpha: 0.10),
+          AppColors.neonCyan.withValues(alpha: 0.10),
           Colors.transparent,
         ],
       ).createShader(Offset.zero & size)

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
+import '../core/core.dart';
 import '../data/curated_shorts_data.dart';
 
 class PreferencesModalSheet extends StatefulWidget {
@@ -53,19 +54,19 @@ class _PreferencesModalSheetState extends State<PreferencesModalSheet> {
   Color _getCategoryColor(String category) {
     switch (category) {
       case 'Anime & Gaming':
-        return const Color(0xFFFF5722);
+        return AppColors.sunsetAmber;
       case 'Nature & Scenery':
-        return const Color(0xFF00E676);
+        return AppColors.auroraEmerald;
       case 'Cyberpunk & Tech':
-        return const Color(0xFFD500F9);
+        return AppColors.auroraViolet;
       case 'Cars & Speed':
-        return const Color(0xFFFF1744);
+        return AppColors.favoriteRed;
       case 'Minimal & AMOLED':
-        return const Color(0xFF7C4DFF);
+        return AppColors.deepPurple;
       case 'Motivation & Mindset':
-        return const Color(0xFF00E5FF);
+        return AppColors.neonCyan;
       case 'Fitness & Grind':
-        return const Color(0xFFFFC107);
+        return AppColors.solarGold;
       default:
         return Colors.white;
     }
@@ -82,14 +83,16 @@ class _PreferencesModalSheetState extends State<PreferencesModalSheet> {
       bloc.add(ToggleTextOverlayVisibilityIntent());
     }
 
-    Navigator.of(context).pop();
+    if (mounted && Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF141416),
+        color: AppColors.darkSurface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
@@ -124,12 +127,12 @@ class _PreferencesModalSheetState extends State<PreferencesModalSheet> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFD600).withValues(alpha: 0.15),
+                      color: AppColors.solarGold.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
                       Icons.tune_rounded,
-                      color: Color(0xFFFFD600),
+                      color: AppColors.solarGold,
                       size: 20,
                     ),
                   ),
@@ -244,7 +247,7 @@ class _PreferencesModalSheetState extends State<PreferencesModalSheet> {
                 ),
                 selected: isSelected,
                 selectedColor: catColor,
-                backgroundColor: const Color(0xFF1E1E22),
+                backgroundColor: AppColors.sheetBackground,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                   side: BorderSide(
@@ -274,7 +277,7 @@ class _PreferencesModalSheetState extends State<PreferencesModalSheet> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF1B1B1E),
+              color: AppColors.modalBackground,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
             ),
@@ -288,7 +291,7 @@ class _PreferencesModalSheetState extends State<PreferencesModalSheet> {
                   ),
                   child: Icon(
                     _textOverlayEnabled ? Icons.subtitles_rounded : Icons.subtitles_off_rounded,
-                    color: _textOverlayEnabled ? const Color(0xFF00E676) : Colors.white38,
+                    color: _textOverlayEnabled ? AppColors.auroraEmerald : Colors.white38,
                     size: 20,
                   ),
                 ),
@@ -320,7 +323,7 @@ class _PreferencesModalSheetState extends State<PreferencesModalSheet> {
                 ),
                 Switch.adaptive(
                   value: _textOverlayEnabled,
-                  activeTrackColor: const Color(0xFF00E676),
+                  activeTrackColor: AppColors.auroraEmerald,
                   activeThumbColor: Colors.white,
                   onChanged: (val) {
                     setState(() {
@@ -341,7 +344,7 @@ class _PreferencesModalSheetState extends State<PreferencesModalSheet> {
             child: ElevatedButton(
               onPressed: _savePreferences,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFFD600),
+                backgroundColor: AppColors.solarGold,
                 foregroundColor: Colors.black,
                 elevation: 4,
                 shape: RoundedRectangleBorder(

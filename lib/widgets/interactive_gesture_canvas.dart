@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../core/core.dart';
 import '../models/aura_palette_config.dart';
 import '../models/gesture_control_config.dart';
 
@@ -107,13 +108,13 @@ class _InteractiveGestureCanvasState extends State<InteractiveGestureCanvas>
       case TouchColorMode.auraSync:
         return widget.auraConfig.preset.primaryAccent;
       case TouchColorMode.electricCyan:
-        return const Color(0xFF00E5FF);
+        return AppColors.neonCyan;
       case TouchColorMode.auroraViolet:
-        return const Color(0xFFD500F9);
+        return AppColors.auroraViolet;
       case TouchColorMode.solarAmber:
-        return const Color(0xFFFF5722);
+        return AppColors.sunsetAmber;
       case TouchColorMode.emeraldNeon:
-        return const Color(0xFF00E676);
+        return AppColors.auroraEmerald;
       case TouchColorMode.pureWhite:
         return Colors.white;
     }

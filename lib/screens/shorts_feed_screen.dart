@@ -76,7 +76,7 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
               SnackBar(
                 content: Row(
                   children: [
-                    const Icon(Icons.check_circle_rounded, color: Color(0xFF00E676)),
+                    const Icon(Icons.check_circle_rounded, color: AppColors.auroraEmerald),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -86,7 +86,7 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                     ),
                   ],
                 ),
-                backgroundColor: const Color(0xFF212124),
+                backgroundColor: AppColors.cardSurface,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 duration: const Duration(seconds: 5),
@@ -110,7 +110,7 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
               SnackBar(
                 content: Row(
                   children: [
-                    const Icon(Icons.error_outline_rounded, color: Colors.redAccent),
+                    const Icon(Icons.error_outline_rounded, color: AppColors.error),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -120,7 +120,7 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                     ),
                   ],
                 ),
-                backgroundColor: const Color(0xFF2C1E20),
+                backgroundColor: AppColors.modalBackground,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 duration: const Duration(seconds: 4),
@@ -396,7 +396,7 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                                   ),
                                   const SizedBox(width: 10),
                                 ],
-                                const Icon(Icons.bolt_rounded, color: Color(0xFFFFD600), size: 22),
+                                const Icon(Icons.bolt_rounded, color: AppColors.solarGold, size: 22),
                                 const SizedBox(width: 6),
                                 const Text(
                                   'LIVE WALLPAPER',
@@ -415,10 +415,10 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF00E676).withValues(alpha: 0.2),
+                                      color: AppColors.auroraEmerald.withValues(alpha: 0.2),
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: const Color(0xFF00E676),
+                                        color: AppColors.auroraEmerald,
                                         width: 1,
                                       ),
                                     ),
@@ -426,7 +426,7 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                                       children: [
                                         CircleAvatar(
                                           radius: 3,
-                                          backgroundColor: Color(0xFF00E676),
+                                          backgroundColor: AppColors.auroraEmerald,
                                         ),
                                         SizedBox(width: 5),
                                         Text(
@@ -434,7 +434,7 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                                           style: TextStyle(
                                             fontSize: 9,
                                             fontWeight: FontWeight.w800,
-                                            color: Color(0xFF00E676),
+                                            color: AppColors.auroraEmerald,
                                             letterSpacing: 0.8,
                                           ),
                                         ),
@@ -455,7 +455,7 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                                         ? Icons.subtitles_rounded
                                         : Icons.subtitles_off_rounded,
                                     color: state.isTextOverlayVisible
-                                        ? const Color(0xFF00E676)
+                                        ? AppColors.auroraEmerald
                                         : Colors.white38,
                                     size: 22,
                                   ),

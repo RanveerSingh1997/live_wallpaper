@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../core/core.dart';
 import '../models/weather_atmosphere_config.dart';
 
 /// Interactive canvas rendering real-time atmospheric weather and climate FX
@@ -174,7 +175,7 @@ class _AtmospherePainter extends CustomPainter {
         break;
 
       case WeatherEffectType.cyberRain:
-        _paintRain(canvas, size, const Color(0xFF00E5FF));
+        _paintRain(canvas, size, AppColors.neonCyan);
         break;
 
       case WeatherEffectType.cosmicSnow:
@@ -182,7 +183,7 @@ class _AtmospherePainter extends CustomPainter {
         break;
 
       case WeatherEffectType.thunderstorm:
-        _paintRain(canvas, size, const Color(0xFF80D8FF));
+        _paintRain(canvas, size, AppColors.electricBlue);
         if (lightningAlpha > 0.0) {
           _paintLightningFlash(canvas, size);
         }
@@ -244,7 +245,7 @@ class _AtmospherePainter extends CustomPainter {
 
   void _paintLightningFlash(Canvas canvas, Size size) {
     final flashPaint = Paint()
-      ..color = const Color(0xFFD500F9).withValues(alpha: lightningAlpha * 0.35);
+      ..color = AppColors.auroraViolet.withValues(alpha: lightningAlpha * 0.35);
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), flashPaint);
 
     final whiteFlash = Paint()
@@ -270,8 +271,8 @@ class _AtmospherePainter extends CustomPainter {
       final paint = Paint()
         ..shader = LinearGradient(
           colors: [
-            const Color(0xFFFFD600).withValues(alpha: 0.25 * config.intensity),
-            const Color(0xFFFF9100).withValues(alpha: 0.12 * config.intensity),
+            AppColors.solarGold.withValues(alpha: 0.25 * config.intensity),
+            AppColors.sunsetAmber.withValues(alpha: 0.12 * config.intensity),
             Colors.transparent,
           ],
           begin: Alignment.topCenter,
@@ -306,8 +307,8 @@ class _AtmospherePainter extends CustomPainter {
       paint.shader = LinearGradient(
         colors: [
           Colors.transparent,
-          const Color(0xFF00E676).withValues(alpha: 0.12 * config.intensity),
-          const Color(0xFF00E5FF).withValues(alpha: 0.18 * config.intensity),
+          AppColors.auroraEmerald.withValues(alpha: 0.12 * config.intensity),
+          AppColors.neonCyan.withValues(alpha: 0.18 * config.intensity),
         ],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
@@ -332,7 +333,7 @@ class _AtmospherePainter extends CustomPainter {
           ..shader = LinearGradient(
             colors: [
               Colors.transparent,
-              const Color(0xFFFF5722).withValues(alpha: 0.8),
+              AppColors.sunsetAmber.withValues(alpha: 0.8),
               Colors.white,
             ],
           ).createShader(Rect.fromPoints(
