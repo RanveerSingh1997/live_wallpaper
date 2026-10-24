@@ -149,6 +149,9 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('UI Components Widget Tests', () {
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+    });
     testWidgets('KineticQuoteOverlay renders quote, author, and category badge',
         (WidgetTester tester) async {
       final short = CuratedShortsData.shorts.first; // Hajime no Ippo
@@ -2518,6 +2521,7 @@ void main() {
         tester.view.resetDevicePixelRatio();
       });
 
+      SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
       final repo = FakeWallpaperRepository(prefs: prefs);
 
@@ -2563,11 +2567,14 @@ void main() {
 
       // 3. Tap Restore
       await tester.tap(find.text('Verify & Restore Setup'));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Verify BLoC state received imported favorite
       expect(bloc.state.favoriteIds, contains('wall_imported_test'));
       expect(bloc.state.isAmoledSaverModeEnabled, isTrue);
+
+      await tester.pumpWidget(const SizedBox.shrink());
     });
 
     testWidgets('SettingsSheet opens DataPortabilitySheet when tapping Data Portability & Backup Hub tile',

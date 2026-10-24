@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,7 +47,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
     final jsonStr = bundle.toJsonString(pretty: true);
 
     await Clipboard.setData(ClipboardData(text: jsonStr));
-    HapticFeedback.selectionClick();
+    unawaited(HapticFeedback.selectionClick());
 
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -71,7 +72,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
         _jsonInputController.text = data.text!;
         _validateJson(data.text!);
       });
-      HapticFeedback.selectionClick();
+      unawaited(HapticFeedback.selectionClick());
     }
   }
 
@@ -105,7 +106,7 @@ class _DataPortabilitySheetState extends State<DataPortabilitySheet> {
 
     try {
       final bundle = WalloraBackupBundle.fromJsonString(raw);
-      HapticFeedback.heavyImpact();
+      unawaited(HapticFeedback.heavyImpact());
 
       context.read<WallpaperBloc>().add(
             RestoreBackupIntent(

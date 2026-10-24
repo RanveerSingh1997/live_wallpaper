@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -65,7 +66,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem>
         });
 
         if (widget.isActive) {
-          _controller?.play();
+          unawaited(_controller?.play());
         }
       } else {
         await controller.dispose();
@@ -88,7 +89,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem>
       // Play/Pause based on whether this page is currently active in the feed
       if (widget.isActive != oldWidget.isActive) {
         if (widget.isActive) {
-          _controller?.play();
+          unawaited(_controller?.play());
         } else {
           _controller?.pause();
         }

@@ -19,7 +19,9 @@ public class WallazaRateLimitException extends WallazaException {
     }
 
     private static Long parseLong(Map<String, Object> map, String key) {
-        if (map == null || !map.containsKey(key)) return null;
+        if (map == null || !map.containsKey(key)) {
+            return null;
+        }
         Object val = map.get(key);
         if (val instanceof Number n) {
             return n.longValue();

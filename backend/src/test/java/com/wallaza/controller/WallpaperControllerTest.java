@@ -4,7 +4,13 @@ import com.wallaza.WallazaApplication;
 import com.wallaza.client.WallazaClient;
 import com.wallaza.client.exception.WallazaNotFoundException;
 import com.wallaza.client.exception.WallazaRateLimitException;
-import com.wallaza.client.model.*;
+import com.wallaza.client.model.PaginationLinks;
+import com.wallaza.client.model.PaginationMeta;
+import com.wallaza.client.model.Wallpaper;
+import com.wallaza.client.model.WallpaperAuthor;
+import com.wallaza.client.model.WallpaperListQuery;
+import com.wallaza.client.model.WallpaperListResponse;
+import com.wallaza.client.model.WallpaperSearchQuery;
 import com.wallaza.exception.GlobalExceptionHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +29,10 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = WallpaperController.class)
 @ContextConfiguration(classes = {WallazaApplication.class})

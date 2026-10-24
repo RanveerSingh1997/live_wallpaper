@@ -29,4 +29,9 @@ Developer & AI Agent Guidelines for the Wallora Codebase.
 ## 5. Testing & Verification Mandate
 - Any state or logic change requires unit tests in `test/blocs/wallpaper_bloc_test.dart`.
 - Any new screen or modal requires widget tests in `test/widget_test.dart`.
-- All tests must pass green (`flutter test`) and `flutter analyze` must report 0 issues before changes are committed.
+- All tests must pass green (`flutter test` and `./mvnw test`) and `flutter analyze` must report 0 issues before changes are committed.
+
+## 6. Linting & Code Structure Standards (See CODING_STRUCTURE.md)
+- **Dart / Flutter Linting**: Strict rules in `analysis_options.yaml` (async safety, `unawaited_futures`, `use_build_context_synchronously`, widget const optimization). Enforced via `flutter analyze --fatal-infos --fatal-warnings`.
+- **Java Backend Linting**: Strict rules in `backend/checkstyle.xml` (no wildcard imports, unused import prevention, bracket discipline). Enforced via `cd backend && ./mvnw checkstyle:check`.
+- **Architectural Reference**: Refer to [CODING_STRUCTURE.md](file:///Users/zml-mac-ranveerg-01/flutterProject/live_wallpaper/CODING_STRUCTURE.md) for full directory layout and layer boundaries.

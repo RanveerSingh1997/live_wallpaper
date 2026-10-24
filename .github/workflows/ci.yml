@@ -68,6 +68,11 @@ jobs:
       - name: Grant Executable Permissions to Maven Wrapper
         run: chmod +x backend/mvnw
 
+      - name: Verify Backend Code Style & Linting (Checkstyle)
+        run: |
+          cd backend
+          ./mvnw checkstyle:check -B
+
       - name: Compile and Run JUnit 5 Integration Tests
         run: |
           cd backend

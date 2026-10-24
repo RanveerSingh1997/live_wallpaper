@@ -1,6 +1,12 @@
 package com.wallaza.exception;
 
-import com.wallaza.client.exception.*;
+import com.wallaza.client.exception.WallazaAuthenticationException;
+import com.wallaza.client.exception.WallazaException;
+import com.wallaza.client.exception.WallazaForbiddenException;
+import com.wallaza.client.exception.WallazaNotFoundException;
+import com.wallaza.client.exception.WallazaRateLimitException;
+import com.wallaza.client.exception.WallazaServerException;
+import com.wallaza.client.exception.WallazaValidationException;
 import com.wallaza.client.model.WallazaErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpHeaders;
@@ -69,7 +75,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WallazaException.class)
     public ResponseEntity<WallazaErrorResponse> handleGenericWallazaException(WallazaException ex) {
         HttpStatus status = HttpStatus.resolve(ex.getStatusCode());
-        if (status == null) status = HttpStatus.INTERNAL_SERVER_ERROR;
+        if (status == null) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
         return buildErrorResponse(status, ex.getErrorCode(), ex.getMessage(), ex.getAdditionalInfo());
     }
 

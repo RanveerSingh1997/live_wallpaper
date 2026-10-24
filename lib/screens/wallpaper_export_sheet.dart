@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,7 +16,7 @@ class WallpaperExportSheet extends StatefulWidget {
   });
 
   static Future<void> show(BuildContext context, MotivationalShort wallpaper) {
-    HapticFeedback.mediumImpact();
+    unawaited(HapticFeedback.mediumImpact());
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -33,7 +34,7 @@ class _WallpaperExportSheetState extends State<WallpaperExportSheet> {
   bool _isExporting = false;
 
   Future<void> _exportAndShare({required bool isDirectShare}) async {
-    HapticFeedback.mediumImpact();
+    unawaited(HapticFeedback.mediumImpact());
     setState(() => _isExporting = true);
 
     try {
