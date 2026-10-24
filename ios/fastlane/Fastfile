@@ -26,6 +26,11 @@ platform :ios do
     )
   end
 
+  desc "Capture canonical Apple App Store screenshots"
+  lane :screenshots do
+    sh("cd ../.. && flutter test test/store_screenshots/store_screenshots_test.dart --update-goldens")
+  end
+
   desc "Submit build to Apple App Store for review"
   lane :release do
     build_ipa
@@ -34,6 +39,9 @@ platform :ios do
       description: File.read("../../store_metadata/app_store/description.txt"),
       promotional_text: File.read("../../store_metadata/app_store/promotional_text.txt"),
       keywords: File.read("../../store_metadata/app_store/keywords.txt").strip.split(","),
+      screenshots_path: "../../store_metadata/screenshots/phone",
+      support_url: File.read("../../store_metadata/app_store/support_url.txt").strip,
+      privacy_url: File.read("../../store_metadata/app_store/privacy_url.txt").strip,
       submit_for_review: false,
       automatic_release: true
     )

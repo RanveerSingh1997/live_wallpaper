@@ -1,0 +1,7 @@
+Welcome to Wallora v1.0.0!
+• Cinematic 4K live video wallpapers tailored for Super Retina OLED displays
+• 12 hardware-accelerated aesthetic studios including Spatial Parallax, Aurora Waves, and Kinetic Quotes
+• Native Apple "Use as Wallpaper" integration for iOS and iPadOS
+• Dynamic Battery Governor with true-black power efficiency
+• Offline LRU Cache with zero-stutter playback prefetching
+• Multi-language localization in 6 languages (en, es, ja, de, fr, hi)

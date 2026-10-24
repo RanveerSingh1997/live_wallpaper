@@ -14,7 +14,12 @@ import 'standby_dock_sheet.dart';
 /// Transforms the device into a modern desk clock, nightstand charging hub,
 /// or ambient focus companion with OLED anti-burn-in micro-shifting and circadian night mode.
 class StandbyDockScreen extends StatefulWidget {
-  const StandbyDockScreen({super.key});
+  final DateTime? fixedTime;
+
+  const StandbyDockScreen({
+    super.key,
+    this.fixedTime,
+  });
 
   @override
   State<StandbyDockScreen> createState() => _StandbyDockScreenState();
@@ -29,15 +34,17 @@ class _StandbyDockScreenState extends State<StandbyDockScreen> {
   @override
   void initState() {
     super.initState();
-    _currentTime = DateTime.now();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted) {
-        setState(() {
-          _currentTime = DateTime.now();
-        });
-      }
-    });
-    _scheduleControlsAutoHide();
+    _currentTime = widget.fixedTime ?? DateTime.now();
+    if (widget.fixedTime == null) {
+      _ticker = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (mounted) {
+          setState(() {
+            _currentTime = DateTime.now();
+          });
+        }
+      });
+      _scheduleControlsAutoHide();
+    }
   }
 
   @override

@@ -1,0 +1,6 @@
+Welcome to Wallora v1.0.0!
+• Ultra-HD 4K live video wallpapers with zero sleep battery drain
+• 12 customization studios including Spatial Parallax, Aurora Waves, and Kinetic Quotes
+• Battery Governor with dynamic 60 FPS / 30 FPS power scaling
+• Offline LRU Cache with automatic background pre-caching
+• Full internationalization in 6 languages (en, es, ja, de, fr, hi)

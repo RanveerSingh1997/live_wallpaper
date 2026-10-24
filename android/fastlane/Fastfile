@@ -35,13 +35,19 @@ platform :android do
     )
   end
 
+  desc "Capture canonical Google Play store screenshots"
+  lane :screenshots do
+    sh("cd ../.. && flutter test test/store_screenshots/store_screenshots_test.dart --update-goldens")
+  end
+
   desc "Deploy App Bundle to Google Play Production track"
   lane :deploy_production do
     build_aab
     upload_to_play_store(
       track: "production",
       aab: "../../build/app/outputs/bundle/release/app-release.aab",
-      metadata_path: "../../store_metadata/google_play"
+      metadata_path: "../../store_metadata/google_play",
+      screenshots_path: "../../store_metadata/screenshots"
     )
   end
 end

@@ -693,21 +693,27 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Row(
-                            children: [
-                              Icon(Icons.whatshot_rounded, color: AppColors.sunsetAmber, size: 18),
-                              SizedBox(width: 6),
-                              Text(
-                                'TRENDING LIVE WALLPAPERS',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.8,
+                          const Expanded(
+                            child: Row(
+                              children: [
+                                Icon(Icons.whatshot_rounded, color: AppColors.sunsetAmber, size: 18),
+                                SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    'TRENDING LIVE WALLPAPERS',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.8,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                          const SizedBox(width: 8),
                           GestureDetector(
                             onTap: widget.onOpenLiveFeed,
                             child: const Text(
@@ -746,22 +752,28 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Row(
-                            children: [
-                              Icon(Icons.collections_bookmark_rounded,
-                                  color: AppColors.auroraViolet, size: 18),
-                              SizedBox(width: 6),
-                              Text(
-                                'CURATED COLLECTIONS',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.8,
+                          const Expanded(
+                            child: Row(
+                              children: [
+                                Icon(Icons.collections_bookmark_rounded,
+                                    color: AppColors.auroraViolet, size: 18),
+                                SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    'CURATED COLLECTIONS',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.8,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                          const SizedBox(width: 8),
                           Text(
                             '${CuratedShortsData.collections.length} COLLECTIONS',
                             style: const TextStyle(
@@ -1191,7 +1203,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         WallpaperQuickActionsSheet.show(context, featured);
       },
       child: Container(
-        height: 180,
+        height: 200,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           gradient: LinearGradient(
@@ -1228,7 +1240,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1258,12 +1270,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                           ],
                         ),
                       ),
-                      Text(
-                        featured.category.toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white54,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
+                      Flexible(
+                        child: Text(
+                          featured.category.toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
