@@ -113,21 +113,27 @@ class _WeatherAtmosphereCanvasState extends State<WeatherAtmosphereCanvas>
       return widget.child ?? const SizedBox.shrink();
     }
 
-    return RepaintBoundary(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return CustomPaint(
-            foregroundPainter: _AtmospherePainter(
-              config: widget.config,
-              animationValue: _controller.value,
-              particles: _particles,
-              lightningAlpha: _lightningAlpha,
-            ),
-            child: child,
-          );
-        },
-        child: widget.child,
+    return Semantics(
+      label: 'Atmospheric Weather Canvas',
+      hint: widget.config.isEnabled
+          ? '${widget.config.effectType.displayName} weather effect active'
+          : 'Weather effects disabled',
+      child: RepaintBoundary(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return CustomPaint(
+              foregroundPainter: _AtmospherePainter(
+                config: widget.config,
+                animationValue: _controller.value,
+                particles: _particles,
+                lightningAlpha: _lightningAlpha,
+              ),
+              child: child,
+            );
+          },
+          child: widget.child,
+        ),
       ),
     );
   }

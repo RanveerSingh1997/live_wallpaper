@@ -222,7 +222,13 @@ class _InteractiveGestureCanvasState extends State<InteractiveGestureCanvas>
       ),
     );
 
-    return gestureLayer;
+    return Semantics(
+      label: 'Interactive Touch Gesture Canvas',
+      hint: widget.config.isGesturesEnabled
+          ? 'Tap, double tap, or long press to trigger wallpaper actions'
+          : 'Gesture actions disabled',
+      child: gestureLayer,
+    );
   }
 }
 

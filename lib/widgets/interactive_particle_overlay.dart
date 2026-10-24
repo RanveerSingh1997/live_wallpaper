@@ -194,17 +194,25 @@ class _InteractiveParticleOverlayState extends State<InteractiveParticleOverlay>
       );
     }
 
+    final accessibleContent = Semantics(
+      label: 'Interactive Particle Overlay',
+      hint: widget.config.isEnabled
+          ? '${widget.config.preset.displayName} particles active'
+          : 'Particles disabled',
+      child: content,
+    );
+
     if (widget.child != null) {
       return Stack(
         fit: StackFit.passthrough,
         children: [
           widget.child!,
-          Positioned.fill(child: content),
+          Positioned.fill(child: accessibleContent),
         ],
       );
     }
 
-    return content;
+    return accessibleContent;
   }
 }
 

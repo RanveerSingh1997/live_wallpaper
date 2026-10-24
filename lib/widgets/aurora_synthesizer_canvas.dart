@@ -145,7 +145,13 @@ class _AuroraSynthesizerCanvasState extends State<AuroraSynthesizerCanvas>
           );
         }
 
-        return content;
+        return Semantics(
+          label: 'Interactive Aurora Wave Synthesizer Visualizer',
+          hint: widget.config.isEnabled
+              ? 'Real-time procedural aurora waves active'
+              : 'Aurora waves disabled',
+          child: content,
+        );
       },
     );
   }
