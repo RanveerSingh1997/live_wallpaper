@@ -19,6 +19,9 @@ class WallazaCloudWallpaper extends Equatable {
   final String? authorUsername;
   final String? authorAvatarUrl;
   final DateTime? createdAt;
+  final bool isVideo;
+  final String? videoStreamUrl;
+  final int durationSeconds;
 
   const WallazaCloudWallpaper({
     required this.id,
@@ -36,6 +39,9 @@ class WallazaCloudWallpaper extends Equatable {
     this.authorUsername,
     this.authorAvatarUrl,
     this.createdAt,
+    this.isVideo = false,
+    this.videoStreamUrl,
+    this.durationSeconds = 15,
   });
 
   WallazaCloudWallpaper copyWith({
@@ -54,6 +60,9 @@ class WallazaCloudWallpaper extends Equatable {
     String? authorUsername,
     String? authorAvatarUrl,
     DateTime? createdAt,
+    bool? isVideo,
+    String? videoStreamUrl,
+    int? durationSeconds,
   }) {
     return WallazaCloudWallpaper(
       id: id ?? this.id,
@@ -71,6 +80,9 @@ class WallazaCloudWallpaper extends Equatable {
       authorUsername: authorUsername ?? this.authorUsername,
       authorAvatarUrl: authorAvatarUrl ?? this.authorAvatarUrl,
       createdAt: createdAt ?? this.createdAt,
+      isVideo: isVideo ?? this.isVideo,
+      videoStreamUrl: videoStreamUrl ?? this.videoStreamUrl,
+      durationSeconds: durationSeconds ?? this.durationSeconds,
     );
   }
 
@@ -124,6 +136,9 @@ class WallazaCloudWallpaper extends Equatable {
         'avatar_url': authorAvatarUrl,
       },
       'created_at': createdAt?.toIso8601String(),
+      'video_url': videoStreamUrl,
+      'is_video': isVideo,
+      'duration': durationSeconds,
     };
   }
 
@@ -143,6 +158,12 @@ class WallazaCloudWallpaper extends Equatable {
       tagsList = rawTags.map((t) => t.toString()).toList();
     }
 
+    final String? videoUrl = json['video_url'] as String?;
+    final bool isVideoParsed = (json['is_video'] as bool?) ??
+        (videoUrl != null && videoUrl.isNotEmpty) ||
+        (json['category'] as String? ?? '').toLowerCase() == 'live' ||
+        tagsList.any((t) => t.toLowerCase() == 'live' || t.toLowerCase() == 'video');
+
     return WallazaCloudWallpaper(
       id: json['id'] as String? ?? 'wallaza_${DateTime.now().millisecondsSinceEpoch}',
       title: json['title'] as String? ?? 'Cloud Wallpaper',
@@ -159,6 +180,9 @@ class WallazaCloudWallpaper extends Equatable {
       authorUsername: authorMap?['username'] as String?,
       authorAvatarUrl: authorMap?['avatar_url'] as String?,
       createdAt: parsedDate,
+      isVideo: isVideoParsed,
+      videoStreamUrl: videoUrl,
+      durationSeconds: (json['duration'] as num?)?.toInt() ?? 15,
     );
   }
 
@@ -168,6 +192,7 @@ class WallazaCloudWallpaper extends Equatable {
   MotivationalShort toMotivationalShort() {
     Color accent;
     switch (category.toLowerCase()) {
+      case 'live':
       case 'cyberpunk':
         accent = const Color(0xFF00E5FF); // Neon Cyan
         break;
@@ -197,16 +222,16 @@ class WallazaCloudWallpaper extends Equatable {
       quote: title,
       author: authorName ?? 'Wallaza Cloud Artist',
       category: category,
-      videoAssetPath: '',
-      imageUrl: url,
+      videoAssetPath: isVideo ? (videoStreamUrl ?? url) : '',
+      imageUrl: isVideo ? thumbnailUrl : url,
       accentColor: accent,
       tags: tags.join(', '),
       hasTextByDefault: false,
-      mood: 'Cloud Discover',
-      isLive: false,
+      mood: isVideo ? 'Live Motion 60FPS' : 'Cloud Discover',
+      isLive: isVideo,
       resolution: '$resolution (Ultra HD)',
       fileSizeBytes: fileSizeBytes,
-      durationSeconds: 0,
+      durationSeconds: isVideo ? durationSeconds : 0,
       trueBlackPercentage: isAmoled ? 85 : 15,
       gradientColors: [
         accent.withAlpha(200),
@@ -232,6 +257,9 @@ class WallazaCloudWallpaper extends Equatable {
         authorUsername,
         authorAvatarUrl,
         createdAt,
+        isVideo,
+        videoStreamUrl,
+        durationSeconds,
       ];
 
   /// High-definition curated fallback cloud wallpapers to guarantee zero-latency
@@ -326,6 +354,60 @@ class WallazaCloudWallpaper extends Equatable {
       favorites: 22100,
       authorName: 'Sakura K.',
       authorUsername: 'sakurak',
+    ),
+    WallazaCloudWallpaper(
+      id: 'wlz_live_cyber_07',
+      title: 'Neo-Tokyo Holographic Neon Rain',
+      description: 'Continuous 4K 60fps holographic raindrops falling across neon skyscraper billboards',
+      url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=3840&auto=format&fit=crop',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop',
+      videoStreamUrl: 'https://assets.mixkit.co/videos/preview/mixkit-futuristic-city-with-flying-traffic-at-night-41546-large.mp4',
+      category: 'Live',
+      tags: ['live', 'motion', 'video', 'cyberpunk', 'neon', 'rain', '4k', 'loop'],
+      resolution: '3840x2160',
+      fileSizeBytes: 8900000,
+      downloads: 54100,
+      favorites: 22300,
+      isVideo: true,
+      durationSeconds: 15,
+      authorName: 'Kenji Takahashi',
+      authorUsername: 'kenjit',
+    ),
+    WallazaCloudWallpaper(
+      id: 'wlz_live_cosmic_08',
+      title: 'Hyperdrive Stellar Singularity',
+      description: 'Mesmerizing looping warp drive through glowing cosmic nebula clouds',
+      url: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=3840&auto=format&fit=crop',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=800&auto=format&fit=crop',
+      videoStreamUrl: 'https://assets.mixkit.co/videos/preview/mixkit-flying-through-a-starfield-in-space-41544-large.mp4',
+      category: 'Live',
+      tags: ['live', 'motion', 'video', 'space', 'nebula', 'cosmic', 'hyperspace', '4k'],
+      resolution: '3840x2160',
+      fileSizeBytes: 9800000,
+      downloads: 68900,
+      favorites: 28400,
+      isVideo: true,
+      durationSeconds: 15,
+      authorName: 'Aria Sterling',
+      authorUsername: 'ariacosmos',
+    ),
+    WallazaCloudWallpaper(
+      id: 'wlz_live_aurora_09',
+      title: 'Aurora Borealis Liquid Ribbon Waves',
+      description: 'Fluid emerald and violet aurora ribbons shimmering across polar night skies',
+      url: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=3840&auto=format&fit=crop',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=800&auto=format&fit=crop',
+      videoStreamUrl: 'https://assets.mixkit.co/videos/preview/mixkit-ink-swirling-in-water-in-slow-motion-41551-large.mp4',
+      category: 'Live',
+      tags: ['live', 'motion', 'video', 'aurora', 'nature', 'fluid', 'emerald', '4k'],
+      resolution: '3840x2160',
+      fileSizeBytes: 7600000,
+      downloads: 49800,
+      favorites: 18700,
+      isVideo: true,
+      durationSeconds: 12,
+      authorName: 'Vance Calloway',
+      authorUsername: 'vancefluid',
     ),
   ];
 }

@@ -22,9 +22,30 @@ public record Wallpaper(
         @JsonProperty("downloads") Long downloads,
         @JsonProperty("favorites") Long favorites,
         @JsonProperty("author") WallpaperAuthor author,
-        @JsonProperty("created_at") Instant createdAt
+        @JsonProperty("created_at") Instant createdAt,
+        @JsonProperty("video_url") String videoUrl,
+        @JsonProperty("is_video") Boolean isVideo,
+        @JsonProperty("duration") Integer duration
 ) {
     public Wallpaper {
         tags = tags == null ? List.of() : List.copyOf(tags);
+    }
+
+    public Wallpaper(
+            String id,
+            String title,
+            String description,
+            String url,
+            String thumbnailUrl,
+            String category,
+            List<String> tags,
+            String resolution,
+            Long fileSize,
+            Long downloads,
+            Long favorites,
+            WallpaperAuthor author,
+            Instant createdAt
+    ) {
+        this(id, title, description, url, thumbnailUrl, category, tags, resolution, fileSize, downloads, favorites, author, createdAt, null, false, 0);
     }
 }

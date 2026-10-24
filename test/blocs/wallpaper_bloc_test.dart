@@ -65,6 +65,43 @@ class FakeWallpaperRepository extends WallpaperRepository {
     await prefs.setStringList('downloaded_wallpaper_ids', current.toList());
     return true;
   }
+
+  @override
+  Future<List<WallazaCloudWallpaper>> fetchCloudWallpapers({
+    int page = 1,
+    int limit = 20,
+    String? category,
+  }) async {
+    if (category == null || category.isEmpty || category == 'All') {
+      return List.from(WallazaCloudWallpaper.curatedCloudLibrary);
+    }
+    final c = category.toLowerCase();
+    final filtered = WallazaCloudWallpaper.curatedCloudLibrary
+        .where((w) => w.category.toLowerCase() == c)
+        .toList();
+    return filtered.isNotEmpty
+        ? filtered
+        : List.from(WallazaCloudWallpaper.curatedCloudLibrary);
+  }
+
+  @override
+  Future<List<WallazaCloudWallpaper>> searchCloudWallpapers({
+    required String query,
+    String? resolution,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final q = query.trim().toLowerCase();
+    return WallazaCloudWallpaper.curatedCloudLibrary.where((w) {
+      final matchesQuery = w.title.toLowerCase().contains(q) ||
+          w.description.toLowerCase().contains(q) ||
+          w.category.toLowerCase().contains(q);
+      final matchesRes = resolution == null ||
+          resolution == 'All' ||
+          w.resolution.contains(resolution);
+      return matchesQuery && matchesRes;
+    }).toList();
+  }
 }
 
 void main() {
@@ -1968,6 +2005,87 @@ void main() {
 
       expect(repository.getDownloads().contains('cloud_wlz_dl_cyber_99'), isTrue);
       expect(repository.getCustomImportedWallpapers().any((s) => s.id == 'cloud_wlz_dl_cyber_99'), isTrue);
+    });
+
+    test('WallazaCloudWallpaper live video converts to MotivationalShort with isLive true', () {
+      const liveItem = WallazaCloudWallpaper(
+        id: 'wlz_live_test_01',
+        title: 'Hyperdrive Warp Tunnel 60FPS',
+        description: 'Ultra-fast hyperspace light tunnel',
+        url: 'https://example.com/warp_poster.jpg',
+        thumbnailUrl: 'https://example.com/warp_thumb.jpg',
+        videoStreamUrl: 'https://example.com/warp_60fps.mp4',
+        category: 'Live',
+        isVideo: true,
+        durationSeconds: 14,
+        resolution: '3840x2160',
+        authorName: 'Neo Orbit',
+      );
+
+      final short = liveItem.toMotivationalShort();
+      expect(short.id, 'cloud_wlz_live_test_01');
+      expect(short.isLive, isTrue);
+      expect(short.videoAssetPath, 'https://example.com/warp_60fps.mp4');
+      expect(short.mood, 'Live Motion 60FPS');
+      expect(short.durationSeconds, 14);
+      expect(short.title, 'Hyperdrive Warp Tunnel 60FPS');
+      expect(short.author, 'Neo Orbit');
+    });
+
+    test('WallazaCloudWallpaper.fromJson parses video_url, is_video, and duration correctly', () {
+      final json = {
+        'id': 'wlz_live_json_99',
+        'title': 'Neon Rain Stream',
+        'description': 'Blade Runner style neon rain loop',
+        'url': 'https://example.com/rain_poster.jpg',
+        'thumbnail_url': 'https://example.com/rain_thumb.jpg',
+        'video_url': 'https://example.com/rain_loop.mp4',
+        'is_video': true,
+        'duration': 18,
+        'category': 'Live',
+        'tags': ['live', 'neon', 'rain'],
+        'resolution': '3840x2160',
+        'file_size': 12000000,
+        'downloads': 15000,
+        'favorites': 8000,
+      };
+
+      final parsed = WallazaCloudWallpaper.fromJson(json);
+      expect(parsed.id, 'wlz_live_json_99');
+      expect(parsed.isVideo, isTrue);
+      expect(parsed.videoStreamUrl, 'https://example.com/rain_loop.mp4');
+      expect(parsed.durationSeconds, 18);
+      expect(parsed.toMotivationalShort().isLive, isTrue);
+    });
+
+    test('ImportCloudWallpaperIntent with live video sets live motion wallpaper as active', () async {
+      const liveItem = WallazaCloudWallpaper(
+        id: 'wlz_live_apply_88',
+        title: 'Aurora Borealis Liquid Ribbon Waves',
+        description: 'Fluid emerald ribbon waves',
+        url: 'https://example.com/aurora_poster.jpg',
+        thumbnailUrl: 'https://example.com/aurora_thumb.jpg',
+        videoStreamUrl: 'https://example.com/aurora_loop.mp4',
+        category: 'Live',
+        isVideo: true,
+        durationSeconds: 12,
+      );
+
+      final expectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) =>
+            s.activeWallpaperId == 'cloud_wlz_live_apply_88' &&
+            s.actionStatus == WallpaperActionStatus.appliedSuccess &&
+            s.message != null &&
+            s.message!.contains('Aurora Borealis Liquid Ribbon Waves'))),
+      );
+
+      bloc.add(const ImportCloudWallpaperIntent(liveItem, setAsActive: true));
+      await expectation;
+
+      expect(bloc.state.activeWallpaperId, 'cloud_wlz_live_apply_88');
+      final saved = repository.getCustomImportedWallpapers();
+      expect(saved.any((s) => s.id == 'cloud_wlz_live_apply_88' && s.isLive), isTrue);
     });
   });
 }

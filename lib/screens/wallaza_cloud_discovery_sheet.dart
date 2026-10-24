@@ -34,6 +34,7 @@ class _WallazaCloudDiscoverySheetState
 
   static const List<String> _categories = [
     'All',
+    'Live',
     'Cyberpunk',
     'Space',
     'Nature',
@@ -752,7 +753,7 @@ class _CloudWallpaperCard extends StatelessWidget {
               },
             ),
 
-            // Top Badges (Resolution & AMOLED)
+            // Top Badges (Resolution, Live Motion, AMOLED)
             Positioned(
               top: 8,
               left: 8,
@@ -760,41 +761,85 @@ class _CloudWallpaperCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withAlpha(190),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: item.is4K
-                            ? const Color(0xFF00E5FF).withAlpha(150)
-                            : Colors.white24,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.hd_rounded,
-                          size: 11,
-                          color: item.is4K
-                              ? const Color(0xFF00E5FF)
-                              : Colors.white70,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          item.is4K ? '4K UHD' : 'FHD',
-                          style: TextStyle(
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withAlpha(190),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
                             color: item.is4K
-                                ? const Color(0xFF00E5FF)
-                                : Colors.white70,
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
+                                ? const Color(0xFF00E5FF).withAlpha(150)
+                                : Colors.white24,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.hd_rounded,
+                              size: 11,
+                              color: item.is4K
+                                  ? const Color(0xFF00E5FF)
+                                  : Colors.white70,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              item.is4K ? '4K UHD' : 'FHD',
+                              style: TextStyle(
+                                color: item.is4K
+                                    ? const Color(0xFF00E5FF)
+                                    : Colors.white70,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (item.isVideo) ...[
+                        const SizedBox(width: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x6600E5FF),
+                                blurRadius: 4,
+                              ),
+                            ],
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.videocam_rounded,
+                                size: 10,
+                                color: Colors.white,
+                              ),
+                              SizedBox(width: 3),
+                              Text(
+                                'LIVE 60FPS',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
-                    ),
+                    ],
                   ),
                   if (item.isAmoled)
                     Container(
@@ -818,6 +863,36 @@ class _CloudWallpaperCard extends StatelessWidget {
                 ],
               ),
             ),
+
+            // Live Motion Center Play Indicator
+            if (item.isVideo)
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withAlpha(150),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF00E5FF).withAlpha(200),
+                      width: 1.5,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x5500E5FF),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.play_arrow_rounded,
+                      color: Color(0xFF00E5FF),
+                      size: 22,
+                    ),
+                  ),
+                ),
+              ),
 
             // Bottom Gradient Overlay & Meta
             Positioned(
@@ -966,9 +1041,38 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      'By ${item.authorName ?? "Wallaza Cloud Artist"} • ${item.category}',
-                      style: const TextStyle(color: Colors.white60, fontSize: 12),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'By ${item.authorName ?? "Wallaza Cloud Artist"} • ${item.category}',
+                            style: const TextStyle(color: Colors.white60, fontSize: 12),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (item.isVideo) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                              ),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Text(
+                              'LIVE MOTION',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
@@ -994,16 +1098,46 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
               border: Border.all(color: Colors.white12),
             ),
             clipBehavior: Clip.antiAlias,
-            child: Image.network(
-              item.url,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(
-                color: const Color(0xFF1A1A24),
-                child: const Center(
-                  child: Icon(Icons.broken_image_rounded,
-                      color: Colors.white30, size: 48),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.network(
+                  item.url,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => Container(
+                    color: const Color(0xFF1A1A24),
+                    child: const Center(
+                      child: Icon(Icons.broken_image_rounded,
+                          color: Colors.white30, size: 48),
+                    ),
+                  ),
                 ),
-              ),
+                if (item.isVideo)
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withAlpha(160),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFF00E5FF),
+                          width: 2,
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x6600E5FF),
+                            blurRadius: 16,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.play_arrow_rounded,
+                        color: Color(0xFF00E5FF),
+                        size: 36,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
 
@@ -1103,9 +1237,15 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
           // Specs Bar
           Row(
             children: [
-              _buildSpecTile('RESOLUTION', item.resolution, Icons.aspect_ratio_rounded),
-              _buildSpecTile('SIZE', item.fileSizeFormatted, Icons.sd_storage_rounded),
-              _buildSpecTile('DOWNLOADS', item.downloads.toString(), Icons.cloud_download_rounded),
+              if (item.isVideo) ...[
+                _buildSpecTile('MOTION', '60 FPS LOOP', Icons.slow_motion_video_rounded),
+                _buildSpecTile('DURATION', '${item.durationSeconds}s Stream', Icons.timer_rounded),
+                _buildSpecTile('QUALITY', 'Ultra-HD 4K', Icons.high_quality_rounded),
+              ] else ...[
+                _buildSpecTile('RESOLUTION', item.resolution, Icons.aspect_ratio_rounded),
+                _buildSpecTile('SIZE', item.fileSizeFormatted, Icons.sd_storage_rounded),
+                _buildSpecTile('DOWNLOADS', item.downloads.toString(), Icons.cloud_download_rounded),
+              ],
             ],
           ),
 
@@ -1116,9 +1256,11 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
             height: 48,
             child: ElevatedButton.icon(
               icon: const Icon(Icons.file_download_rounded, color: Colors.white, size: 20),
-              label: const Text(
-                'Download Offline 4K (Save to Device)',
-                style: TextStyle(
+              label: Text(
+                item.isVideo
+                    ? 'Download Live Motion (Save MP4)'
+                    : 'Download Offline 4K (Save to Device)',
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.3,
@@ -1185,16 +1327,23 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton.icon(
-                  icon: const Icon(Icons.wallpaper_rounded, color: Colors.black),
-                  label: const Text(
-                    'Apply Wallpaper',
-                    style: TextStyle(
+                  icon: Icon(
+                    item.isVideo
+                        ? Icons.motion_photos_on_rounded
+                        : Icons.wallpaper_rounded,
+                    color: Colors.black,
+                  ),
+                  label: Text(
+                    item.isVideo ? 'Apply Live Motion' : 'Apply Wallpaper',
+                    style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00E5FF),
+                    backgroundColor: item.isVideo
+                        ? const Color(0xFF00E676)
+                        : const Color(0xFF00E5FF),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -1209,7 +1358,9 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
                     }
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Applied "${item.title}" to screen!'),
+                        content: Text(item.isVideo
+                            ? 'Applied live motion "${item.title}" to screen!'
+                            : 'Applied "${item.title}" to screen!'),
                         backgroundColor: const Color(0xFF00E676),
                         behavior: SnackBarBehavior.floating,
                       ),

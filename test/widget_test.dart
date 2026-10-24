@@ -106,6 +106,43 @@ class FakeWallpaperRepository extends WallpaperRepository {
     await prefs.setStringList('downloaded_wallpaper_ids', current.toList());
     return true;
   }
+
+  @override
+  Future<List<WallazaCloudWallpaper>> fetchCloudWallpapers({
+    int page = 1,
+    int limit = 20,
+    String? category,
+  }) async {
+    if (category == null || category.isEmpty || category == 'All') {
+      return List.from(WallazaCloudWallpaper.curatedCloudLibrary);
+    }
+    final c = category.toLowerCase();
+    final filtered = WallazaCloudWallpaper.curatedCloudLibrary
+        .where((w) => w.category.toLowerCase() == c)
+        .toList();
+    return filtered.isNotEmpty
+        ? filtered
+        : List.from(WallazaCloudWallpaper.curatedCloudLibrary);
+  }
+
+  @override
+  Future<List<WallazaCloudWallpaper>> searchCloudWallpapers({
+    required String query,
+    String? resolution,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final q = query.trim().toLowerCase();
+    return WallazaCloudWallpaper.curatedCloudLibrary.where((w) {
+      final matchesQuery = w.title.toLowerCase().contains(q) ||
+          w.description.toLowerCase().contains(q) ||
+          w.category.toLowerCase().contains(q);
+      final matchesRes = resolution == null ||
+          resolution == 'All' ||
+          w.resolution.contains(resolution);
+      return matchesQuery && matchesRes;
+    }).toList();
+  }
 }
 
 void main() {
@@ -3780,6 +3817,77 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
 
       expect(bloc.state.selectedCloudAuthor, isNull);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('WallazaCloudDiscoverySheet displays Live 60FPS badges, filters by Live category, and inspects live motion details',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          weatherConfig: const WeatherAtmosphereConfig(effectType: WeatherEffectType.none),
+          cloudWallpapers: WallazaCloudWallpaper.curatedCloudLibrary,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: WallazaCloudDiscoverySheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+
+      // Verify 'Live' category chip is present and tap it
+      final liveCategoryChip = find.widgetWithText(ChoiceChip, 'Live');
+      expect(liveCategoryChip, findsOneWidget);
+      await tester.tap(liveCategoryChip);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(bloc.state.selectedCloudCategory, 'Live');
+
+      // Verify LIVE 60FPS badge is present in the grid for video wallpapers
+      expect(find.text('LIVE 60FPS'), findsWidgets);
+
+      // Find and tap on a live motion wallpaper card
+      final liveCard = find.text('Neo-Tokyo Holographic Neon Rain');
+      expect(liveCard, findsOneWidget);
+      await tester.tap(liveCard);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Verify detail modal displays live motion elements
+      expect(find.text('LIVE MOTION'), findsOneWidget);
+      expect(find.text('60 FPS LOOP'), findsOneWidget);
+      expect(find.text('Apply Live Motion'), findsOneWidget);
+      expect(find.text('Download Live Motion (Save MP4)'), findsOneWidget);
+
+      // Tap Apply Live Motion
+      await tester.tap(find.text('Apply Live Motion'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(bloc.state.activeWallpaperId, 'cloud_wlz_live_cyber_07');
 
       await tester.pumpWidget(const SizedBox.shrink());
     });

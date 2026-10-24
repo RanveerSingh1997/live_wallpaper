@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
@@ -40,7 +41,18 @@ class _VideoPlayerItemState extends State<VideoPlayerItem>
 
   Future<void> _initializePlayer() async {
     try {
-      final controller = VideoPlayerController.asset(widget.videoAssetPath);
+      final VideoPlayerController controller;
+      final path = widget.videoAssetPath;
+      if (path.startsWith('http://') || path.startsWith('https://')) {
+        controller = VideoPlayerController.networkUrl(Uri.parse(path));
+      } else if (path.startsWith('/') || path.startsWith('file://')) {
+        final cleanPath =
+            path.startsWith('file://') ? path.replaceFirst('file://', '') : path;
+        controller = VideoPlayerController.file(File(cleanPath));
+      } else {
+        controller = VideoPlayerController.asset(path);
+      }
+
       await controller.initialize();
       await controller.setLooping(true);
       await controller.setVolume(widget.isMuted ? 0.0 : 1.0);

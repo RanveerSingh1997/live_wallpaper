@@ -711,6 +711,39 @@ class WallpaperRepository {
       return targetFile.path;
     }
 
+    // Cloud streaming video wallpapers downloaded and cached on-device
+    if (short.videoAssetPath.startsWith('http://') ||
+        short.videoAssetPath.startsWith('https://')) {
+      final rawId = short.id.replaceFirst('cloud_', '');
+      final downloaded = await wallazaService.downloadWallpaperBytes(rawId);
+      if (downloaded != null && downloaded.isNotEmpty) {
+        await targetFile.writeAsBytes(downloaded, flush: true);
+        return targetFile.path;
+      }
+      try {
+        final client = HttpClient();
+        final req = await client
+            .getUrl(Uri.parse(short.videoAssetPath))
+            .timeout(const Duration(seconds: 10));
+        final res = await req.close().timeout(const Duration(seconds: 10));
+        if (res.statusCode == HttpStatus.ok) {
+          final bytes =
+              await res.fold<List<int>>([], (acc, chunk) => acc..addAll(chunk));
+          await targetFile.writeAsBytes(bytes, flush: true);
+          return targetFile.path;
+        }
+      } catch (_) {}
+    } else if (short.videoAssetPath.startsWith('/') ||
+        short.videoAssetPath.startsWith('file://')) {
+      final cleanPath = short.videoAssetPath.startsWith('file://')
+          ? short.videoAssetPath.replaceFirst('file://', '')
+          : short.videoAssetPath;
+      final file = File(cleanPath);
+      if (await file.exists()) {
+        return file.path;
+      }
+    }
+
     // Copy bytes from Flutter asset bundle to application directory
     final ByteData byteData = await rootBundle.load(short.videoAssetPath);
     final Uint8List bytes = byteData.buffer.asUint8List(

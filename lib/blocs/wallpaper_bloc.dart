@@ -751,22 +751,38 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
 
     try {
       if (nextWallpaper.isLive) {
+        if (nextWallpaper.id.startsWith('cloud_')) {
+          await repository.saveCustomImportedWallpaper(nextWallpaper);
+        }
         final res = await repository.applyAsLiveWallpaper(
           short: nextWallpaper,
           isMuted: true,
+        );
+        final all = repository.getCuratedShorts();
+        final updatedFiltered = _filterShorts(
+          allShorts: all,
+          category: state.selectedCategory,
+          preferences: state.userPreferences,
+          smartFilter: state.smartFilter,
         );
         if (res['status'] == 'service_started' ||
             res['status'] == 'applied_mock' ||
             res['status'] == 'updated_active' ||
             res['status'] == 'opened_chooser') {
           emit(state.copyWith(
+            allShorts: all,
+            filteredShorts: updatedFiltered,
             activeWallpaperId: nextWallpaper.id,
             isLiveWallpaperActiveOnDevice: true,
             actionStatus: WallpaperActionStatus.appliedSuccess,
-            message: 'Rotated to "${nextWallpaper.title}"',
+            message: nextWallpaper.id.startsWith('cloud_')
+                ? 'Rotated to Wallaza 4K: "${nextWallpaper.title}"'
+                : 'Rotated to "${nextWallpaper.title}"',
           ));
         } else {
           emit(state.copyWith(
+            allShorts: all,
+            filteredShorts: updatedFiltered,
             actionStatus: WallpaperActionStatus.idle,
             message: 'Opened wallpaper rotation chooser for "${nextWallpaper.title}"',
           ));
@@ -1816,22 +1832,41 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
       );
 
       if (event.setAsActive) {
-        final result = await repository.applyStaticWallpaper(
-          short: imported,
-          targetScreen: 'both',
-          customQuote: imported.quote,
-          effectConfig: state.getEffectiveEffects(imported.id),
-        );
-        final status = result['status']?.toString();
-        emit(state.copyWith(
-          allShorts: all,
-          filteredShorts: updatedFiltered,
-          activeWallpaperId: imported.id,
-          actionStatus: WallpaperActionStatus.appliedSuccess,
-          message: status == 'applied_static'
-              ? '✨ Applied "${imported.title}" to Home & Lock Screen!'
-              : 'Imported & configured "${imported.title}"!',
-        ));
+        if (imported.isLive) {
+          final result = await repository.applyAsLiveWallpaper(
+            short: imported,
+            isMuted: state.isFeedMuted,
+          );
+          final status = result['status']?.toString();
+          emit(state.copyWith(
+            allShorts: all,
+            filteredShorts: updatedFiltered,
+            activeWallpaperId: imported.id,
+            actionStatus: WallpaperActionStatus.appliedSuccess,
+            isLiveWallpaperActiveOnDevice:
+                status == 'updated_active' || state.isLiveWallpaperActiveOnDevice,
+            message: status == 'updated_active'
+                ? '⚡ Live wallpaper switched instantly on Home & Lock Screen!'
+                : '🎬 Wallaza Cloud Live Motion set for "${imported.title}"!',
+          ));
+        } else {
+          final result = await repository.applyStaticWallpaper(
+            short: imported,
+            targetScreen: 'both',
+            customQuote: imported.quote,
+            effectConfig: state.getEffectiveEffects(imported.id),
+          );
+          final status = result['status']?.toString();
+          emit(state.copyWith(
+            allShorts: all,
+            filteredShorts: updatedFiltered,
+            activeWallpaperId: imported.id,
+            actionStatus: WallpaperActionStatus.appliedSuccess,
+            message: status == 'applied_static'
+                ? '✨ Applied "${imported.title}" to Home & Lock Screen!'
+                : 'Imported & configured "${imported.title}"!',
+          ));
+        }
       } else {
         emit(state.copyWith(
           allShorts: all,
