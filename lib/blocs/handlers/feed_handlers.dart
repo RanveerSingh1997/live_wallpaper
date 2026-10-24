@@ -114,6 +114,11 @@ mixin FeedHandlers on Bloc<WallpaperIntent, WallpaperState> {
   ) {
     if (event.index >= 0 && event.index < state.filteredShorts.length) {
       emit(state.copyWith(activeIndex: event.index));
+      repository.prefetchFeed(
+        currentIndex: event.index,
+        shorts: state.filteredShorts,
+        wifiOnly: state.autoRotationWifiOnly,
+      );
     }
   }
 

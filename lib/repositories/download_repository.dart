@@ -10,6 +10,7 @@ abstract class DownloadRepository {
     required WallazaApiService wallazaService,
     Future<void> Function(MotivationalShort short)? onPrepareVideoFile,
     Future<void> Function(MotivationalShort short)? onSaveCustomImport,
+    LruStorageManager? lruManager,
   }) = DownloadRepositoryImpl;
 
   Set<String> getDownloads();
@@ -19,6 +20,7 @@ abstract class DownloadRepository {
   Future<void> clearAllDownloads();
   Future<int> getCacheSizeInBytes();
   Future<void> setDownloads(Set<String> downloads);
+  LruStorageManager get lruManager;
 }
 
 /// Concrete implementation of [DownloadRepository].
@@ -27,13 +29,16 @@ class DownloadRepositoryImpl implements DownloadRepository {
   final WallazaApiService wallazaService;
   final Future<void> Function(MotivationalShort short)? onPrepareVideoFile;
   final Future<void> Function(MotivationalShort short)? onSaveCustomImport;
+  @override
+  final LruStorageManager lruManager;
 
   DownloadRepositoryImpl({
     required this.cache,
     required this.wallazaService,
     this.onPrepareVideoFile,
     this.onSaveCustomImport,
-  });
+    LruStorageManager? lruManager,
+  }) : lruManager = lruManager ?? LruStorageManager(cache: cache);
 
   @override
   Set<String> getDownloads() {
@@ -64,9 +69,15 @@ class DownloadRepositoryImpl implements DownloadRepository {
           final bytes = await wallazaService.downloadWallpaperBytes(rawId);
           if (bytes != null && bytes.isNotEmpty) {
             await cache.saveFile(fileName, bytes);
+            await lruManager.recordAccess(fileName, bytes.length, isPinned: true);
           } else {
-            await cache.saveFile(fileName, [0xFF, 0xD8, 0xFF, 0xE0]);
+            const fallback = [0xFF, 0xD8, 0xFF, 0xE0];
+            await cache.saveFile(fileName, fallback);
+            await lruManager.recordAccess(fileName, fallback.length, isPinned: true);
           }
+          await lruManager.evictIfNeeded(onDeleteFile: cache.deleteFile);
+        } else {
+          await lruManager.setPinned(fileName, true);
         }
       }
       final current = getDownloads();
@@ -84,10 +95,12 @@ class DownloadRepositoryImpl implements DownloadRepository {
       final mp4File = 'wallpaper_$shortId.mp4';
       if (await cache.fileExists(mp4File)) {
         await cache.deleteFile(mp4File);
+        await lruManager.remove(mp4File);
       }
       final jpgFile = 'wallpaper_$shortId.jpg';
       if (await cache.fileExists(jpgFile)) {
         await cache.deleteFile(jpgFile);
+        await lruManager.remove(jpgFile);
       }
       final current = getDownloads();
       current.remove(shortId);
@@ -102,6 +115,7 @@ class DownloadRepositoryImpl implements DownloadRepository {
   Future<void> clearAllDownloads() async {
     try {
       await cache.clearAllFiles();
+      await lruManager.clearAll(keepPinned: false);
       await cache.setStringList(AppConstants.keyDownloads, []);
     } catch (_) {}
   }

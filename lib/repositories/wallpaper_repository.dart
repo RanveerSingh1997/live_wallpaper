@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/core.dart';
@@ -155,6 +156,11 @@ abstract class WallpaperFacadeRepository {
   Future<bool> deleteDownload(String shortId);
   Future<void> clearAllDownloads();
   Future<int> getTotalDownloadSizeBytes();
+  void prefetchFeed({
+    required int currentIndex,
+    required List<MotivationalShort> shorts,
+    bool wifiOnly = false,
+  });
 
   // Community Blueprints
   List<WalloraScreenBlueprint> getCommunityBlueprints();
@@ -208,6 +214,9 @@ class WallpaperRepository implements WallpaperFacadeRepository {
   final WallazaApiService wallazaService;
 
   final LocalCacheService cache;
+  final LruStorageManager lruManager;
+  final NetworkConnectivityService connectivity;
+  final FeedPrefetchManager feedPrefetchManager;
   final CatalogRepository catalog;
   final PlaylistRepository playlist;
   final DownloadRepository download;
@@ -220,6 +229,9 @@ class WallpaperRepository implements WallpaperFacadeRepository {
     WallpaperServiceBridge? bridge,
     WallazaApiService? wallazaService,
     LocalCacheService? cache,
+    LruStorageManager? lruManager,
+    NetworkConnectivityService? connectivity,
+    FeedPrefetchManager? feedPrefetchManager,
     CatalogRepository? catalog,
     PlaylistRepository? playlist,
     DownloadRepository? download,
@@ -229,6 +241,21 @@ class WallpaperRepository implements WallpaperFacadeRepository {
   })  : _bridge = bridge ?? WallpaperServiceBridge(),
         wallazaService = wallazaService ?? WallazaApiService(),
         cache = cache ?? SharedPreferencesCacheService(prefs: prefs),
+        lruManager = lruManager ??
+            LruStorageManager(
+              cache: cache ?? SharedPreferencesCacheService(prefs: prefs),
+            ),
+        connectivity = connectivity ?? DefaultNetworkConnectivityService(),
+        feedPrefetchManager = feedPrefetchManager ??
+            FeedPrefetchManager(
+              cache: cache ?? SharedPreferencesCacheService(prefs: prefs),
+              lruManager: lruManager ??
+                  LruStorageManager(
+                    cache: cache ?? SharedPreferencesCacheService(prefs: prefs),
+                  ),
+              apiService: wallazaService ?? WallazaApiService(),
+              connectivity: connectivity ?? DefaultNetworkConnectivityService(),
+            ),
         catalog = catalog ??
             CatalogRepository(
               cache: cache ?? SharedPreferencesCacheService(prefs: prefs),
@@ -243,6 +270,10 @@ class WallpaperRepository implements WallpaperFacadeRepository {
             DownloadRepository(
               cache: cache ?? SharedPreferencesCacheService(prefs: prefs),
               wallazaService: wallazaService ?? WallazaApiService(),
+              lruManager: lruManager ??
+                  LruStorageManager(
+                    cache: cache ?? SharedPreferencesCacheService(prefs: prefs),
+                  ),
             ),
         studio = studio ??
             StudioConfigRepository(
@@ -624,6 +655,19 @@ class WallpaperRepository implements WallpaperFacadeRepository {
 
   @override
   Future<int> getTotalDownloadSizeBytes() => download.getCacheSizeInBytes();
+
+  @override
+  void prefetchFeed({
+    required int currentIndex,
+    required List<MotivationalShort> shorts,
+    bool wifiOnly = false,
+  }) {
+    unawaited(feedPrefetchManager.onFeedIndexChanged(
+      currentIndex: currentIndex,
+      shorts: shorts,
+      wifiOnly: wifiOnly,
+    ));
+  }
 
   // ==========================================
   // Aesthetic Screen Blueprints & Community

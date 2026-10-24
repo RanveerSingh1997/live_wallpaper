@@ -24,6 +24,10 @@ void main() async {
 
   final prefs = await SharedPreferences.getInstance();
   final repository = WallpaperRepository(prefs: prefs);
+  ServiceLocator.registerSingleton<LocalCacheService>(repository.cache);
+  ServiceLocator.registerSingleton<LruStorageManager>(repository.lruManager);
+  ServiceLocator.registerSingleton<NetworkConnectivityService>(repository.connectivity);
+  ServiceLocator.registerSingleton<FeedPrefetchManager>(repository.feedPrefetchManager);
   ServiceLocator.registerSingleton<WallpaperFacadeRepository>(repository);
 
   runApp(LiveWallpaperApp(repository: repository));
