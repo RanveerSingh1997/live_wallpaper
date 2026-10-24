@@ -24,12 +24,13 @@ void main() async {
 
   final prefs = await SharedPreferences.getInstance();
   final repository = WallpaperRepository(prefs: prefs);
+  ServiceLocator.registerSingleton<WallpaperFacadeRepository>(repository);
 
   runApp(LiveWallpaperApp(repository: repository));
 }
 
 class LiveWallpaperApp extends StatelessWidget {
-  final WallpaperRepository repository;
+  final WallpaperFacadeRepository repository;
 
   const LiveWallpaperApp({super.key, required this.repository});
 

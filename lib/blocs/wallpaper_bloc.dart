@@ -19,7 +19,7 @@ import 'wallpaper_intent.dart';
 import 'wallpaper_state.dart';
 
 class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
-  final WallpaperRepository repository;
+  final WallpaperFacadeRepository repository;
 
   WallpaperBloc({
     required this.repository,

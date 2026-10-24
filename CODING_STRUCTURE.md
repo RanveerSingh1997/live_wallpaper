@@ -14,23 +14,36 @@ Wallora is structured as a co-located client-server repository where the Flutter
 live_wallpaper/
 ├── analysis_options.yaml            # Comprehensive Dart & Flutter linting rules
 ├── lib/                             # Wallora Flutter Client Core
-│   ├── blocs/                       # State Management (BLoC / UDF Pattern)
+│   ├── blocs/                       # Presentation State Management (BLoC / UDF Pattern)
 │   ├── core/                        # Core Shared Infrastructure
+│   │   ├── cache/                   # LocalCacheService, MemoryCacheService & TTL entries
 │   │   ├── constants/               # App constants, dimensions, strings & keys
+│   │   ├── di/                      # ServiceLocator dependency injection container
 │   │   ├── localization/            # Multi-language translations (en, es, ja, de) & delegate
+│   │   ├── network/                 # NetworkClient, interceptors, request/response envelopes
+│   │   ├── result/                  # Functional Result, Success & Failure pattern
 │   │   ├── theme/                   # Obsidian palette, Aurora neon colors & ThemeData
 │   │   └── core.dart                # Master barrel export
 │   ├── data/                        # Static Curated Fallback Library & Presets
-│   ├── models/                      # Immutable Domain Models & Value Objects
-│   ├── repositories/                # Storage, Platform Bridges & Service Repository
+│   ├── models/                      # Immutable Domain Entities & Value Objects
+│   ├── repositories/                # Clean Domain Repositories & Facade
+│   │   ├── catalog_repository.dart
+│   │   ├── community_blueprint_repository.dart
+│   │   ├── data_portability_repository.dart
+│   │   ├── download_repository.dart
+│   │   ├── playlist_repository.dart
+│   │   ├── studio_config_repository.dart
+│   │   └── wallpaper_repository.dart
 │   ├── screens/                     # Feature Screens & Modal Studio Sheets
 │   ├── services/                    # REST HTTP Clients & Hardware Rendering Services
+│   ├── usecases/                    # Domain Layer Business Use Cases / Interactors
 │   └── widgets/                     # Atomic Reusable Visual Components
 ├── test/                            # Comprehensive Automated Test Suites
 │   ├── blocs/                       # BLoC Unit Tests (State Transitions & Intents)
-│   ├── core/                        # Constants, Theme & Localization Unit & Widget Tests
+│   ├── core/                        # Constants, Theme, Localization, Network & Cache Tests
 │   ├── models/                      # Domain Model Serialization & Transformation Tests
-│   ├── repositories/                # Repository & Persistence Integration Tests
+│   ├── repositories/                # Sub-Repository & Persistence Integration Tests
+│   ├── usecases/                    # Domain Use Cases Unit Tests
 │   └── widget_test.dart             # Golden & Interactive UI Widget Tests
 ├── backend/                         # Wallaza Cloud Proxy & Client SDK (Java 21 / Spring Boot)
 │   ├── checkstyle.xml               # Java Checkstyle Linting & Style Rules
@@ -47,16 +60,48 @@ live_wallpaper/
 
 ## 2. Flutter Client Coding Structure (`lib/`)
 
-### 2.1 Unidirectional Data Flow (UDF) & Layer Responsibilities
+### 2.1 Clean Architecture & Unidirectional Data Flow (UDF)
 
 ```mermaid
-flowchart LR
-    View["Flutter UI View\n(Screens & Sheets)"] -->|"Dispatches WallpaperIntent"| Bloc["WallpaperBloc\n(Business Logic)"]
-    Bloc -->|"Invokes Operations"| Repo["WallpaperRepository\n(Single Source of Truth)"]
-    Repo -->|"Persists"| Prefs["SharedPreferences"]
-    Repo -->|"Invokes Platform"| Bridge["WallpaperServiceBridge\n(Platform Channels)"]
-    Repo -->|"Queries HTTP"| Api["WallazaApiService\n(Spring Boot Proxy)"]
-    Bloc -->|"Emits Immutable"| State["WallpaperState\n(Rendered by Views)"]
+flowchart TD
+    subgraph Presentation["Presentation Layer"]
+        View["Flutter UI View\n(Screens & Sheets)"]
+        Bloc["WallpaperBloc\n(State Orchestrator)"]
+    end
+
+    subgraph Domain["Domain Layer"]
+        UseCase["Domain Use Cases\n(ApplyWallpaper, ToggleFav, Portability)"]
+        Entity["Domain Entities & Models\n(Short, Blueprint, StudioConfigs)"]
+    end
+
+    subgraph Data["Data & Repository Layer"]
+        Facade["WallpaperFacadeRepository\n(Unified Facade)"]
+        CatalogRepo["CatalogRepository"]
+        PlaylistRepo["PlaylistRepository"]
+        DownloadRepo["DownloadRepository"]
+        StudioRepo["StudioConfigRepository"]
+        CommunityRepo["CommunityBlueprintRepository"]
+        PortabilityRepo["DataPortabilityRepository"]
+    end
+
+    subgraph Infrastructure["Infrastructure & Platform Layer"]
+        Cache["LocalCacheService\n(SharedPreferences & Memory)"]
+        NetClient["NetworkClient\n(HttpNetworkClient + Interceptors)"]
+        Bridge["WallpaperServiceBridge\n(Platform Channels)"]
+        CloudApi["WallazaApiService\n(Backend REST Proxy)"]
+    end
+
+    View -->|"Dispatches WallpaperIntent"| Bloc
+    Bloc -->|"Executes"| UseCase
+    Bloc -->|"Delegates"| Facade
+    UseCase -->|"Queries"| Facade
+    Facade --> CatalogRepo & PlaylistRepo & DownloadRepo & StudioRepo & CommunityRepo & PortabilityRepo
+    CatalogRepo & PlaylistRepo & DownloadRepo & StudioRepo & CommunityRepo & PortabilityRepo --> Cache
+    CatalogRepo & DownloadRepo --> CloudApi
+    CatalogRepo --> Bridge
+    CloudApi --> NetClient
+    Bloc -->|"Emits Immutable"| State["WallpaperState"]
+    State --> View
 ```
 
 1. **`lib/blocs/` (Intent-Driven State Management)**:
