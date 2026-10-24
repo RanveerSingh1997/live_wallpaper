@@ -45,8 +45,11 @@ jobs:
       - name: Verify Zero Lint Issues (flutter analyze)
         run: flutter analyze --fatal-infos --fatal-warnings
 
-      - name: Run Flutter Test Suite (287+ Tests)
+      - name: Run Flutter Test Suite (377+ Tests)
         run: flutter test --reporter=expanded
+
+      - name: Verify Android Production APK Release Build
+        run: flutter build apk --release --split-per-abi
 
   # ============================================================================
   # Job 2: Java Spring Boot Backend Verification (Compile & JUnit 5 Tests)

@@ -33,5 +33,18 @@ void main() {
       expect(() async => await bridge.setAudioMuted(true), returnsNormally);
       expect(() async => await bridge.openChooser(), returnsNormally);
     });
+
+    test('getInitialDeepLink returns null and onDeepLinkReceived emits stream', () async {
+      final initial = await bridge.getInitialDeepLink();
+      expect(initial, isNull);
+      expect(bridge.onDeepLinkReceived, isNotNull);
+    });
+
+    test('getHardwareBatteryInfo returns fallback telemetry on host test environment', () async {
+      final batteryInfo = await bridge.getHardwareBatteryInfo();
+      expect(batteryInfo['batteryPercent'], equals(100));
+      expect(batteryInfo['isCharging'], isFalse);
+      expect(batteryInfo['isPowerSaveMode'], isFalse);
+    });
   });
 }

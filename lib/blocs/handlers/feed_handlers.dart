@@ -237,4 +237,44 @@ mixin FeedHandlers on Bloc<WallpaperIntent, WallpaperState> {
     await repository.setHasSeenOnboarding(false);
     emit(state.copyWith(hasSeenOnboarding: false));
   }
+
+  Future<void> onHandleDeepLink(
+    HandleDeepLinkIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    final uri = Uri.tryParse(event.uri);
+    if (uri == null) return;
+
+    final pathSegments = uri.pathSegments;
+    String? type;
+    String? targetId;
+
+    if (uri.scheme == 'wallora') {
+      if (uri.host.isNotEmpty) {
+        type = uri.host;
+        targetId = pathSegments.isNotEmpty ? pathSegments.first : null;
+      }
+    } else if (uri.host == 'wallora.app' || uri.host == 'www.wallora.app') {
+      if (pathSegments.isNotEmpty) {
+        type = pathSegments.first;
+        targetId = pathSegments.length > 1 ? pathSegments[1] : null;
+      }
+    }
+
+    if (type == 'blueprint' && targetId != null) {
+      final matches =
+          state.communityBlueprints.where((b) => b.id == targetId).toList();
+      if (matches.isNotEmpty) {
+        add(ApplyScreenBlueprintIntent(matches.first));
+        emit(state.copyWith(
+          message: 'Applied blueprint "${matches.first.title}" via link',
+        ));
+      }
+    } else if ((type == 'wallpaper' || type == 'short') && targetId != null) {
+      final index = state.filteredShorts.indexWhere((s) => s.id == targetId);
+      if (index != -1) {
+        add(ChangeActiveShortIntent(index));
+      }
+    }
+  }
 }

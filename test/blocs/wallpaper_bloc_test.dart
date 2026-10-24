@@ -2087,5 +2087,40 @@ void main() {
       final saved = repository.getCustomImportedWallpapers();
       expect(saved.any((s) => s.id == 'cloud_wlz_live_apply_88' && s.isLive), isTrue);
     });
+
+    test('HandleDeepLinkIntent navigates to matching wallpaper short', () async {
+      bloc.add(LoadFeedIntent());
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      final allShorts = bloc.state.filteredShorts;
+      expect(allShorts.isNotEmpty, isTrue);
+      final targetShort = allShorts.last;
+      final targetIndex = allShorts.length - 1;
+
+      bloc.add(HandleDeepLinkIntent('wallora://wallpaper/${targetShort.id}'));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      expect(bloc.state.activeIndex, equals(targetIndex));
+    });
+
+    test('HandleDeepLinkIntent applies matching blueprint from custom URI and https URI', () async {
+      bloc.add(LoadFeedIntent());
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      final blueprints = bloc.state.communityBlueprints;
+      expect(blueprints.isNotEmpty, isTrue);
+      final target = blueprints.first;
+
+      bloc.add(HandleDeepLinkIntent('wallora://blueprint/${target.id}'));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      expect(bloc.state.message, contains(target.title));
+
+      // Test https link
+      bloc.add(HandleDeepLinkIntent('https://wallora.app/blueprint/${target.id}'));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      expect(bloc.state.message, contains(target.title));
+    });
   });
 }

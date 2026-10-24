@@ -199,6 +199,9 @@ abstract class WallpaperFacadeRepository {
   Future<void> openPhotos();
   Future<void> setWallpaperAudioMuted(bool isMuted);
   Future<void> openChooser();
+  Future<String?> getInitialDeepLink();
+  Stream<String> get onDeepLinkReceived;
+  Future<Map<String, dynamic>> getHardwareBatteryInfo();
 }
 
 /// Unified aggregate facade coordinating domain sub-repositories.
@@ -783,4 +786,14 @@ class WallpaperRepository implements WallpaperFacadeRepository {
 
   @override
   Future<void> openChooser() => _bridge.openChooser();
+
+  @override
+  Future<String?> getInitialDeepLink() => _bridge.getInitialDeepLink();
+
+  @override
+  Stream<String> get onDeepLinkReceived => _bridge.onDeepLinkReceived;
+
+  @override
+  Future<Map<String, dynamic>> getHardwareBatteryInfo() =>
+      _bridge.getHardwareBatteryInfo();
 }

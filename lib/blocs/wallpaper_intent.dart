@@ -690,5 +690,14 @@ class FilterCloudByAuthorIntent extends WallpaperIntent {
   List<Object?> get props => [author];
 }
 
+/// Intent to handle incoming universal links and custom scheme deep links (e.g. wallora://blueprint/{id}).
+class HandleDeepLinkIntent extends WallpaperIntent {
+  final String uri;
+  const HandleDeepLinkIntent(this.uri);
+
+  @override
+  List<Object?> get props => [uri];
+}
+
 
 

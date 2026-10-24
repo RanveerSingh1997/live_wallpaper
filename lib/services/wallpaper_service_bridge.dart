@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/services.dart';
 import '../core/core.dart';
 
@@ -32,12 +33,32 @@ abstract class WallpaperServiceBridge {
 
   /// Opens the system live wallpaper chooser on Android.
   Future<void> openChooser();
+
+  /// Retrieves initial deep link if app was cold-started from an intent.
+  Future<String?> getInitialDeepLink();
+
+  /// Broadcast stream of incoming deep links while app is running.
+  Stream<String> get onDeepLinkReceived;
+
+  /// Retrieves real hardware battery telemetry from the device.
+  Future<Map<String, dynamic>> getHardwareBatteryInfo();
 }
 
 /// Concrete implementation of [WallpaperServiceBridge] communicating via Flutter MethodChannels.
 class WallpaperServiceBridgeImpl implements WallpaperServiceBridge {
   static const MethodChannel _channel =
       MethodChannel(AppConstants.wallpaperChannelName);
+
+  final StreamController<String> _deepLinkController =
+      StreamController<String>.broadcast();
+
+  WallpaperServiceBridgeImpl() {
+    _channel.setMethodCallHandler((call) async {
+      if (call.method == 'onDeepLinkReceived' && call.arguments is String) {
+        _deepLinkController.add(call.arguments as String);
+      }
+    });
+  }
 
   @override
   Future<Map<String, dynamic>> setLiveWallpaper({
@@ -143,5 +164,48 @@ class WallpaperServiceBridgeImpl implements WallpaperServiceBridge {
     try {
       await _channel.invokeMethod('openLiveWallpaperChooser');
     } catch (_) {}
+  }
+
+  @override
+  Stream<String> get onDeepLinkReceived => _deepLinkController.stream;
+
+  @override
+  Future<String?> getInitialDeepLink() async {
+    if (!AppPlatform.isAndroid && !AppPlatform.isIOS) return null;
+    try {
+      final String? link =
+          await _channel.invokeMethod<String>('getInitialDeepLink');
+      return link;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getHardwareBatteryInfo() async {
+    if (!AppPlatform.isAndroid) {
+      return {
+        'batteryPercent': 100,
+        'isCharging': false,
+        'isPowerSaveMode': false,
+      };
+    }
+    try {
+      final dynamic result = await _channel.invokeMethod('getBatteryTelemetry');
+      if (result is Map) {
+        return Map<String, dynamic>.from(result);
+      }
+      return {
+        'batteryPercent': 100,
+        'isCharging': false,
+        'isPowerSaveMode': false,
+      };
+    } catch (_) {
+      return {
+        'batteryPercent': 100,
+        'isCharging': false,
+        'isPowerSaveMode': false,
+      };
+    }
   }
 }

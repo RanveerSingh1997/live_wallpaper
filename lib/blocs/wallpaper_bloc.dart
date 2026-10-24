@@ -47,6 +47,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState>
     on<ClearStatusMessageIntent>(onClearStatusMessage);
     on<CompleteOnboardingIntent>(onCompleteOnboarding);
     on<ResetOnboardingIntent>(onResetOnboarding);
+    on<HandleDeepLinkIntent>(onHandleDeepLink);
 
     // Playlist, Favorites & Collection Events
     on<ToggleFavoriteIntent>(onToggleFavorite);

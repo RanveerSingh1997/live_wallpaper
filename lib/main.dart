@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,17 +34,51 @@ void main() async {
   runApp(LiveWallpaperApp(repository: repository));
 }
 
-class LiveWallpaperApp extends StatelessWidget {
+class LiveWallpaperApp extends StatefulWidget {
   final WallpaperFacadeRepository repository;
 
   const LiveWallpaperApp({super.key, required this.repository});
 
   @override
+  State<LiveWallpaperApp> createState() => _LiveWallpaperAppState();
+}
+
+class _LiveWallpaperAppState extends State<LiveWallpaperApp> {
+  late final WallpaperBloc _bloc;
+  StreamSubscription<String>? _deepLinkSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = WallpaperBloc(repository: widget.repository)
+      ..add(LoadFeedIntent())
+      ..add(CheckWallpaperStatusIntent());
+
+    _initDeepLinks();
+  }
+
+  Future<void> _initDeepLinks() async {
+    final initialLink = await widget.repository.getInitialDeepLink();
+    if (initialLink != null && initialLink.isNotEmpty) {
+      _bloc.add(HandleDeepLinkIntent(initialLink));
+    }
+
+    _deepLinkSubscription = widget.repository.onDeepLinkReceived.listen((uri) {
+      _bloc.add(HandleDeepLinkIntent(uri));
+    });
+  }
+
+  @override
+  void dispose() {
+    _deepLinkSubscription?.cancel();
+    _bloc.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => WallpaperBloc(repository: repository)
-        ..add(LoadFeedIntent())
-        ..add(CheckWallpaperStatusIntent()),
+    return BlocProvider.value(
+      value: _bloc,
       child: MaterialApp(
         title: AppConstants.appName,
         debugShowCheckedModeBanner: false,
