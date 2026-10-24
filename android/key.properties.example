@@ -1,0 +1,22 @@
+# Wallora Production Keystore Configuration Template
+# ----------------------------------------------------
+# Copy this file to `key.properties` (which is git-ignored) and populate with
+# your production signing credentials.
+#
+# Generating a production keystore:
+# keytool -genkey -v -keystore wallora-release.jks -keyalg RSA \
+#         -keysize 2048 -validity 10000 -alias wallora
+#
+# GitHub Actions CI Secrets:
+# In CI/CD pipelines, encode the .jks file with base64:
+#   base64 -i wallora-release.jks | pbcopy
+# Store in secrets as:
+#   KEYSTORE_BASE64
+#   KEY_ALIAS
+#   KEY_PASSWORD
+#   STORE_PASSWORD
+
+storePassword=YOUR_STORE_PASSWORD_HERE
+keyPassword=YOUR_KEY_PASSWORD_HERE
+keyAlias=wallora
+storeFile=wallora-release.jks
