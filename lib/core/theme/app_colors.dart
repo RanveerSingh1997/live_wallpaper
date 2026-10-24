@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 abstract final class AppColors {
   // Brand Aurora Neon Palette
   static const Color neonCyan = Color(0xFF00E5FF);
+  static const Color auroraCyan = neonCyan;
   static const Color auroraViolet = Color(0xFFD500F9);
   static const Color sunsetAmber = Color(0xFFFF5722);
+  static const Color auroraAmber = sunsetAmber;
   static const Color cyberEmerald = Color(0xFF00E676);
+  static const Color auroraEmerald = cyberEmerald;
   static const Color solarGold = Color(0xFFFFD600);
   static const Color electricBlue = Color(0xFF00B0FF);
   static const Color plasmaPink = Color(0xFFFF4081);
@@ -16,8 +19,10 @@ abstract final class AppColors {
   static const Color obsidianBlack = Color(0xFF000000);
   static const Color darkBackground = Color(0xFF0A0A0E);
   static const Color darkSurface = Color(0xFF101018);
+  static const Color obsidianSurface = darkSurface;
   static const Color surfaceElevated = Color(0xFF121214);
   static const Color cardBackground = Color(0xFF161622);
+  static const Color obsidianCard = cardBackground;
   static const Color modalBackground = Color(0xFF1A1A24);
   static const Color sheetBackground = Color(0xFF1E1E28);
 
@@ -34,6 +39,7 @@ abstract final class AppColors {
 
   // Status & Semantic Colors
   static const Color error = Color(0xFFFF5252);
+  static const Color favoriteRed = Color(0xFFFF1744);
   static const Color warning = Color(0xFFFFB74D);
   static const Color success = Color(0xFF00E676);
   static const Color info = Color(0xFF00E5FF);

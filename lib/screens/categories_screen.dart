@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/wallpaper_collection.dart';
 import 'collection_detail_sheet.dart';
@@ -45,19 +46,19 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   Color _getCategoryColor(String category) {
     switch (category) {
       case 'Anime & Gaming':
-        return const Color(0xFFFF5722);
+        return AppColors.sunsetAmber;
       case 'Nature & Scenery':
-        return const Color(0xFF00E676);
+        return AppColors.cyberEmerald;
       case 'Cyberpunk & Tech':
-        return const Color(0xFFD500F9);
+        return AppColors.auroraViolet;
       case 'Cars & Speed':
-        return const Color(0xFFFF1744);
+        return AppColors.favoriteRed;
       case 'Minimal & AMOLED':
-        return const Color(0xFF7C4DFF);
+        return AppColors.deepPurple;
       case 'Fitness & Grind':
-        return const Color(0xFFFFC107);
+        return AppColors.warning;
       case 'Motivation & Mindset':
-        return const Color(0xFF00E5FF);
+        return AppColors.neonCyan;
       default:
         return Colors.white70;
     }

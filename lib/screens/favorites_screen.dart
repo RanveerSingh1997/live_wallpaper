@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import 'wallpaper_preview_sheet.dart';
 import 'wallpaper_quick_actions_sheet.dart';
 
@@ -35,7 +36,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             elevation: 0,
             title: Row(
               children: [
-                const Icon(Icons.favorite_rounded, color: Color(0xFFFF1744), size: 20),
+                const Icon(Icons.favorite_rounded, color: AppColors.favoriteRed, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   'FAVORITES (${favorites.length})',
@@ -59,13 +60,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFF1744).withValues(alpha: 0.1),
+                            color: AppColors.favoriteRed.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.favorite_border_rounded,
                             size: 48,
-                            color: Color(0xFFFF1744),
+                            color: AppColors.favoriteRed,
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -94,7 +95,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                             widget.onBrowseWallpapers();
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFF1744),
+                            backgroundColor: AppColors.favoriteRed,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                             shape: RoundedRectangleBorder(
@@ -213,7 +214,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                     ),
                                     child: const Icon(
                                       Icons.favorite_rounded,
-                                      color: Color(0xFFFF1744),
+                                      color: AppColors.favoriteRed,
                                       size: 16,
                                     ),
                                   ),
@@ -296,8 +297,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           setState(() => _filter = filterName);
         }
       },
-      backgroundColor: const Color(0xFF16161A),
-      selectedColor: const Color(0xFFFF1744),
+      backgroundColor: AppColors.cardBackground,
+      selectedColor: AppColors.favoriteRed,
       labelStyle: TextStyle(
         color: isSelected ? Colors.white : Colors.white70,
         fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
@@ -306,7 +307,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: isSelected ? const Color(0xFFFF1744) : Colors.white12,
+          color: isSelected ? AppColors.favoriteRed : Colors.white12,
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),

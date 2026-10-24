@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import 'categories_screen.dart';
 import 'discover_screen.dart';
 import 'downloads_screen.dart';
@@ -75,15 +76,15 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           ),
           bottomNavigationBar: Container(
             decoration: const BoxDecoration(
-              color: Color(0xFF121214),
+              color: AppColors.surfaceElevated,
               border: Border(top: BorderSide(color: Colors.white10, width: 0.8)),
             ),
             child: BottomNavigationBar(
               currentIndex: currentIndex,
               onTap: _navigateToTab,
               type: BottomNavigationBarType.fixed,
-              backgroundColor: const Color(0xFF121214),
-              selectedItemColor: const Color(0xFFFF5722),
+              backgroundColor: AppColors.surfaceElevated,
+              selectedItemColor: AppColors.sunsetAmber,
               unselectedItemColor: Colors.white38,
               selectedLabelStyle: const TextStyle(
                 fontSize: 11,
@@ -99,12 +100,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.explore_outlined),
                   activeIcon: Icon(Icons.explore_rounded),
-                  label: 'Discover',
+                  label: AppStrings.navDiscover,
                 ),
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.grid_view_outlined),
                   activeIcon: Icon(Icons.grid_view_rounded),
-                  label: 'Categories',
+                  label: AppStrings.navCategories,
                 ),
                 BottomNavigationBarItem(
                   icon: Badge(
@@ -119,24 +120,24 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                     backgroundColor: const Color(0xFFFF1744),
                     child: const Icon(Icons.favorite_rounded),
                   ),
-                  label: 'Favorites',
+                  label: AppStrings.navFavorites,
                 ),
                 BottomNavigationBarItem(
                   icon: Badge(
                     isLabelVisible: state.downloadedIds.isNotEmpty,
                     label: Text('${state.downloadedIds.length}'),
-                    backgroundColor: const Color(0xFF00E676),
+                    backgroundColor: AppColors.cyberEmerald,
                     textColor: Colors.black,
                     child: const Icon(Icons.file_download_outlined),
                   ),
                   activeIcon: Badge(
                     isLabelVisible: state.downloadedIds.isNotEmpty,
                     label: Text('${state.downloadedIds.length}'),
-                    backgroundColor: const Color(0xFF00E676),
+                    backgroundColor: AppColors.cyberEmerald,
                     textColor: Colors.black,
                     child: const Icon(Icons.download_done_rounded),
                   ),
-                  label: 'Downloads',
+                  label: AppStrings.navDownloads,
                 ),
               ],
             ),

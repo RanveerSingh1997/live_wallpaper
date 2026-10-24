@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import 'custom_wallpaper_import_sheet.dart';
 import 'wallpaper_preview_sheet.dart';
 import 'wallpaper_quick_actions_sheet.dart';
@@ -27,7 +28,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E22),
+        backgroundColor: AppColors.darkSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text(
           'Reclaim Storage?',
@@ -48,7 +49,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               context.read<WallpaperBloc>().add(ClearAllDownloadsIntent());
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF1744),
+              backgroundColor: AppColors.favoriteRed,
               foregroundColor: Colors.white,
             ),
             child: const Text('RECLAIM STORAGE'),
@@ -71,7 +72,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
             elevation: 0,
             title: Row(
               children: [
-                const Icon(Icons.download_done_rounded, color: Color(0xFF00E676), size: 20),
+                const Icon(Icons.download_done_rounded, color: AppColors.cyberEmerald, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   'DOWNLOADS (${downloads.length})',
@@ -86,7 +87,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.add_photo_alternate_rounded, color: Color(0xFFFFD600), size: 20),
+                icon: const Icon(Icons.add_photo_alternate_rounded, color: AppColors.solarGold, size: 20),
                 tooltip: 'Import Wallpaper',
                 onPressed: () {
                   HapticFeedback.selectionClick();
@@ -114,13 +115,13 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                         Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF00E676).withValues(alpha: 0.1),
+                            color: AppColors.cyberEmerald.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.cloud_download_rounded,
                             size: 48,
-                            color: Color(0xFF00E676),
+                            color: AppColors.cyberEmerald,
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -152,7 +153,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                                 widget.onBrowseWallpapers();
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF00E676),
+                                backgroundColor: AppColors.cyberEmerald,
                                 foregroundColor: Colors.black,
                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                 shape: RoundedRectangleBorder(
@@ -172,8 +173,8 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                                 CustomWallpaperImportSheet.show(context);
                               },
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: const Color(0xFFFFD600),
-                                side: const BorderSide(color: Color(0xFFFFD600)),
+                                foregroundColor: AppColors.solarGold,
+                                side: const BorderSide(color: AppColors.solarGold),
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
@@ -198,7 +199,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF16161A),
+                        color: AppColors.cardBackground,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: Colors.white10),
                       ),
@@ -207,12 +208,12 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF00E676).withValues(alpha: 0.15),
+                              color: AppColors.cyberEmerald.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
                               Icons.storage_rounded,
-                              color: Color(0xFF00E676),
+                              color: AppColors.cyberEmerald,
                               size: 22,
                             ),
                           ),
@@ -318,7 +319,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                           border: Border.all(color: Colors.white10),
                         ),
                         child: Material(
-                          color: const Color(0xFF18181C),
+                          color: AppColors.obsidianCard,
                           borderRadius: BorderRadius.circular(16),
                           child: ListTile(
                           onTap: () => WallpaperPreviewSheet.show(context, item),
@@ -365,14 +366,14 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                                   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                                   margin: const EdgeInsets.only(right: 6),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF00E5FF).withValues(alpha: 0.2),
+                                    color: AppColors.neonCyan.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: const Color(0xFF00E5FF), width: 0.6),
+                                    border: Border.all(color: AppColors.neonCyan, width: 0.6),
                                   ),
                                   child: const Text(
                                     'CLOUD 4K',
                                     style: TextStyle(
-                                      color: Color(0xFF00E5FF),
+                                      color: AppColors.neonCyan,
                                       fontSize: 8,
                                       fontWeight: FontWeight.w900,
                                     ),
@@ -446,8 +447,8 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           setState(() => _filter = filterName);
         }
       },
-      backgroundColor: const Color(0xFF16161A),
-      selectedColor: const Color(0xFF00E676),
+      backgroundColor: AppColors.cardBackground,
+      selectedColor: AppColors.cyberEmerald,
       labelStyle: TextStyle(
         color: isSelected ? Colors.black : Colors.white70,
         fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
@@ -456,7 +457,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: isSelected ? const Color(0xFF00E676) : Colors.white12,
+          color: isSelected ? AppColors.cyberEmerald : Colors.white12,
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),

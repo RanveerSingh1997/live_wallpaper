@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
 import '../models/wallpaper_collection.dart';
@@ -65,7 +66,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.check_circle_rounded, color: Color(0xFF00E676)),
+                  const Icon(Icons.check_circle_rounded, color: AppColors.cyberEmerald),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -75,7 +76,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ),
                 ],
               ),
-              backgroundColor: const Color(0xFF212124),
+              backgroundColor: AppColors.darkSurface,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               duration: const Duration(seconds: 4),
@@ -90,7 +91,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             backgroundColor: Colors.black,
             body: Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF5722)),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.sunsetAmber),
               ),
             ),
           );
@@ -123,7 +124,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               padding: const EdgeInsets.all(7),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFFFF5722), Color(0xFFD500F9)],
+                                  colors: [AppColors.sunsetAmber, AppColors.auroraViolet],
                                 ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
