@@ -1,0 +1,7 @@
+# Wallora Release Artifacts SHA-256 Checksums
+# Generated for Production Release v1.0.0+1
+0f19be938ea7c82dbc2bbc6bff94b1fc7993272f0d9853788b1f4ca1de6ae9dc  build/app/outputs/bundle/release/app-release.aab
+07c7fb0c0b3aef0f59ec05a80547e64787a014420321f1d5b6dd9301f0e81b9f  build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+dc022d1999faaab148c0e559a255fb16ab04fd82c1e18658e64522586ee924c5  build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+b850b4125bb7e5b7cc001311e30103f5777fd20f6d91fa3f55edff419a3a3860  build/app/outputs/flutter-apk/app-x86_64-release.apk
+d07552ad4d58915ad4c40f402af59cf6e944bc93bdc44548dc2f6080168b4efe  backend/target/wallaza-service-1.0.0-SNAPSHOT.jar

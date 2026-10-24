@@ -1,0 +1,72 @@
+{
+  "appName": "Wallora",
+  "tagline": "Make every screen yours.",
+  "version": "1.0.0",
+  "buildNumber": "1",
+  "generatedAt": "2026-10-25T01:59:00+05:30",
+  "gitCommit": "f7f6133",
+  "qualityCertification": {
+    "flutterAnalyzer": "0 issues (fatal-infos, fatal-warnings)",
+    "flutterUnitAndWidgetTests": "418/418 passed (100% green)",
+    "canvasPerformanceBenchmarks": "4/4 verified (<16.6ms at 60 FPS)",
+    "visualRegressionGoldens": "6/6 snapshots verified",
+    "storeScreenshotsSuite": "4/4 canonical mockups verified",
+    "backendCheckstyle": "0 violations",
+    "backendJUnitTests": "15/15 passed (100% green)"
+  },
+  "artifacts": [
+    {
+      "platform": "android",
+      "target": "Google Play Store (AAB)",
+      "file": "build/app/outputs/bundle/release/app-release.aab",
+      "sizeBytes": 74700000,
+      "sha256": "0f19be938ea7c82dbc2bbc6bff94b1fc7993272f0d9853788b1f4ca1de6ae9dc",
+      "distribution": "Google Play Console Production Track"
+    },
+    {
+      "platform": "android",
+      "target": "ARM64 Split APK",
+      "file": "build/app/outputs/flutter-apk/app-arm64-v8a-release.apk",
+      "sizeBytes": 37500000,
+      "sha256": "07c7fb0c0b3aef0f59ec05a80547e64787a014420321f1d5b6dd9301f0e81b9f",
+      "distribution": "Direct Download & GitHub Releases (Modern Android 64-bit)"
+    },
+    {
+      "platform": "android",
+      "target": "ARMv7 Split APK",
+      "file": "build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk",
+      "sizeBytes": 35100000,
+      "sha256": "dc022d1999faaab148c0e559a255fb16ab04fd82c1e18658e64522586ee924c5",
+      "distribution": "Direct Download & GitHub Releases (Legacy 32-bit)"
+    },
+    {
+      "platform": "android",
+      "target": "x86_64 Split APK",
+      "file": "build/app/outputs/flutter-apk/app-x86_64-release.apk",
+      "sizeBytes": 39000000,
+      "sha256": "b850b4125bb7e5b7cc001311e30103f5777fd20f6d91fa3f55edff419a3a3860",
+      "distribution": "Chromebook & Android Emulator Testing"
+    },
+    {
+      "platform": "ios",
+      "target": "Apple App Store (Runner.app)",
+      "file": "build/ios/iphoneos/Runner.app",
+      "sizeBytes": 37200000,
+      "distribution": "Apple App Store Connect / TestFlight"
+    },
+    {
+      "platform": "web",
+      "target": "Production Web App",
+      "directory": "build/web",
+      "distribution": "Cloudflare Pages / Firebase Hosting"
+    },
+    {
+      "platform": "backend",
+      "target": "Spring Boot Executable JAR",
+      "file": "backend/target/wallaza-service-1.0.0-SNAPSHOT.jar",
+      "sizeBytes": 31457280,
+      "sha256": "d07552ad4d58915ad4c40f402af59cf6e944bc93bdc44548dc2f6080168b4efe",
+      "distribution": "Docker / Kubernetes / AWS ECS Cloud Service"
+    }
+  ]
+}
