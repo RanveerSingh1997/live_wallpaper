@@ -1858,6 +1858,48 @@ void main() {
       await clearExpectation;
 
       expect(bloc.state.cloudSearchQuery, isEmpty);
+      expect(bloc.state.selectedCloudAuthor, isNull);
+    });
+
+    test('UpdateCloudSortIntent and sortedCloudWallpapers sort by popular, trending, newest, quality', () async {
+      // Seed with curated library
+      bloc.add(const FetchCloudWallpapersIntent(page: 1, category: 'All'));
+      await bloc.stream.firstWhere((s) => s.cloudWallpapers.isNotEmpty);
+
+      // 1. Trending (Favorites)
+      bloc.add(const UpdateCloudSortIntent('trending'));
+      await bloc.stream.firstWhere((s) => s.selectedCloudSort == 'trending');
+      final trendingList = bloc.state.sortedCloudWallpapers;
+      expect(trendingList.first.favorites >= trendingList.last.favorites, isTrue);
+
+      // 2. Quality (File Size)
+      bloc.add(const UpdateCloudSortIntent('quality'));
+      await bloc.stream.firstWhere((s) => s.selectedCloudSort == 'quality');
+      final qualityList = bloc.state.sortedCloudWallpapers;
+      expect(qualityList.first.fileSizeBytes >= qualityList.last.fileSizeBytes, isTrue);
+
+      // 3. Popular (Downloads)
+      bloc.add(const UpdateCloudSortIntent('popular'));
+      await bloc.stream.firstWhere((s) => s.selectedCloudSort == 'popular');
+      final popularList = bloc.state.sortedCloudWallpapers;
+      expect(popularList.first.downloads >= popularList.last.downloads, isTrue);
+    });
+
+    test('FilterCloudByAuthorIntent filters sortedCloudWallpapers by creator', () async {
+      bloc.add(const FetchCloudWallpapersIntent(page: 1, category: 'All'));
+      await bloc.stream.firstWhere((s) => s.cloudWallpapers.isNotEmpty);
+
+      bloc.add(const FilterCloudByAuthorIntent('Kenji Takahashi'));
+      await bloc.stream.firstWhere((s) => s.selectedCloudAuthor == 'Kenji Takahashi');
+
+      final filtered = bloc.state.sortedCloudWallpapers;
+      expect(filtered.isNotEmpty, isTrue);
+      expect(filtered.every((w) => w.authorName == 'Kenji Takahashi' || w.authorUsername == 'Kenji Takahashi'), isTrue);
+
+      // Clear filter
+      bloc.add(const FilterCloudByAuthorIntent(null));
+      await bloc.stream.firstWhere((s) => s.selectedCloudAuthor == null);
+      expect(bloc.state.sortedCloudWallpapers.length, greaterThan(filtered.length));
     });
 
     test('rotationPoolShorts yields Wallaza Cloud wallpapers when source is wallaza_cloud', () async {

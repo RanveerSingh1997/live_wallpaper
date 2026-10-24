@@ -75,6 +75,8 @@ class WallpaperState extends Equatable {
   final String? cloudErrorMessage;
   final String selectedCloudCategory;
   final String selectedCloudResolution;
+  final String selectedCloudSort;
+  final String? selectedCloudAuthor;
   final String cloudSearchQuery;
   final int cloudCurrentPage;
   final String? message;
@@ -128,6 +130,8 @@ class WallpaperState extends Equatable {
     this.cloudErrorMessage,
     this.selectedCloudCategory = 'All',
     this.selectedCloudResolution = 'All',
+    this.selectedCloudSort = 'curated',
+    this.selectedCloudAuthor,
     this.cloudSearchQuery = '',
     this.cloudCurrentPage = 1,
     this.message,
@@ -241,6 +245,45 @@ class WallpaperState extends Equatable {
     return '${(totalStorageUsedBytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
 
+  /// Returns cloud wallpapers optionally filtered by author and sorted by `selectedCloudSort`.
+  List<WallazaCloudWallpaper> get sortedCloudWallpapers {
+    var list = cloudWallpapers;
+    if (selectedCloudAuthor != null && selectedCloudAuthor!.trim().isNotEmpty) {
+      final a = selectedCloudAuthor!.toLowerCase().trim();
+      list = list.where((item) {
+        final name = item.authorName?.toLowerCase() ?? '';
+        final username = item.authorUsername?.toLowerCase() ?? '';
+        return name.contains(a) || username.contains(a);
+      }).toList();
+    } else {
+      list = List.of(list);
+    }
+
+    switch (selectedCloudSort) {
+      case 'popular':
+        list.sort((a, b) => b.downloads.compareTo(a.downloads));
+        break;
+      case 'trending':
+        list.sort((a, b) => b.favorites.compareTo(a.favorites));
+        break;
+      case 'newest':
+        list.sort((a, b) {
+          final da = a.createdAt ?? DateTime(2020);
+          final db = b.createdAt ?? DateTime(2020);
+          return db.compareTo(da);
+        });
+        break;
+      case 'quality':
+        list.sort((a, b) => b.fileSizeBytes.compareTo(a.fileSizeBytes));
+        break;
+      case 'curated':
+      default:
+        // Preserves incoming API / editorial sequence
+        break;
+    }
+    return list;
+  }
+
   /// All collections (user custom collections merged with curated editorial collections).
   List<WallpaperCollection> get allCollections =>
       [...customCollections, ...CuratedShortsData.collections];
@@ -341,6 +384,9 @@ class WallpaperState extends Equatable {
     String? cloudErrorMessage,
     String? selectedCloudCategory,
     String? selectedCloudResolution,
+    String? selectedCloudSort,
+    String? selectedCloudAuthor,
+    bool clearCloudAuthor = false,
     String? cloudSearchQuery,
     int? cloudCurrentPage,
     String? message,
@@ -400,6 +446,10 @@ class WallpaperState extends Equatable {
           selectedCloudCategory ?? this.selectedCloudCategory,
       selectedCloudResolution:
           selectedCloudResolution ?? this.selectedCloudResolution,
+      selectedCloudSort: selectedCloudSort ?? this.selectedCloudSort,
+      selectedCloudAuthor: clearCloudAuthor
+          ? null
+          : (selectedCloudAuthor ?? this.selectedCloudAuthor),
       cloudSearchQuery: cloudSearchQuery ?? this.cloudSearchQuery,
       cloudCurrentPage: cloudCurrentPage ?? this.cloudCurrentPage,
       message: message,
@@ -456,6 +506,8 @@ class WallpaperState extends Equatable {
         cloudErrorMessage,
         selectedCloudCategory,
         selectedCloudResolution,
+        selectedCloudSort,
+        selectedCloudAuthor,
         cloudSearchQuery,
         cloudCurrentPage,
         message,

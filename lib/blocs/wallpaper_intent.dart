@@ -672,5 +672,23 @@ class ClearCloudSearchIntent extends WallpaperIntent {
   const ClearCloudSearchIntent();
 }
 
+/// Intent to update sorting order of cloud wallpapers ('popular', 'trending', 'newest', 'quality').
+class UpdateCloudSortIntent extends WallpaperIntent {
+  final String sort;
+  const UpdateCloudSortIntent(this.sort);
+
+  @override
+  List<Object?> get props => [sort];
+}
+
+/// Intent to filter cloud discovery stream by a specific artist/creator username or name.
+class FilterCloudByAuthorIntent extends WallpaperIntent {
+  final String? author;
+  const FilterCloudByAuthorIntent(this.author);
+
+  @override
+  List<Object?> get props => [author];
+}
+
 
 

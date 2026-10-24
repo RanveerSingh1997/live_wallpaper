@@ -105,6 +105,8 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     on<SearchCloudWallpapersIntent>(_onSearchCloudWallpapers);
     on<ImportCloudWallpaperIntent>(_onImportCloudWallpaper);
     on<ClearCloudSearchIntent>(_onClearCloudSearch);
+    on<UpdateCloudSortIntent>(_onUpdateCloudSort);
+    on<FilterCloudByAuthorIntent>(_onFilterCloudByAuthor);
   }
 
   List<MotivationalShort> _buildForYouList(
@@ -1851,6 +1853,8 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
     emit(state.copyWith(
       cloudSearchQuery: '',
       selectedCloudResolution: 'All',
+      clearCloudAuthor: true,
+      selectedCloudSort: 'curated',
       isCloudLoading: true,
       cloudErrorMessage: null,
     ));
@@ -1869,6 +1873,23 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState> {
         cloudErrorMessage: 'Failed to restore cloud wallpapers: $e',
       ));
     }
+  }
+
+  void _onUpdateCloudSort(
+    UpdateCloudSortIntent event,
+    Emitter<WallpaperState> emit,
+  ) {
+    emit(state.copyWith(selectedCloudSort: event.sort));
+  }
+
+  void _onFilterCloudByAuthor(
+    FilterCloudByAuthorIntent event,
+    Emitter<WallpaperState> emit,
+  ) {
+    emit(state.copyWith(
+      selectedCloudAuthor: event.author,
+      clearCloudAuthor: event.author == null,
+    ));
   }
 }
 

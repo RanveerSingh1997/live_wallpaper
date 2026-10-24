@@ -93,6 +93,17 @@ class WallazaCloudWallpaper extends Equatable {
       category.toLowerCase().contains('amoled') ||
       tags.any((t) => t.toLowerCase().contains('amoled'));
 
+  /// Formatted initials for the author's avatar badge
+  String get authorInitials {
+    final name = authorName?.trim();
+    if (name == null || name.isEmpty) return 'W';
+    final parts = name.split(' ');
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return name.substring(0, 1).toUpperCase();
+  }
+
   /// Serializes this entity into a JSON map matching the Wallaza API specification
   Map<String, dynamic> toJson() {
     return {

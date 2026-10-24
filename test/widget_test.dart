@@ -3558,7 +3558,8 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
       final cloudButton = find.byTooltip('Wallaza Cloud Discovery');
       expect(cloudButton, findsOneWidget);
@@ -3606,7 +3607,8 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
       final bannerTitle = find.text('WALLAZA CLOUD DISCOVERY');
       await tester.scrollUntilVisible(
@@ -3680,6 +3682,12 @@ void main() {
       expect(find.text('All Resolutions'), findsOneWidget);
       expect(find.text('3840x2160'), findsOneWidget);
 
+      // Verifies Sorting chips
+      expect(find.text('Featured'), findsOneWidget);
+      expect(find.text('Popular'), findsOneWidget);
+      expect(find.text('Trending'), findsOneWidget);
+      expect(find.text('4K Ultra'), findsOneWidget);
+
       // Verifies Cloud Wallpaper Card
       final firstCardTitle = find.text(WallazaCloudWallpaper.curatedCloudLibrary.first.title);
       expect(firstCardTitle, findsOneWidget);
@@ -3689,12 +3697,14 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
-      // Verifies detail modal action buttons and specs
+      // Verifies detail modal action buttons, specs, and creator profile card
       expect(find.text('Download Offline 4K (Save to Device)'), findsOneWidget);
       expect(find.text('Import to Library'), findsOneWidget);
       expect(find.text('Apply Wallpaper'), findsOneWidget);
       expect(find.text('RESOLUTION'), findsOneWidget);
       expect(find.text('SIZE'), findsOneWidget);
+      expect(find.text('Filter Artist'), findsOneWidget);
+      expect(find.byIcon(Icons.verified_rounded), findsOneWidget);
 
       // Tap Download Offline 4K button
       await tester.tap(find.text('Download Offline 4K (Save to Device)'));
@@ -3702,6 +3712,74 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(repo.getDownloads().isNotEmpty, isTrue);
+
+      // Tap Trending sort chip
+      await tester.tap(find.text('Trending'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+
+      expect(bloc.state.selectedCloudSort, 'trending');
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('WallazaCloudDiscoverySheet Filter Artist button filters stream and displays banner',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final repo = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repo,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          weatherConfig: const WeatherAtmosphereConfig(effectType: WeatherEffectType.none),
+          cloudWallpapers: WallazaCloudWallpaper.curatedCloudLibrary,
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: WallazaCloudDiscoverySheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+
+      // Open detail modal of first card
+      final firstCard = find.text(WallazaCloudWallpaper.curatedCloudLibrary.first.title);
+      await tester.tap(firstCard);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Tap Filter Artist button
+      await tester.tap(find.text('Filter Artist'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Verifies Creator Filter Banner is shown
+      expect(find.textContaining('Filtered by Creator:'), findsOneWidget);
+      expect(bloc.state.selectedCloudAuthor, isNotNull);
+
+      // Tap clear icon on the banner
+      await tester.tap(find.byKey(const Key('clear_author_filter_button')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+
+      expect(bloc.state.selectedCloudAuthor, isNull);
 
       await tester.pumpWidget(const SizedBox.shrink());
     });

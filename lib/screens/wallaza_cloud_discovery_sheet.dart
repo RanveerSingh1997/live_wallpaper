@@ -45,7 +45,37 @@ class _WallazaCloudDiscoverySheetState
   static const List<String> _resolutions = [
     'All',
     '3840x2160',
+    '2560x1440',
     '1920x1080',
+    'AMOLED',
+  ];
+
+  static const List<Map<String, dynamic>> _sortOptions = [
+    {
+      'id': 'curated',
+      'label': 'Featured',
+      'icon': Icons.auto_awesome_rounded,
+    },
+    {
+      'id': 'popular',
+      'label': 'Popular',
+      'icon': Icons.local_fire_department_rounded,
+    },
+    {
+      'id': 'trending',
+      'label': 'Trending',
+      'icon': Icons.favorite_rounded,
+    },
+    {
+      'id': 'newest',
+      'label': 'Newest',
+      'icon': Icons.bolt_rounded,
+    },
+    {
+      'id': 'quality',
+      'label': '4K Ultra',
+      'icon': Icons.high_quality_rounded,
+    },
   ];
 
   @override
@@ -74,6 +104,27 @@ class _WallazaCloudDiscoverySheetState
       page: 1,
       category: category,
     ));
+  }
+
+  String _resolutionLabel(String res) {
+    switch (res) {
+      case 'All':
+        return 'All Resolutions';
+      case '3840x2160':
+        return '3840x2160';
+      case '2560x1440':
+        return '2K QHD';
+      case '1920x1080':
+        return '1920x1080';
+      case 'AMOLED':
+        return 'AMOLED True-Black';
+      default:
+        return res;
+    }
+  }
+
+  void _onSortSelected(String sortId) {
+    context.read<WallpaperBloc>().add(UpdateCloudSortIntent(sortId));
   }
 
   void _onResolutionSelected(String resolution) {
@@ -345,7 +396,7 @@ class _WallazaCloudDiscoverySheetState
                           padding: const EdgeInsets.only(right: 8),
                           child: FilterChip(
                             label: Text(
-                              res == 'All' ? 'All Resolutions' : res,
+                              _resolutionLabel(res),
                               style: TextStyle(
                                 color:
                                     isSelected ? Colors.white : Colors.white54,
@@ -375,13 +426,149 @@ class _WallazaCloudDiscoverySheetState
                 },
               ),
 
+              const SizedBox(height: 6),
+
+              // Sorting Options Strip
+              BlocBuilder<WallpaperBloc, WallpaperState>(
+                buildWhen: (prev, curr) =>
+                    prev.selectedCloudSort != curr.selectedCloudSort,
+                builder: (context, state) {
+                  return SizedBox(
+                    height: 30,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: _sortOptions.length,
+                      itemBuilder: (context, index) {
+                        final sort = _sortOptions[index];
+                        final id = sort['id'] as String;
+                        final label = sort['label'] as String;
+                        final icon = sort['icon'] as IconData;
+                        final isSelected = state.selectedCloudSort == id;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: InkWell(
+                            onTap: () => _onSortSelected(id),
+                            borderRadius: BorderRadius.circular(12),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? const Color(0xFF00E5FF).withAlpha(35)
+                                    : const Color(0xFF14141E),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? const Color(0xFF00E5FF)
+                                      : Colors.white12,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    icon,
+                                    size: 13,
+                                    color: isSelected
+                                        ? const Color(0xFF00E5FF)
+                                        : Colors.white54,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    label,
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? const Color(0xFF00E5FF)
+                                          : Colors.white70,
+                                      fontSize: 11,
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+
+              // Active Creator Filter Banner
+              BlocBuilder<WallpaperBloc, WallpaperState>(
+                buildWhen: (prev, curr) =>
+                    prev.selectedCloudAuthor != curr.selectedCloudAuthor,
+                builder: (context, state) {
+                  final author = state.selectedCloudAuthor;
+                  if (author == null || author.isEmpty) {
+                    return const SizedBox(height: 6);
+                  }
+                  return Container(
+                    margin: const EdgeInsets.fromLTRB(16, 6, 16, 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF26103A), Color(0xFF14142B)],
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                          color: const Color(0xFFD500F9).withAlpha(160)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.person_pin_circle_rounded,
+                            color: Color(0xFFD500F9), size: 16),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Filtered by Creator: $author',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        InkWell(
+                          key: const Key('clear_author_filter_button'),
+                          onTap: () {
+                            context
+                                .read<WallpaperBloc>()
+                                .add(const FilterCloudByAuthorIntent(null));
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white12,
+                            ),
+                            child: const Icon(Icons.close_rounded,
+                                color: Colors.white70, size: 14),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
               const SizedBox(height: 8),
 
               // Wallpaper Grid or Empty / Loading States
               Expanded(
                 child: BlocBuilder<WallpaperBloc, WallpaperState>(
                   builder: (context, state) {
-                    if (state.isCloudLoading && state.cloudWallpapers.isEmpty) {
+                    final displayedWallpapers = state.sortedCloudWallpapers;
+
+                    if (state.isCloudLoading && displayedWallpapers.isEmpty) {
                       return const Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -402,7 +589,7 @@ class _WallazaCloudDiscoverySheetState
                     }
 
                     if (state.cloudErrorMessage != null &&
-                        state.cloudWallpapers.isEmpty) {
+                        displayedWallpapers.isEmpty) {
                       return Center(
                         child: Padding(
                           padding: const EdgeInsets.all(24),
@@ -439,7 +626,7 @@ class _WallazaCloudDiscoverySheetState
                       );
                     }
 
-                    if (state.cloudWallpapers.isEmpty) {
+                    if (displayedWallpapers.isEmpty) {
                       return Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -482,9 +669,9 @@ class _WallazaCloudDiscoverySheetState
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 12,
                       ),
-                      itemCount: state.cloudWallpapers.length,
+                      itemCount: displayedWallpapers.length,
                       itemBuilder: (context, index) {
-                        final item = state.cloudWallpapers[index];
+                        final item = displayedWallpapers[index];
                         return _CloudWallpaperCard(
                           item: item,
                           onTap: () => _showDetailSheet(item),
@@ -667,6 +854,27 @@ class _CloudWallpaperCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Row(
                       children: [
+                        Container(
+                          width: 14,
+                          height: 14,
+                          margin: const EdgeInsets.only(right: 5),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              item.authorInitials,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 7,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
                         Flexible(
                           child: Text(
                             item.authorName ?? item.category,
@@ -799,7 +1007,98 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
+
+          // Creator Profile Card
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF161624),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFF00E5FF).withAlpha(60)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF00E5FF), Color(0xFFD500F9)],
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      item.authorInitials,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              item.authorName ?? 'Wallaza Cloud Artist',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.verified_rounded,
+                              size: 14, color: Color(0xFF00E5FF)),
+                        ],
+                      ),
+                      Text(
+                        '@${item.authorUsername ?? "wallaza_artist"}',
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.art_track_rounded, size: 14),
+                  label: const Text('Filter Artist', style: TextStyle(fontSize: 11)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF00E5FF),
+                    side: const BorderSide(color: Color(0xFF00E5FF), width: 1.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    visualDensity: VisualDensity.compact,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    final author = item.authorUsername ?? item.authorName;
+                    if (author != null) {
+                      context.read<WallpaperBloc>().add(FilterCloudByAuthorIntent(author));
+                    }
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 14),
 
           // Specs Bar
           Row(

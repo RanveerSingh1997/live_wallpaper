@@ -110,12 +110,20 @@ class WallazaApiService {
           w.title.toLowerCase().contains(q) ||
           w.description.toLowerCase().contains(q) ||
           w.category.toLowerCase().contains(q) ||
+          (w.authorName?.toLowerCase().contains(q) ?? false) ||
+          (w.authorUsername?.toLowerCase().contains(q) ?? false) ||
           w.tags.any((t) => t.toLowerCase().contains(q));
 
-      final matchesRes = resolution == null ||
-          resolution.isEmpty ||
-          resolution == 'All' ||
-          w.resolution.contains(resolution);
+      final bool matchesRes;
+      if (resolution == null || resolution.isEmpty || resolution == 'All') {
+        matchesRes = true;
+      } else if (resolution == 'AMOLED') {
+        matchesRes = w.isAmoled;
+      } else if (resolution == '3840x2160' || resolution == '4K') {
+        matchesRes = w.is4K || w.resolution.contains('3840x2160');
+      } else {
+        matchesRes = w.resolution.contains(resolution);
+      }
 
       return matchesQuery && matchesRes;
     }).toList();
