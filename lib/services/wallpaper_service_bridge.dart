@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
+import '../core/core.dart';
 
 class WallpaperServiceBridge {
   static const MethodChannel _channel =
-      MethodChannel('com.example.live_wallpaper/wallpaper');
+      MethodChannel(AppConstants.wallpaperChannelName);
 
   /// Sets the native live wallpaper using the local MP4 file path.
   /// On Android: launches the WallpaperService chooser (Lock & Home screen).

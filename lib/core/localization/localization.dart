@@ -1,0 +1,7 @@
+export 'app_localizations.dart';
+export 'app_localizations_delegate.dart';
+export 'translations/app_translations.dart';
+export 'translations/app_translations_de.dart';
+export 'translations/app_translations_en.dart';
+export 'translations/app_translations_es.dart';
+export 'translations/app_translations_ja.dart';

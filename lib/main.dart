@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'blocs/wallpaper_bloc.dart';
 import 'blocs/wallpaper_intent.dart';
+import 'core/core.dart';
 import 'repositories/wallpaper_repository.dart';
 import 'screens/splash_screen.dart';
 
@@ -38,21 +40,16 @@ class LiveWallpaperApp extends StatelessWidget {
         ..add(LoadFeedIntent())
         ..add(CheckWallpaperStatusIntent()),
       child: MaterialApp(
-        title: 'Wallora',
+        title: AppConstants.appName,
         debugShowCheckedModeBanner: false,
-        theme: ThemeData.dark().copyWith(
-          scaffoldBackgroundColor: Colors.black,
-          colorScheme: const ColorScheme.dark(
-            primary: Color(0xFFFF5722),
-            secondary: Color(0xFFFFC107),
-            surface: Color(0xFF121214),
-          ),
-          textTheme: ThemeData.dark().textTheme.apply(
-                fontFamily: 'sans-serif',
-                bodyColor: Colors.white,
-                displayColor: Colors.white,
-              ),
-        ),
+        theme: AppTheme.darkTheme,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
         home: const SplashScreen(),
       ),
     );

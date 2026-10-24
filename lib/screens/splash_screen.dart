@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../core/core.dart';
 import 'main_navigation_shell.dart';
 
 /// Premium animated splash screen for Wallora.
@@ -18,7 +19,7 @@ class SplashScreen extends StatefulWidget {
 
   const SplashScreen({
     super.key,
-    this.duration = const Duration(milliseconds: 2200),
+    this.duration = AppConstants.splashDelay,
     this.nextScreen,
     this.onAnimationComplete,
   });
@@ -272,16 +273,16 @@ class _SplashScreenState extends State<SplashScreen>
                         opacity: _titleFadeAnimation.value,
                         child: SlideTransition(
                           position: _titleSlideAnimation,
-                          child: const Text(
-                            'WALLORA',
-                            style: TextStyle(
+                          child: Text(
+                            AppStrings.appName.toUpperCase(),
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 28,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 8.0,
                               shadows: [
                                 Shadow(
-                                  color: Color(0xFFFF5722),
+                                  color: AppColors.sunsetAmber,
                                   blurRadius: 18,
                                 ),
                               ],
@@ -308,14 +309,14 @@ class _SplashScreenState extends State<SplashScreen>
                               height: 1.5,
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Colors.transparent, Color(0xFFFF5722)],
+                                  colors: [Colors.transparent, AppColors.sunsetAmber],
                                 ),
                                 borderRadius: BorderRadius.circular(1),
                               ),
                             ),
                             const SizedBox(width: 8),
                             const Text(
-                              'Make every screen yours.',
+                              AppStrings.appTagline,
                               style: TextStyle(
                                 color: Colors.white70,
                                 fontSize: 13,

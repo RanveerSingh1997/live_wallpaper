@@ -15,6 +15,11 @@ live_wallpaper/
 ├── analysis_options.yaml            # Comprehensive Dart & Flutter linting rules
 ├── lib/                             # Wallora Flutter Client Core
 │   ├── blocs/                       # State Management (BLoC / UDF Pattern)
+│   ├── core/                        # Core Shared Infrastructure
+│   │   ├── constants/               # App constants, dimensions, strings & keys
+│   │   ├── localization/            # Multi-language translations (en, es, ja, de) & delegate
+│   │   ├── theme/                   # Obsidian palette, Aurora neon colors & ThemeData
+│   │   └── core.dart                # Master barrel export
 │   ├── data/                        # Static Curated Fallback Library & Presets
 │   ├── models/                      # Immutable Domain Models & Value Objects
 │   ├── repositories/                # Storage, Platform Bridges & Service Repository
@@ -23,6 +28,7 @@ live_wallpaper/
 │   └── widgets/                     # Atomic Reusable Visual Components
 ├── test/                            # Comprehensive Automated Test Suites
 │   ├── blocs/                       # BLoC Unit Tests (State Transitions & Intents)
+│   ├── core/                        # Constants, Theme & Localization Unit & Widget Tests
 │   ├── models/                      # Domain Model Serialization & Transformation Tests
 │   ├── repositories/                # Repository & Persistence Integration Tests
 │   └── widget_test.dart             # Golden & Interactive UI Widget Tests
@@ -77,6 +83,30 @@ flowchart LR
    - Feature screens (`DiscoverScreen`, `CategoriesScreen`, `FavoritesScreen`, `DownloadsScreen`).
    - Specialized modal studio sheets (`WallazaCloudDiscoverySheet`, `AuroraSynthesizerSheet`, `WeatherAtmosphereSheet`, `StandbyDockSheet`, `DataPortabilitySheet`).
    - Atomic widgets (`VideoPlayerItem`, `KineticQuoteOverlay`, `ShortsActionRail`).
+
+### 2.4 Core Infrastructure & Separation of Concerns (`lib/core/`)
+
+To prevent hardcoded literals, duplicated styling, and mixed presentation responsibilities, all foundational configurations are partitioned into dedicated core sub-packages:
+
+1. **`lib/core/constants/` (Single Source of Truth for Constants & Strings)**:
+   - **`AppConstants`**: Immutable metadata (App name, tagline, version, build number, platform channel identifiers, persistence keys, animation timings, rotation limits).
+   - **`AppDimensions`**: Standardized 4pt/8pt spacing units, EdgeInsets presets, corner border radii, and canonical icon sizes.
+   - **`AppStrings`**: Centralized UI copy, button labels, sheet headers, and default messages.
+   - **`constants.dart`**: Barrel export aggregating all constants.
+
+2. **`lib/core/theme/` (Color Palette & Dark Aurora System)**:
+   - **`AppColors`**: Obsidian black surfaces (`#000000`, `#101018`, `#161622`), fluid Aurora neon gradients (cyan `#00E5FF`, violet `#D500F9`, amber `#FF5722`, emerald `#00E676`), and semantic status colors.
+   - **`AppTheme`**: Centralized `ThemeData.darkTheme` definition with unified typography, switch styling, card styling, and dialog styling.
+   - **`theme.dart`**: Barrel export for design tokens and theme.
+
+3. **`lib/core/localization/` (Internationalization & Multi-Language Support)**:
+   - **`AppTranslations`**: Strongly-typed abstract contract defining all user-facing copy and parameterized string formatters.
+   - **Language Implementations**: English (`AppTranslationsEn`), Spanish (`AppTranslationsEs`), Japanese (`AppTranslationsJa`), and German (`AppTranslationsDe`).
+   - **`AppLocalizations`**: Context-aware accessor (`AppLocalizations.of(context)`) with automatic fallback to English for unsupported locales.
+   - **`AppLocalizationsDelegate`**: Flutter `LocalizationsDelegate` seamlessly integrating with `MaterialApp.localizationsDelegates` and `MaterialApp.supportedLocales`.
+   - **`localization.dart`**: Barrel export for internationalization.
+
+4. **`lib/core/core.dart`**: Master barrel export facilitating clean, single-import access across features.
 
 ---
 
