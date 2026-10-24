@@ -170,7 +170,7 @@ class CatalogRepositoryImpl implements CatalogRepository {
       effectConfig: effectConfig,
     );
 
-    if (Platform.isAndroid) {
+    if (AppPlatform.isAndroid) {
       final result = await bridge.setStaticWallpaper(
         filePath: file.path,
         targetScreen: targetScreen,
@@ -179,7 +179,7 @@ class CatalogRepositoryImpl implements CatalogRepository {
         await setActiveWallpaperId(short.id);
       }
       return result;
-    } else if (Platform.isIOS) {
+    } else if (AppPlatform.isIOS) {
       await bridge.shareVideo(file.path);
       return {'status': 'shared_ios', 'targetScreen': targetScreen};
     } else {

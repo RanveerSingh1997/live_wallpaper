@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../core/core.dart';
 import '../models/motivational_short.dart';
 
 class ShortsActionRail extends StatelessWidget {
@@ -65,7 +66,7 @@ class ShortsActionRail extends StatelessWidget {
           _buildActionButton(
             icon: isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
             label: isFavorite ? 'Saved' : 'Like',
-            accentColor: isFavorite ? const Color(0xFFFF1744) : Colors.white,
+            accentColor: isFavorite ? AppColors.favoriteRed : Colors.white,
             onTap: onToggleFavorite,
           ),
 
@@ -84,7 +85,7 @@ class ShortsActionRail extends StatelessWidget {
             _buildActionButton(
               icon: Icons.ios_share_rounded,
               label: 'Share',
-              accentColor: const Color(0xFF00B0FF),
+              accentColor: AppColors.electricBlue,
               onTap: onShare!,
             ),
           ],
@@ -112,14 +113,14 @@ class ShortsActionRail extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: LinearGradient(
                 colors: isCurrentActive
-                    ? [const Color(0xFF00E676), const Color(0xFF00B0FF)]
+                    ? [AppColors.auroraEmerald, AppColors.electricBlue]
                     : [short.accentColor, short.accentColor.withValues(alpha: 0.8)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: (isCurrentActive ? const Color(0xFF00E676) : short.accentColor)
+                  color: (isCurrentActive ? AppColors.auroraEmerald : short.accentColor)
                       .withValues(alpha: 0.5),
                   blurRadius: 16,
                   spreadRadius: 2,
@@ -150,7 +151,7 @@ class ShortsActionRail extends StatelessWidget {
               fontSize: 10,
               fontWeight: FontWeight.w900,
               letterSpacing: 1.0,
-              color: isCurrentActive ? const Color(0xFF00E676) : Colors.white,
+              color: isCurrentActive ? AppColors.auroraEmerald : Colors.white,
             ),
           ),
         ],
@@ -212,7 +213,7 @@ class ShortsActionRail extends StatelessWidget {
   void _showShortInfo(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF161618),
+      backgroundColor: AppColors.cardSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),

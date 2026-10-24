@@ -1,11 +1,11 @@
 {
-    "name": "live_wallpaper",
-    "short_name": "live_wallpaper",
+    "name": "Wallora — Make every screen yours.",
+    "short_name": "Wallora",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0A0A0E",
+    "theme_color": "#00E5FF",
+    "description": "Wallora — Make every screen yours. Dynamic live 4K wallpapers, sensory visualizer studios, and community showcase.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

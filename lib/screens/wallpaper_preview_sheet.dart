@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/motivational_short.dart';
 import '../widgets/video_player_item.dart';
 import 'add_to_collection_sheet.dart';
@@ -644,7 +644,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                   onPressed: () {
                                     HapticFeedback.mediumImpact();
                                     Navigator.of(context).pop();
-                                    if (Platform.isIOS) {
+                                    if (AppPlatform.isIOS) {
                                       IPadWallpaperDialog.show(context, wallpaper);
                                     } else if (wallpaper.isLive) {
                                       context.read<WallpaperBloc>().add(

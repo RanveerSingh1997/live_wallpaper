@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
+import '../core/core.dart';
 
 class VideoPlayerItem extends StatefulWidget {
   final String videoAssetPath;
@@ -46,10 +48,12 @@ class _VideoPlayerItemState extends State<VideoPlayerItem>
       final path = widget.videoAssetPath;
       if (path.startsWith('http://') || path.startsWith('https://')) {
         controller = VideoPlayerController.networkUrl(Uri.parse(path));
-      } else if (path.startsWith('/') || path.startsWith('file://')) {
+      } else if (!kIsWeb && (path.startsWith('/') || path.startsWith('file://'))) {
         final cleanPath =
             path.startsWith('file://') ? path.replaceFirst('file://', '') : path;
         controller = VideoPlayerController.file(File(cleanPath));
+      } else if (kIsWeb && (path.startsWith('/') || path.startsWith('file://'))) {
+        controller = VideoPlayerController.networkUrl(Uri.parse(path));
       } else {
         controller = VideoPlayerController.asset(path);
       }
@@ -162,7 +166,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem>
             )
           else if (_hasError)
             Container(
-              color: const Color(0xFF141416),
+              color: AppColors.darkSurface,
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -248,7 +252,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem>
                   ),
                   child: const Icon(
                     Icons.favorite_rounded,
-                    color: Color(0xFFFF1744),
+                    color: AppColors.favoriteRed,
                     size: 96,
                     shadows: [
                       Shadow(

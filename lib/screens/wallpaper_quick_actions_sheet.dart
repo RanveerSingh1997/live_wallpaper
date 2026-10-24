@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/motivational_short.dart';
 import 'add_to_collection_sheet.dart';
 import 'fullscreen_wallpaper_viewer.dart';
@@ -279,7 +279,7 @@ class WallpaperQuickActionsSheet extends StatelessWidget {
                   if (Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
                   }
-                  if (Platform.isIOS) {
+                  if (AppPlatform.isIOS) {
                     IPadWallpaperDialog.show(context, wallpaper);
                   } else if (wallpaper.isLive) {
                     context.read<WallpaperBloc>().add(

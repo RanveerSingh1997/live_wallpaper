@@ -1,4 +1,3 @@
-import 'dart:io';
 import '../core/core.dart';
 import '../models/wallaza_cloud_wallpaper.dart';
 
@@ -11,7 +10,6 @@ abstract class WallazaApiService {
   factory WallazaApiService({
     String? baseUrl,
     NetworkClient? networkClient,
-    HttpClient? httpClient,
     Duration timeout,
   }) = WallazaApiServiceImpl;
 
@@ -42,22 +40,16 @@ class WallazaApiServiceImpl implements WallazaApiService {
   WallazaApiServiceImpl({
     String? baseUrl,
     NetworkClient? networkClient,
-    HttpClient? httpClient,
     this.timeout = const Duration(seconds: 4),
   })  : baseUrl = baseUrl ?? _defaultBaseUrl(),
         _networkClient = networkClient ??
             HttpNetworkClient(
-              httpClient: httpClient,
               defaultTimeout: timeout,
             );
 
   static String _defaultBaseUrl() {
-    try {
-      if (Platform.isAndroid) {
-        return 'http://10.0.2.2:8080/api/v1/wallpapers';
-      }
-    } catch (_) {
-      // In web or non-standard environments
+    if (AppPlatform.isAndroid) {
+      return 'http://10.0.2.2:8080/api/v1/wallpapers';
     }
     return 'http://localhost:8080/api/v1/wallpapers';
   }

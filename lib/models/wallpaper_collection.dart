@@ -11,6 +11,48 @@ class WallpaperCollection extends Equatable {
   final List<Color> gradientColors;
   final bool isUserCreated;
 
+  /// Compile-time constant icons supported for collections to ensure tree-shaking
+  /// compatibility on Flutter Web, iOS, and Android.
+  static const List<IconData> supportedIcons = [
+    Icons.collections_bookmark_rounded,
+    Icons.electric_bolt_rounded,
+    Icons.local_fire_department_rounded,
+    Icons.auto_awesome_rounded,
+    Icons.dark_mode_rounded,
+    Icons.favorite_rounded,
+    Icons.palette_rounded,
+    Icons.speed_rounded,
+    Icons.landscape_rounded,
+    Icons.sports_mma_rounded,
+    Icons.wallpaper_rounded,
+    Icons.star_rounded,
+    Icons.movie_rounded,
+    Icons.music_note_rounded,
+    Icons.fitness_center_rounded,
+    Icons.lightbulb_rounded,
+    Icons.flag_rounded,
+    Icons.bolt_rounded,
+    Icons.wb_sunny_rounded,
+    Icons.nights_stay_rounded,
+    Icons.play_arrow_rounded,
+    Icons.queue_music_rounded,
+    Icons.explore_rounded,
+    Icons.photo_library_rounded,
+    Icons.diamond_rounded,
+    Icons.flare_rounded,
+    Icons.blur_on_rounded,
+  ];
+
+  static IconData iconFromCodePoint(int? codePoint) {
+    if (codePoint == null) return Icons.collections_bookmark_rounded;
+    for (final icon in supportedIcons) {
+      if (icon.codePoint == codePoint) {
+        return icon;
+      }
+    }
+    return Icons.collections_bookmark_rounded;
+  }
+
   const WallpaperCollection({
     required this.id,
     required this.title,
@@ -58,15 +100,13 @@ class WallpaperCollection extends Equatable {
   }
 
   factory WallpaperCollection.fromJson(Map<String, dynamic> json) {
-    final codePoint = json['iconCodePoint'] as int? ??
-        Icons.collections_bookmark_rounded.codePoint;
+    final codePoint = json['iconCodePoint'] as int?;
     return WallpaperCollection(
       id: json['id'] as String,
       title: json['title'] as String,
       subtitle: json['subtitle'] as String? ?? 'Custom Playlist',
       badge: json['badge'] as String? ?? 'PLAYLIST',
-      // ignore: non_const_argument_for_const_parameter
-      icon: IconData(codePoint, fontFamily: 'MaterialIcons'),
+      icon: iconFromCodePoint(codePoint),
       wallpaperIds: (json['wallpaperIds'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??

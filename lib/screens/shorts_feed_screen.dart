@@ -1,9 +1,9 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
 import '../widgets/interactive_gesture_canvas.dart';
@@ -90,10 +90,10 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 duration: const Duration(seconds: 5),
-                action: Platform.isIOS
+                action: AppPlatform.isIOS
                     ? SnackBarAction(
                         label: 'OPEN PHOTOS',
-                        textColor: const Color(0xFF00E676),
+                        textColor: AppColors.auroraEmerald,
                         onPressed: () {
                           context.read<WallpaperBloc>().add(OpenPhotosIntent());
                         },
@@ -274,7 +274,7 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                             isApplying: state.actionStatus == WallpaperActionStatus.applying &&
                                 isPageActive,
                             onApplyWallpaper: () {
-                              if (Platform.isIOS) {
+                              if (AppPlatform.isIOS) {
                                 IPadWallpaperDialog.show(context, short);
                               } else {
                                 context.read<WallpaperBloc>().add(

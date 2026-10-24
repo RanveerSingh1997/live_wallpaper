@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
 import '../widgets/interactive_particle_overlay.dart';
@@ -215,7 +215,7 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
   }
 
   void _applyWallpaper(MotivationalShort short, String target) {
-    if (Platform.isIOS) {
+    if (AppPlatform.isIOS) {
       IPadWallpaperDialog.show(context, short);
       return;
     }

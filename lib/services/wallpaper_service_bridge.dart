@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/services.dart';
 import '../core/core.dart';
 
@@ -45,7 +44,7 @@ class WallpaperServiceBridgeImpl implements WallpaperServiceBridge {
     required String videoPath,
     bool isMuted = true,
   }) async {
-    if (!Platform.isAndroid && !Platform.isIOS) {
+    if (!AppPlatform.isAndroid && !AppPlatform.isIOS) {
       return {
         'status': 'unsupported_platform',
         'isAlreadyActive': false,
@@ -77,7 +76,7 @@ class WallpaperServiceBridgeImpl implements WallpaperServiceBridge {
     required String filePath,
     String targetScreen = 'both',
   }) async {
-    if (!Platform.isAndroid) {
+    if (!AppPlatform.isAndroid) {
       return {
         'status': 'unsupported_platform',
         'message':
@@ -105,7 +104,7 @@ class WallpaperServiceBridgeImpl implements WallpaperServiceBridge {
 
   @override
   Future<void> shareVideo(String videoPath) async {
-    if (!Platform.isIOS) return;
+    if (!AppPlatform.isIOS) return;
     try {
       await _channel.invokeMethod('shareVideo', {'videoPath': videoPath});
     } catch (_) {}
@@ -113,7 +112,7 @@ class WallpaperServiceBridgeImpl implements WallpaperServiceBridge {
 
   @override
   Future<void> openPhotos() async {
-    if (!Platform.isIOS) return;
+    if (!AppPlatform.isIOS) return;
     try {
       await _channel.invokeMethod('openPhotos');
     } catch (_) {}
@@ -121,7 +120,7 @@ class WallpaperServiceBridgeImpl implements WallpaperServiceBridge {
 
   @override
   Future<bool> isWallpaperActive() async {
-    if (!Platform.isAndroid) return false;
+    if (!AppPlatform.isAndroid) return false;
     try {
       final bool? isActive =
           await _channel.invokeMethod<bool>('isWallpaperActive');
@@ -140,7 +139,7 @@ class WallpaperServiceBridgeImpl implements WallpaperServiceBridge {
 
   @override
   Future<void> openChooser() async {
-    if (!Platform.isAndroid) return;
+    if (!AppPlatform.isAndroid) return;
     try {
       await _channel.invokeMethod('openLiveWallpaperChooser');
     } catch (_) {}

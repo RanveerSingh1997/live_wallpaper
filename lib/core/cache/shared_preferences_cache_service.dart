@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'cache_entry.dart';
@@ -126,6 +127,7 @@ class SharedPreferencesCacheService implements LocalCacheService {
 
   @override
   Future<File?> saveFile(String fileName, List<int> bytes) async {
+    if (kIsWeb) return null;
     try {
       final dir = await getApplicationDocumentsDirectory();
       final file = File('${dir.path}/$fileName');
@@ -138,6 +140,7 @@ class SharedPreferencesCacheService implements LocalCacheService {
 
   @override
   Future<File?> getFile(String fileName) async {
+    if (kIsWeb) return null;
     try {
       final dir = await getApplicationDocumentsDirectory();
       final file = File('${dir.path}/$fileName');
@@ -152,6 +155,7 @@ class SharedPreferencesCacheService implements LocalCacheService {
 
   @override
   Future<bool> deleteFile(String fileName) async {
+    if (kIsWeb) return false;
     try {
       final dir = await getApplicationDocumentsDirectory();
       final file = File('${dir.path}/$fileName');
@@ -167,6 +171,7 @@ class SharedPreferencesCacheService implements LocalCacheService {
 
   @override
   Future<bool> fileExists(String fileName) async {
+    if (kIsWeb) return false;
     try {
       final dir = await getApplicationDocumentsDirectory();
       final file = File('${dir.path}/$fileName');
@@ -178,6 +183,7 @@ class SharedPreferencesCacheService implements LocalCacheService {
 
   @override
   Future<int> getCacheSizeInBytes() async {
+    if (kIsWeb) return 0;
     try {
       final dir = await getApplicationDocumentsDirectory();
       if (!await dir.exists()) return 0;
@@ -195,6 +201,7 @@ class SharedPreferencesCacheService implements LocalCacheService {
 
   @override
   Future<void> clearAllFiles() async {
+    if (kIsWeb) return;
     try {
       final dir = await getApplicationDocumentsDirectory();
       if (!await dir.exists()) return;
