@@ -106,7 +106,19 @@ To prevent hardcoded literals, duplicated styling, and mixed presentation respon
    - **`AppLocalizationsDelegate`**: Flutter `LocalizationsDelegate` seamlessly integrating with `MaterialApp.localizationsDelegates` and `MaterialApp.supportedLocales`.
    - **`localization.dart`**: Barrel export for internationalization.
 
-4. **`lib/core/core.dart`**: Master barrel export facilitating clean, single-import access across features.
+4. **`lib/core/network/` (Extensible Network Layer adhering to SOLID)**:
+   - **Single Responsibility (SRP)**:
+     - `NetworkRequest`: Immutable value object encapsulating HTTP method, endpoint URI, query parameters, payload body, headers, and metadata bag.
+     - `NetworkResponse<T>`: Type-safe response wrapper exposing status codes and helper predicates (`isSuccess`, `isClientError`, `isServerError`).
+     - `NetworkException`: Typed diagnostic hierarchy (`ConnectionNetworkException`, `TimeoutNetworkException`, `ServerNetworkException`, `ClientNetworkException`, `FormatNetworkException`).
+   - **Open/Closed (OCP)**:
+     - Pipeline hook `NetworkInterceptor` allows intercepting requests, responses, and errors without modifying underlying client code.
+     - Concrete pluggable interceptors: `HeaderInterceptor` (transparent header injection), `LoggingInterceptor` (diagnostic telemetry).
+   - **Dependency Inversion (DIP) & Liskov Substitution (LSP)**:
+     - `NetworkClient` abstract contract decouples high-level application services (`WallazaApiService`) from concrete transport implementations (`HttpNetworkClient` or `FakeNetworkClient`).
+   - **`network.dart`**: Barrel export for the network infrastructure.
+
+5. **`lib/core/core.dart`**: Master barrel export facilitating clean, single-import access across features.
 
 ---
 

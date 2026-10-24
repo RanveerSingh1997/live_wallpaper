@@ -1,20 +1,30 @@
-import 'dart:convert';
 import 'dart:io';
+import '../core/core.dart';
 import '../models/wallaza_cloud_wallpaper.dart';
 
-/// Client service communicating with the Wallaza Spring Boot REST proxy.
+/// Application API service communicating with the Wallaza Spring Boot REST proxy.
+/// Adheres to SOLID Principles:
+/// - Single Responsibility (SRP): Manages only Wallaza endpoint routing, DTO transformation, and offline fallback.
+/// - Dependency Inversion (DIP): Injects the abstract [NetworkClient] interface rather than low-level socket clients.
+/// - Open/Closed (OCP): Network behavior can be extended via interceptors without altering this service.
 class WallazaApiService {
   final String baseUrl;
-  final HttpClient _httpClient;
+  final NetworkClient _networkClient;
   final Duration timeout;
 
-  /// Default baseUrl resolves to 10.0.2.2 for Android emulators, and localhost for iOS/desktop.
+  /// Injects [NetworkClient] interface (Dependency Inversion).
+  /// Retains full backward compatibility with optional [httpClient] and [timeout].
   WallazaApiService({
     String? baseUrl,
+    NetworkClient? networkClient,
     HttpClient? httpClient,
     this.timeout = const Duration(seconds: 4),
   })  : baseUrl = baseUrl ?? _defaultBaseUrl(),
-        _httpClient = httpClient ?? HttpClient();
+        _networkClient = networkClient ??
+            HttpNetworkClient(
+              httpClient: httpClient,
+              defaultTimeout: timeout,
+            );
 
   static String _defaultBaseUrl() {
     try {
@@ -42,14 +52,14 @@ class WallazaApiService {
     }
 
     try {
-      final uri = Uri.parse(baseUrl).replace(queryParameters: queryParams);
-      final request = await _httpClient.getUrl(uri).timeout(timeout);
-      request.headers.set(HttpHeaders.acceptHeader, 'application/json');
+      final response = await _networkClient.get(
+        baseUrl,
+        queryParameters: queryParams,
+        timeout: timeout,
+      );
 
-      final response = await request.close().timeout(timeout);
-      if (response.statusCode == HttpStatus.ok) {
-        final body = await response.transform(utf8.decoder).join();
-        final json = jsonDecode(body) as Map<String, dynamic>;
+      if (response.isSuccess && response.data is Map<String, dynamic>) {
+        final json = response.data as Map<String, dynamic>;
         final data = json['data'] as List<dynamic>?;
         if (data != null) {
           return data
@@ -59,7 +69,7 @@ class WallazaApiService {
         }
       }
     } catch (_) {
-      // Fallback on timeout / connection refused
+      // Fallback on network failure / connection refused
     }
 
     // Curated offline library fallback
@@ -83,14 +93,14 @@ class WallazaApiService {
     }
 
     try {
-      final uri = Uri.parse('$baseUrl/search').replace(queryParameters: queryParams);
-      final request = await _httpClient.getUrl(uri).timeout(timeout);
-      request.headers.set(HttpHeaders.acceptHeader, 'application/json');
+      final response = await _networkClient.get(
+        '$baseUrl/search',
+        queryParameters: queryParams,
+        timeout: timeout,
+      );
 
-      final response = await request.close().timeout(timeout);
-      if (response.statusCode == HttpStatus.ok) {
-        final body = await response.transform(utf8.decoder).join();
-        final json = jsonDecode(body) as Map<String, dynamic>;
+      if (response.isSuccess && response.data is Map<String, dynamic>) {
+        final json = response.data as Map<String, dynamic>;
         final data = json['data'] as List<dynamic>?;
         if (data != null) {
           return data
@@ -100,7 +110,7 @@ class WallazaApiService {
         }
       }
     } catch (_) {
-      // Fallback on timeout / connection refused
+      // Fallback on network failure / connection refused
     }
 
     // Curated offline keyword search fallback
@@ -132,18 +142,17 @@ class WallazaApiService {
   /// Fetches individual wallpaper specifications by ID.
   Future<WallazaCloudWallpaper?> getWallpaperById(String id) async {
     try {
-      final uri = Uri.parse('$baseUrl/$id');
-      final request = await _httpClient.getUrl(uri).timeout(timeout);
-      request.headers.set(HttpHeaders.acceptHeader, 'application/json');
+      final response = await _networkClient.get(
+        '$baseUrl/$id',
+        timeout: timeout,
+      );
 
-      final response = await request.close().timeout(timeout);
-      if (response.statusCode == HttpStatus.ok) {
-        final body = await response.transform(utf8.decoder).join();
-        final json = jsonDecode(body) as Map<String, dynamic>;
+      if (response.isSuccess && response.data is Map<String, dynamic>) {
+        final json = response.data as Map<String, dynamic>;
         return WallazaCloudWallpaper.fromJson(json);
       }
     } catch (_) {
-      // Fallback on timeout / connection refused
+      // Fallback on network failure / connection refused
     }
 
     // Curated offline library fallback
@@ -159,18 +168,13 @@ class WallazaApiService {
   /// Downloads raw high-resolution wallpaper binary bytes from the Wallaza API proxy.
   Future<List<int>?> downloadWallpaperBytes(String id) async {
     try {
-      final uri = Uri.parse('$baseUrl/$id/download');
-      final request = await _httpClient.getUrl(uri).timeout(timeout);
-      final response = await request.close().timeout(timeout);
-      if (response.statusCode == HttpStatus.ok) {
-        final List<int> bytes = [];
-        await for (final chunk in response) {
-          bytes.addAll(chunk);
-        }
-        return bytes;
-      }
+      final bytes = await _networkClient.downloadBytes(
+        '$baseUrl/$id/download',
+        timeout: timeout,
+      );
+      return bytes;
     } catch (_) {
-      // Fallback on timeout / connection refused
+      // Fallback on network failure / connection refused
     }
     return null;
   }
