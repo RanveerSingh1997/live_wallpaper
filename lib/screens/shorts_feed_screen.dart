@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
@@ -503,23 +504,42 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
 
                               return GestureDetector(
                                 onTap: () {
+                                  HapticFeedback.selectionClick();
                                   context.read<WallpaperBloc>().add(FilterByCategoryIntent(category));
                                   if (_pageController.hasClients) {
                                     _pageController.jumpToPage(0);
                                   }
                                 },
-                                child: Container(
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
                                   padding: const EdgeInsets.symmetric(horizontal: 14),
                                   decoration: BoxDecoration(
+                                    gradient: isSelected
+                                        ? const LinearGradient(
+                                            colors: [AppColors.neonCyan, AppColors.auroraViolet],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          )
+                                        : null,
                                     color: isSelected
-                                        ? Colors.white
-                                        : Colors.black.withValues(alpha: 0.45),
+                                        ? null
+                                        : Colors.black.withValues(alpha: 0.5),
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
                                       color: isSelected
-                                          ? Colors.white
-                                          : Colors.white.withValues(alpha: 0.25),
+                                          ? AppColors.neonCyan
+                                          : Colors.white.withValues(alpha: 0.2),
+                                      width: isSelected ? 1.2 : 1.0,
                                     ),
+                                    boxShadow: isSelected
+                                        ? [
+                                            BoxShadow(
+                                              color: AppColors.neonCyan.withValues(alpha: 0.35),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ]
+                                        : null,
                                   ),
                                   alignment: Alignment.center,
                                   child: Text(
@@ -528,7 +548,8 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                                       fontSize: 12,
                                       fontWeight:
                                           isSelected ? FontWeight.w800 : FontWeight.w600,
-                                      color: isSelected ? Colors.black : Colors.white,
+                                      color: Colors.white,
+                                      letterSpacing: 0.3,
                                     ),
                                   ),
                                 ),

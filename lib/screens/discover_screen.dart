@@ -415,16 +415,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             }
                           },
                           backgroundColor: AppColors.cardSurface,
-                          selectedColor: AppColors.sunsetAmber,
+                          selectedColor: AppColors.neonCyan.withValues(alpha: 0.2),
                           labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : Colors.white70,
+                            color: isSelected ? AppColors.neonCyan : Colors.white70,
                             fontSize: 12,
                             fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                             side: BorderSide(
-                              color: isSelected ? AppColors.sunsetAmber : Colors.white10,
+                              color: isSelected ? AppColors.neonCyan : Colors.white10,
+                              width: isSelected ? 1.2 : 1.0,
                             ),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
@@ -1202,7 +1203,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          border: Border.all(color: Colors.white12),
+          border: Border.all(
+            color: featured.accentColor.withValues(alpha: 0.35),
+            width: 1.2,
+          ),
           boxShadow: [
             BoxShadow(
               color: featured.accentColor.withValues(alpha: 0.25),
@@ -1339,7 +1343,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
-          border: Border.all(color: Colors.white12),
+          border: Border.all(
+            color: item.accentColor.withValues(alpha: 0.35),
+            width: 1.2,
+          ),
         ),
         child: Stack(
           children: [
@@ -1447,7 +1454,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                border: Border.all(color: Colors.white12),
+                border: Border.all(
+                  color: item.accentColor.withValues(alpha: 0.35),
+                  width: 1.2,
+                ),
               ),
               child: Stack(
                 children: [
@@ -1656,7 +1666,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          border: Border.all(color: Colors.white12),
+          border: Border.all(
+            color: col.gradientColors[0].withValues(alpha: 0.35),
+            width: 1.2,
+          ),
           boxShadow: [
             BoxShadow(
               color: col.gradientColors[1].withValues(alpha: 0.25),
