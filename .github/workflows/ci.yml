@@ -45,7 +45,7 @@ jobs:
       - name: Verify Zero Lint Issues (flutter analyze)
         run: flutter analyze --fatal-infos --fatal-warnings
 
-      - name: Run Flutter Test Suite (382+ Tests)
+      - name: Run Flutter Test Suite (388+ Tests & Goldens)
         run: flutter test --reporter=expanded
 
       - name: Verify Android Production APK Release Build
