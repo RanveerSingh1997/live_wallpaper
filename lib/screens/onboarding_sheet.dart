@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../data/curated_shorts_data.dart';
 
 class OnboardingSheet extends StatefulWidget {
@@ -67,7 +68,9 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
                 : _selectedPreferences,
           ),
         );
-    Navigator.of(context).pop();
+    if (mounted && Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -77,7 +80,7 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
         return Container(
           height: MediaQuery.of(context).size.height * 0.88,
           decoration: const BoxDecoration(
-            color: Color(0xFF101014),
+            color: AppColors.darkSurface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
             boxShadow: [
               BoxShadow(
@@ -137,7 +140,7 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
                           decoration: BoxDecoration(
                             gradient: isSelected
                                 ? const LinearGradient(
-                                    colors: [Color(0xFFFF5722), Color(0xFFD500F9)],
+                                    colors: [AppColors.sunsetAmber, AppColors.auroraViolet],
                                   )
                                 : null,
                             color: isSelected ? null : Colors.white24,
@@ -170,7 +173,7 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
                         ElevatedButton(
                           onPressed: _nextPage,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFF5722),
+                            backgroundColor: AppColors.sunsetAmber,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             shape: RoundedRectangleBorder(
@@ -210,14 +213,14 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
             height: 84,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFFFF5722), Color(0xFFD500F9), Color(0xFF00E5FF)],
+                colors: [AppColors.sunsetAmber, AppColors.auroraViolet, AppColors.neonCyan],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(26),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFF5722).withValues(alpha: 0.35),
+                  color: AppColors.sunsetAmber.withValues(alpha: 0.35),
                   blurRadius: 28,
                   offset: const Offset(0, 10),
                 ),
@@ -246,7 +249,7 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Color(0xFFFF8A65),
+              color: AppColors.sunsetAmber,
               letterSpacing: 0.4,
             ),
           ),
@@ -265,21 +268,21 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
           // Feature Pillars
           _buildPillarTile(
             icon: Icons.play_circle_fill_rounded,
-            iconColor: const Color(0xFFFF5722),
+            iconColor: AppColors.sunsetAmber,
             title: 'Cinematic Live Wallpapers',
             subtitle: 'Ultra-smooth 60fps vertical shorts with zero battery drain on sleep.',
           ),
           const SizedBox(height: 12),
           _buildPillarTile(
             icon: Icons.wallpaper_rounded,
-            iconColor: const Color(0xFF00E5FF),
+            iconColor: AppColors.neonCyan,
             title: '4K AMOLED Backgrounds',
             subtitle: 'Ultra-deep obsidian blacks and high-contrast visuals for OLED displays.',
           ),
           const SizedBox(height: 12),
           _buildPillarTile(
             icon: Icons.format_quote_rounded,
-            iconColor: const Color(0xFFD500F9),
+            iconColor: AppColors.auroraViolet,
             title: 'Kinetic Quote Studio',
             subtitle: 'Personalize quotes, typography, and daily affirmations on any wallpaper.',
           ),
@@ -336,9 +339,9 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
                     }
                   });
                 },
-                backgroundColor: const Color(0xFF1C1C22),
-                selectedColor: const Color(0xFFFF5722).withValues(alpha: 0.25),
-                checkmarkColor: const Color(0xFFFF5722),
+                backgroundColor: AppColors.cardSurface,
+                selectedColor: AppColors.sunsetAmber.withValues(alpha: 0.25),
+                checkmarkColor: AppColors.sunsetAmber,
                 labelStyle: TextStyle(
                   color: isSelected ? Colors.white : Colors.white70,
                   fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
@@ -347,7 +350,7 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                   side: BorderSide(
-                    color: isSelected ? const Color(0xFFFF5722) : Colors.white12,
+                    color: isSelected ? AppColors.sunsetAmber : Colors.white12,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -360,13 +363,13 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFF18181E),
+              color: AppColors.cardSurface,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: Colors.white10),
             ),
             child: Row(
               children: [
-                const Icon(Icons.tune_rounded, color: Color(0xFF00E5FF), size: 22),
+                const Icon(Icons.tune_rounded, color: AppColors.neonCyan, size: 22),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -409,7 +412,7 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
 
           _buildTrustCard(
             icon: Icons.battery_charging_full_rounded,
-            color: const Color(0xFF00E676),
+            color: AppColors.auroraEmerald,
             title: 'Zero Battery Sleep Drain',
             description:
                 'The Android live engine actively pauses video decoders whenever your screen turns off or another app is open.',
@@ -417,7 +420,7 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
           const SizedBox(height: 12),
           _buildTrustCard(
             icon: Icons.lock_outline_rounded,
-            color: const Color(0xFF00E5FF),
+            color: AppColors.neonCyan,
             title: '100% Private & Local',
             description:
                 'No tracking, no invasive telemetry. Your favorites, offline downloads, and custom quotes remain strictly on your device.',
@@ -425,7 +428,7 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
           const SizedBox(height: 12),
           _buildTrustCard(
             icon: Icons.speed_rounded,
-            color: const Color(0xFFFF5722),
+            color: AppColors.sunsetAmber,
             title: 'Native Hardware Engine',
             description:
                 'Hardware-accelerated media decoders deliver crisp 60fps playback without device stutter or memory pressure.',
@@ -444,7 +447,7 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF16161B),
+        color: AppColors.modalBackground,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
@@ -497,7 +500,7 @@ class _OnboardingSheetState extends State<OnboardingSheet> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF16161B),
+        color: AppColors.modalBackground,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),

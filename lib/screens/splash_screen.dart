@@ -143,7 +143,7 @@ class _SplashScreenState extends State<SplashScreen>
         _navigateToNext();
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF09090C),
+        backgroundColor: AppColors.darkBackground,
         body: Stack(
           children: [
             // Ambient Aurora Radial Glow
@@ -158,13 +158,13 @@ class _SplashScreenState extends State<SplashScreen>
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
                         colors: [
-                          const Color(0xFF7C4DFF).withValues(
+                          AppColors.deepPurple.withValues(
                             alpha: 0.22 * _auraPulseAnimation.value,
                           ),
-                          const Color(0xFFFF5722).withValues(
+                          AppColors.sunsetAmber.withValues(
                             alpha: 0.14 * _auraPulseAnimation.value,
                           ),
-                          const Color(0xFF00E5FF).withValues(
+                          AppColors.neonCyan.withValues(
                             alpha: 0.08 * _auraPulseAnimation.value,
                           ),
                           Colors.transparent,
@@ -218,13 +218,13 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFFFF5722).withValues(alpha: 0.35),
+                                  color: AppColors.sunsetAmber.withValues(alpha: 0.35),
                                   blurRadius: 36,
                                   spreadRadius: 2,
                                   offset: const Offset(0, 10),
                                 ),
                                 BoxShadow(
-                                  color: const Color(0xFF7C4DFF).withValues(alpha: 0.25),
+                                  color: AppColors.deepPurple.withValues(alpha: 0.25),
                                   blurRadius: 24,
                                   spreadRadius: -2,
                                   offset: const Offset(0, -6),
@@ -241,7 +241,7 @@ class _SplashScreenState extends State<SplashScreen>
                                   return Container(
                                     decoration: const BoxDecoration(
                                       gradient: LinearGradient(
-                                        colors: [Color(0xFF2A0D00), Color(0xFFFF5722), Color(0xFF7C4DFF)],
+                                        colors: [AppColors.darkSurface, AppColors.sunsetAmber, AppColors.deepPurple],
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                       ),
@@ -330,7 +330,7 @@ class _SplashScreenState extends State<SplashScreen>
                               height: 1.5,
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFFFF5722), Colors.transparent],
+                                  colors: [AppColors.sunsetAmber, Colors.transparent],
                                 ),
                                 borderRadius: BorderRadius.circular(1),
                               ),
@@ -369,7 +369,7 @@ class _SplashScreenState extends State<SplashScreen>
                               child: const LinearProgressIndicator(
                                 backgroundColor: Colors.transparent,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Color(0xFFFF5722),
+                                  AppColors.sunsetAmber,
                                 ),
                               ),
                             ),
