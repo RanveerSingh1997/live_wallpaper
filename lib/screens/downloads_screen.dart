@@ -40,12 +40,18 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
+            onPressed: () {
+              if (mounted && Navigator.of(ctx).canPop()) {
+                Navigator.of(ctx).pop();
+              }
+            },
             child: const Text('CANCEL', style: TextStyle(color: Colors.white54)),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(ctx).pop();
+              if (mounted && Navigator.of(ctx).canPop()) {
+                Navigator.of(ctx).pop();
+              }
               context.read<WallpaperBloc>().add(ClearAllDownloadsIntent());
             },
             style: ElevatedButton.styleFrom(
@@ -448,9 +454,9 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         }
       },
       backgroundColor: AppColors.cardBackground,
-      selectedColor: AppColors.cyberEmerald,
+      selectedColor: AppColors.cyberEmerald.withValues(alpha: 0.2),
       labelStyle: TextStyle(
-        color: isSelected ? Colors.black : Colors.white70,
+        color: isSelected ? AppColors.cyberEmerald : Colors.white70,
         fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
         fontSize: 12,
       ),
@@ -458,6 +464,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
           color: isSelected ? AppColors.cyberEmerald : Colors.white12,
+          width: isSelected ? 1.2 : 1.0,
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),

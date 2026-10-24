@@ -82,9 +82,15 @@ class WallpaperPreviewSheet extends StatelessWidget {
           maxChildSize: 0.95,
           builder: (context, scrollController) {
             return Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.modalBackground,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                border: Border(
+                  top: BorderSide(
+                    color: wallpaper.accentColor.withValues(alpha: 0.35),
+                    width: 1.2,
+                  ),
+                ),
               ),
               child: ListView(
                 controller: scrollController,

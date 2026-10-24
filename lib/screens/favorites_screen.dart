@@ -298,9 +298,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         }
       },
       backgroundColor: AppColors.cardBackground,
-      selectedColor: AppColors.favoriteRed,
+      selectedColor: AppColors.favoriteRed.withValues(alpha: 0.2),
       labelStyle: TextStyle(
-        color: isSelected ? Colors.white : Colors.white70,
+        color: isSelected ? AppColors.favoriteRed : Colors.white70,
         fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
         fontSize: 12,
       ),
@@ -308,6 +308,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
           color: isSelected ? AppColors.favoriteRed : Colors.white12,
+          width: isSelected ? 1.2 : 1.0,
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),

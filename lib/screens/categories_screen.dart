@@ -130,7 +130,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             elevation: 0,
             title: Row(
               children: [
-                const Icon(Icons.grid_view_rounded, color: AppColors.sunsetAmber, size: 20),
+                const Icon(Icons.grid_view_rounded, color: AppColors.neonCyan, size: 20),
                 const SizedBox(width: 8),
                 const Text(
                   'CATEGORIES',
@@ -177,10 +177,23 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             decoration: BoxDecoration(
-                              color: _selectedTabIndex == 0
-                                  ? AppColors.sunsetAmber
-                                  : Colors.transparent,
+                              gradient: _selectedTabIndex == 0
+                                  ? const LinearGradient(
+                                      colors: [AppColors.neonCyan, AppColors.auroraViolet],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    )
+                                  : null,
                               borderRadius: BorderRadius.circular(9),
+                              boxShadow: _selectedTabIndex == 0
+                                  ? [
+                                      BoxShadow(
+                                        color: AppColors.neonCyan.withValues(alpha: 0.35),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : null,
                             ),
                             alignment: Alignment.center,
                             child: Text(
@@ -190,7 +203,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 0.6,
                                 color: _selectedTabIndex == 0
-                                    ? Colors.black
+                                    ? Colors.white
                                     : Colors.white60,
                               ),
                             ),
@@ -206,10 +219,23 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             decoration: BoxDecoration(
-                              color: _selectedTabIndex == 1
-                                  ? AppColors.neonCyan
-                                  : Colors.transparent,
+                              gradient: _selectedTabIndex == 1
+                                  ? const LinearGradient(
+                                      colors: [AppColors.auroraViolet, AppColors.neonCyan],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    )
+                                  : null,
                               borderRadius: BorderRadius.circular(9),
+                              boxShadow: _selectedTabIndex == 1
+                                  ? [
+                                      BoxShadow(
+                                        color: AppColors.auroraViolet.withValues(alpha: 0.35),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : null,
                             ),
                             alignment: Alignment.center,
                             child: Text(
@@ -219,7 +245,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 0.6,
                                 color: _selectedTabIndex == 1
-                                    ? Colors.black
+                                    ? Colors.white
                                     : Colors.white60,
                               ),
                             ),
@@ -270,11 +296,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               decoration: BoxDecoration(
                 color: AppColors.cardSurface,
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: color.withValues(alpha: 0.25)),
+                border: Border.all(
+                  color: color.withValues(alpha: 0.35),
+                  width: 1.2,
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: color.withValues(alpha: 0.08),
-                    blurRadius: 10,
+                    color: color.withValues(alpha: 0.16),
+                    blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
                 ],
@@ -556,7 +585,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          border: Border.all(color: Colors.white12),
+          border: Border.all(
+            color: col.gradientColors.first.withValues(alpha: 0.35),
+            width: 1.2,
+          ),
           boxShadow: [
             BoxShadow(
               color: col.gradientColors.first.withValues(alpha: 0.25),
@@ -653,9 +685,15 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           maxChildSize: 0.95,
           builder: (ctx, scrollController) {
             return Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.modalBackground,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                border: Border(
+                  top: BorderSide(
+                    color: color.withValues(alpha: 0.35),
+                    width: 1.2,
+                  ),
+                ),
               ),
               child: Column(
                 children: [
@@ -729,7 +767,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                               ),
-                              border: Border.all(color: Colors.white12),
+                              border: Border.all(
+                                color: item.accentColor.withValues(alpha: 0.35),
+                                width: 1.2,
+                              ),
                             ),
                             padding: const EdgeInsets.all(12),
                             child: Column(
