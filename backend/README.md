@@ -179,3 +179,47 @@ docker run -d --name wallaza-service \
   wallaza-service:latest
 ```
 
+---
+
+## ☸️ Kubernetes (K8s) Production Deployment
+
+Production-grade manifests are maintained under `backend/k8s/`:
+- **Rolling Updates**: Zero-downtime rollouts (`maxSurge: 1`, `maxUnavailable: 0`).
+- **Autoscaling (HPA)**: Automatically scales from 2 to 10 pods based on CPU (75%) and memory (80%).
+- **Security Hardened**: Non-root container (`runAsUser: 1000`), drops all Linux capabilities.
+- **Health Probes**: Integrated with Spring Boot Actuator `/actuator/health/liveness` and `/actuator/health/readiness`.
+
+```bash
+# 1. Create Namespace & Secrets
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/secret.yaml.example # Copy to secret.yaml with real base64 key first
+
+# 2. Apply Config, Deployments, Services & Ingress
+kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+kubectl apply -f k8s/hpa.yaml
+kubectl apply -f k8s/ingress.yaml
+
+# 3. Verify Deployment
+kubectl get pods -n wallora
+kubectl get hpa -n wallora
+```
+
+---
+
+## ☁️ Serverless Cloud Deployments
+
+### Google Cloud Run
+Declarative service specification provided in `backend/deploy/cloudrun-service.yaml`:
+```bash
+gcloud run services replace deploy/cloudrun-service.yaml --region=us-central1
+```
+
+### AWS ECS Fargate
+Task definition with CloudWatch logging and Secrets Manager integration provided in `backend/deploy/ecs-task-definition.json`:
+```bash
+aws ecs register-task-definition --cli-input-json file://deploy/ecs-task-definition.json
+```
+
+

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wallora
+  labels:
+    app.kubernetes.io/name: wallora
+    app.kubernetes.io/part-of: wallora-platform
