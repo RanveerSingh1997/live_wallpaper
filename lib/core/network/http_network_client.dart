@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'interceptors/header_interceptor.dart';
 import 'interceptors/network_interceptor.dart';
 import 'network_client.dart';
@@ -8,29 +8,30 @@ import 'network_exception.dart';
 import 'network_request.dart';
 import 'network_response.dart';
 
-/// Concrete [NetworkClient] implemented via [HttpClient] and an extensible [NetworkInterceptor] pipeline.
-/// Adheres to SOLID:
+/// Concrete [NetworkClient] implemented via [http.Client] and an extensible [NetworkInterceptor] pipeline.
+/// Adheres strictly to SOLID Principles:
 /// - Single Responsibility (SRP): Manages only HTTP transport execution and interceptor lifecycle.
 /// - Open/Closed (OCP): Pipeline can be extended indefinitely via [addInterceptor].
 /// - Liskov Substitution (LSP): Fully interchangeable with any [NetworkClient] mock or proxy.
 /// - Interface Segregation (ISP): Exposes granular request helpers and pipeline hooks.
 /// - Dependency Inversion (DIP): Injected wherever network access is needed.
+/// - Cross-Platform: Runs seamlessly across Android, iOS, Web, macOS, Windows, and Linux.
 class HttpNetworkClient implements NetworkClient {
-  final HttpClient _httpClient;
+  final http.Client _client;
   final Duration defaultTimeout;
   final List<NetworkInterceptor> _interceptors = [];
 
   HttpNetworkClient({
-    HttpClient? httpClient,
+    http.Client? client,
     this.defaultTimeout = const Duration(seconds: 5),
     List<NetworkInterceptor>? interceptors,
     Map<String, String>? defaultHeaders,
-  }) : _httpClient = httpClient ?? HttpClient() {
+  }) : _client = client ?? http.Client() {
     // Register default header injector interceptor if headers provided or default
     final headers = defaultHeaders ??
         const {
-          HttpHeaders.acceptHeader: 'application/json',
-          HttpHeaders.contentTypeHeader: 'application/json; charset=utf-8',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=utf-8',
           'User-Agent': 'Wallora-Flutter-Client/1.0',
         };
     _interceptors.add(HeaderInterceptor(headers));
@@ -63,30 +64,25 @@ class HttpNetworkClient implements NetworkClient {
 
     try {
       final uri = _buildUri(currentRequest.path, currentRequest.queryParameters);
-      final httpRequest = await _httpClient
-          .openUrl(currentRequest.method.value, uri)
-          .timeout(effectiveTimeout);
+      final httpRequest = http.Request(currentRequest.method.value, uri);
 
       // Apply request headers
       currentRequest.headers.forEach((key, value) {
-        httpRequest.headers.set(key, value);
+        httpRequest.headers[key] = value;
       });
 
       // Write body if present
       if (currentRequest.body != null) {
         final dynamic raw = currentRequest.body;
         final encodedBody = raw is String ? raw : jsonEncode(raw);
-        httpRequest.write(encodedBody);
+        httpRequest.body = encodedBody;
       }
 
-      final httpResponse = await httpRequest.close().timeout(effectiveTimeout);
+      final streamedResponse = await _client.send(httpRequest).timeout(effectiveTimeout);
+      final httpResponse = await http.Response.fromStream(streamedResponse);
 
-      final responseHeaders = <String, String>{};
-      httpResponse.headers.forEach((name, values) {
-        responseHeaders[name] = values.join(', ');
-      });
-
-      final rawBody = await httpResponse.transform(utf8.decoder).join();
+      final responseHeaders = httpResponse.headers;
+      final rawBody = httpResponse.body;
       dynamic decodedData;
       if (rawBody.isNotEmpty) {
         try {
@@ -116,9 +112,9 @@ class HttpNetworkClient implements NetworkClient {
       );
       await _notifyError(currentRequest, error);
       throw error;
-    } on SocketException catch (e) {
+    } on http.ClientException catch (e) {
       final error = ConnectionNetworkException(
-        'Connection failed for ${currentRequest.method.value} ${currentRequest.path}',
+        'Connection failed for ${currentRequest.method.value} ${currentRequest.path}: ${e.message}',
         cause: e,
       );
       await _notifyError(currentRequest, error);
@@ -230,31 +226,20 @@ class HttpNetworkClient implements NetworkClient {
 
     try {
       final uri = _buildUri(path, queryParameters);
-      final request = await _httpClient.getUrl(uri).timeout(effectiveTimeout);
-
-      headers?.forEach((key, value) {
-        request.headers.set(key, value);
-      });
-
-      final response = await request.close().timeout(effectiveTimeout);
+      final response = await _client.get(uri, headers: headers).timeout(effectiveTimeout);
       if (response.statusCode >= 400) {
         final error = response.statusCode >= 500
-            ? ServerNetworkException(response.reasonPhrase,
+            ? ServerNetworkException(response.reasonPhrase ?? 'Server error',
                 statusCode: response.statusCode)
-            : ClientNetworkException(response.reasonPhrase,
+            : ClientNetworkException(response.reasonPhrase ?? 'Client error',
                 statusCode: response.statusCode);
         throw error;
       }
-
-      final List<int> bytes = [];
-      await for (final chunk in response) {
-        bytes.addAll(chunk);
-      }
-      return bytes;
+      return response.bodyBytes;
     } on TimeoutException catch (e) {
       throw TimeoutNetworkException('Download timed out: $path', cause: e);
-    } on SocketException catch (e) {
-      throw ConnectionNetworkException('Download connection failed: $path',
+    } on http.ClientException catch (e) {
+      throw ConnectionNetworkException('Download connection failed: $path: ${e.message}',
           cause: e);
     } on NetworkException {
       rethrow;
@@ -265,7 +250,7 @@ class HttpNetworkClient implements NetworkClient {
 
   @override
   void close({bool force = false}) {
-    _httpClient.close(force: force);
+    _client.close();
   }
 
   Future<void> _notifyError(

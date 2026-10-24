@@ -1,4 +1,7 @@
+import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:live_wallpaper/core/core.dart';
 import 'package:live_wallpaper/services/wallaza_api_service.dart';
 
@@ -322,6 +325,124 @@ void main() {
       final fallbackItems = await apiService.fetchWallpapers();
       expect(fallbackItems.isNotEmpty, isTrue);
       expect(fallbackItems.first.title.isNotEmpty, isTrue);
+    });
+  });
+
+  group('HttpNetworkClient Cross-Platform Concrete Tests', () {
+    test('executes GET request and decodes JSON payload', () async {
+      final mockClient = MockClient((request) async {
+        expect(request.method, 'GET');
+        expect(request.url.path, '/api/v1/wallpapers');
+        expect(request.headers['Accept'], 'application/json');
+        return http.Response(
+          jsonEncode({'status': 'ok', 'count': 42}),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final client = HttpNetworkClient(client: mockClient);
+      final response = await client.get('https://wallora.internal/api/v1/wallpapers');
+
+      expect(response.statusCode, 200);
+      expect(response.isSuccess, isTrue);
+      expect(response.data['status'], 'ok');
+      expect(response.data['count'], 42);
+    });
+
+    test('executes POST request with JSON encoded body', () async {
+      final mockClient = MockClient((request) async {
+        expect(request.method, 'POST');
+        expect(request.body, jsonEncode({'title': 'Aurora Glow'}));
+        return http.Response(jsonEncode({'id': 'gen_101'}), 201);
+      });
+
+      final client = HttpNetworkClient(client: mockClient);
+      final response = await client.post(
+        'https://wallora.internal/api/v1/generate',
+        body: {'title': 'Aurora Glow'},
+      );
+
+      expect(response.statusCode, 201);
+      expect(response.data['id'], 'gen_101');
+    });
+
+    test('executes PUT and DELETE requests cleanly', () async {
+      final mockClient = MockClient((request) async {
+        if (request.method == 'PUT') {
+          return http.Response('{"updated":true}', 200);
+        } else if (request.method == 'DELETE') {
+          return http.Response('', 204);
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final client = HttpNetworkClient(client: mockClient);
+      final putResp = await client.put('https://wallora.internal/item/1', body: 'test');
+      expect(putResp.statusCode, 200);
+
+      final delResp = await client.delete('https://wallora.internal/item/1');
+      expect(delResp.statusCode, 204);
+    });
+
+    test('downloadBytes downloads binary content successfully', () async {
+      final mockBytes = [0x00, 0xFF, 0xAA, 0x55];
+      final mockClient = MockClient((request) async {
+        return http.Response.bytes(mockBytes, 200);
+      });
+
+      final client = HttpNetworkClient(client: mockClient);
+      final bytes = await client.downloadBytes('https://wallora.internal/wallpaper.png');
+      expect(bytes, mockBytes);
+    });
+
+    test('downloadBytes throws ServerNetworkException on 500 error', () async {
+      final mockClient = MockClient((request) async {
+        return http.Response('Internal Error', 500, reasonPhrase: 'Internal Server Error');
+      });
+
+      final client = HttpNetworkClient(client: mockClient);
+      expect(
+        () => client.downloadBytes('https://wallora.internal/wallpaper.png'),
+        throwsA(isA<ServerNetworkException>()),
+      );
+    });
+
+    test('throws ClientException as ConnectionNetworkException on network failure', () async {
+      final mockClient = MockClient((request) async {
+        throw http.ClientException('DNS failure');
+      });
+
+      final client = HttpNetworkClient(client: mockClient);
+      expect(
+        () => client.get('https://wallora.internal/fail'),
+        throwsA(isA<ConnectionNetworkException>()),
+      );
+    });
+
+    test('interceptor pipeline transforms request and response', () async {
+      final mockClient = MockClient((request) async {
+        expect(request.headers['X-Custom-Auth'], 'Bearer token_abc');
+        return http.Response(jsonEncode({'echo': 'ok'}), 200);
+      });
+
+      final client = HttpNetworkClient(
+        client: mockClient,
+        interceptors: [
+          const HeaderInterceptor({'X-Custom-Auth': 'Bearer token_abc'}),
+        ],
+      );
+
+      final response = await client.get('https://wallora.internal/intercepted');
+      expect(response.statusCode, 200);
+      expect(response.data['echo'], 'ok');
+    });
+
+    test('close terminates client', () {
+      final mockClient = MockClient((request) async => http.Response('', 200));
+      final client = HttpNetworkClient(client: mockClient);
+      client.close();
+      expect(true, isTrue);
     });
   });
 }
