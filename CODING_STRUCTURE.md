@@ -16,11 +16,11 @@ live_wallpaper/
 ├── lib/                             # Wallora Flutter Client Core
 │   ├── blocs/                       # Presentation State Management (BLoC / UDF Pattern)
 │   ├── core/                        # Core Shared Infrastructure
-│   │   ├── cache/                   # LocalCacheService, MemoryCacheService & TTL entries
+│   │   ├── cache/                   # LocalCacheService, LruStorageManager (350MB ceiling), FeedPrefetchManager
 │   │   ├── constants/               # App constants, dimensions, strings & keys
 │   │   ├── di/                      # ServiceLocator dependency injection container
 │   │   ├── localization/            # Multi-language translations (en, es, ja, de) & delegate
-│   │   ├── network/                 # NetworkClient, interceptors, request/response envelopes
+│   │   ├── network/                 # NetworkClient, NetworkConnectivityService & ConnectivityRetryQueue
 │   │   ├── result/                  # Functional Result, Success & Failure pattern
 │   │   ├── theme/                   # Obsidian palette, Aurora neon colors & ThemeData
 │   │   └── core.dart                # Master barrel export
@@ -272,7 +272,7 @@ Before any commit or pull request is merged to `main`, the following commands mu
 # 1. Flutter Client Static Analysis (Zero Warnings / Zero Errors)
 flutter analyze --fatal-infos --fatal-warnings
 
-# 2. Flutter Full Test Suite (Unit + BLoC + Widget Tests)
+# 2. Flutter Full Test Suite (379+ Unit + BLoC + Widget Tests)
 flutter test --reporter=expanded
 
 # 3. Backend Checkstyle Linting (Zero Violations)
