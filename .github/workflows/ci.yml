@@ -45,11 +45,28 @@ jobs:
       - name: Verify Zero Lint Issues (flutter analyze)
         run: flutter analyze --fatal-infos --fatal-warnings
 
-      - name: Run Flutter Test Suite (377+ Tests)
+      - name: Run Flutter Test Suite (382+ Tests)
         run: flutter test --reporter=expanded
 
       - name: Verify Android Production APK Release Build
         run: flutter build apk --release --split-per-abi
+
+      - name: Archive Android Production Release APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: wallora-release-apks
+          path: build/app/outputs/flutter-apk/*.apk
+          retention-days: 7
+
+      - name: Verify Web Production Release Build
+        run: flutter build web --release
+
+      - name: Archive Web Production Release Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wallora-web-release
+          path: build/web/
+          retention-days: 7
 
   # ============================================================================
   # Job 2: Java Spring Boot Backend Verification (Compile & JUnit 5 Tests)
