@@ -2,19 +2,44 @@ import 'dart:io';
 import '../core/core.dart';
 import '../models/wallaza_cloud_wallpaper.dart';
 
-/// Application API service communicating with the Wallaza Spring Boot REST proxy.
+/// Abstract service contract communicating with the Wallaza REST proxy.
 /// Adheres to SOLID Principles:
 /// - Single Responsibility (SRP): Manages only Wallaza endpoint routing, DTO transformation, and offline fallback.
 /// - Dependency Inversion (DIP): Injects the abstract [NetworkClient] interface rather than low-level socket clients.
 /// - Open/Closed (OCP): Network behavior can be extended via interceptors without altering this service.
-class WallazaApiService {
+abstract class WallazaApiService {
+  factory WallazaApiService({
+    String? baseUrl,
+    NetworkClient? networkClient,
+    HttpClient? httpClient,
+    Duration timeout,
+  }) = WallazaApiServiceImpl;
+
+  Future<List<WallazaCloudWallpaper>> fetchWallpapers({
+    int page = 1,
+    int limit = 20,
+    String? category,
+  });
+
+  Future<List<WallazaCloudWallpaper>> searchWallpapers({
+    required String query,
+    String? resolution,
+    int page = 1,
+    int limit = 20,
+  });
+
+  Future<WallazaCloudWallpaper?> getWallpaperById(String id);
+
+  Future<List<int>?> downloadWallpaperBytes(String id);
+}
+
+/// Concrete implementation of [WallazaApiService].
+class WallazaApiServiceImpl implements WallazaApiService {
   final String baseUrl;
   final NetworkClient _networkClient;
   final Duration timeout;
 
-  /// Injects [NetworkClient] interface (Dependency Inversion).
-  /// Retains full backward compatibility with optional [httpClient] and [timeout].
-  WallazaApiService({
+  WallazaApiServiceImpl({
     String? baseUrl,
     NetworkClient? networkClient,
     HttpClient? httpClient,
@@ -37,7 +62,7 @@ class WallazaApiService {
     return 'http://localhost:8080/api/v1/wallpapers';
   }
 
-  /// Fetches a paginated collection of cloud wallpapers with optional category filtering.
+  @override
   Future<List<WallazaCloudWallpaper>> fetchWallpapers({
     int page = 1,
     int limit = 20,
@@ -72,11 +97,10 @@ class WallazaApiService {
       // Fallback on network failure / connection refused
     }
 
-    // Curated offline library fallback
     return _curatedFallback(category: category);
   }
 
-  /// Searches wallpapers across Wallaza matching keywords and resolution filters.
+  @override
   Future<List<WallazaCloudWallpaper>> searchWallpapers({
     required String query,
     String? resolution,
@@ -113,7 +137,6 @@ class WallazaApiService {
       // Fallback on network failure / connection refused
     }
 
-    // Curated offline keyword search fallback
     final q = query.trim().toLowerCase();
     return WallazaCloudWallpaper.curatedCloudLibrary.where((w) {
       final matchesQuery = q.isEmpty ||
@@ -139,7 +162,7 @@ class WallazaApiService {
     }).toList();
   }
 
-  /// Fetches individual wallpaper specifications by ID.
+  @override
   Future<WallazaCloudWallpaper?> getWallpaperById(String id) async {
     try {
       final response = await _networkClient.get(
@@ -155,7 +178,6 @@ class WallazaApiService {
       // Fallback on network failure / connection refused
     }
 
-    // Curated offline library fallback
     try {
       return WallazaCloudWallpaper.curatedCloudLibrary.firstWhere(
         (w) => w.id == id,
@@ -165,7 +187,7 @@ class WallazaApiService {
     }
   }
 
-  /// Downloads raw high-resolution wallpaper binary bytes from the Wallaza API proxy.
+  @override
   Future<List<int>?> downloadWallpaperBytes(String id) async {
     try {
       final bytes = await _networkClient.downloadBytes(
@@ -179,7 +201,6 @@ class WallazaApiService {
     return null;
   }
 
-  /// Curated fallback matching category
   List<WallazaCloudWallpaper> _curatedFallback({String? category}) {
     if (category == null || category.isEmpty || category == 'All') {
       return List.from(WallazaCloudWallpaper.curatedCloudLibrary);
