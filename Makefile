@@ -37,7 +37,7 @@ test-integration:
 test-backend:
 	cd backend && ./mvnw checkstyle:check test
 
-test-all: analyze test test-benchmarks test-backend
+test-all: analyze test test-goldens test-benchmarks test-backend
 
 build-android:
 	flutter build apk --release --split-per-abi
