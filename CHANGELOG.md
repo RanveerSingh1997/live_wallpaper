@@ -39,4 +39,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Production release signing pipeline in `build.gradle.kts` with `key.properties.example` template and fallback to debug keys.
   - Android clear-text traffic ban via `network_security_config.xml` and iOS App Transport Security (`NSAppTransportSecurity`).
   - Multi-language internationalization (i18n) supporting English (`en`), Spanish (`es`), Japanese (`ja`), German (`de`), French (`fr`), and Hindi (`hi`).
-  - Automated CI/CD pipeline in GitHub Actions running 382 Flutter tests, Spring Boot Checkstyle, JUnit 5 integration tests, and Docker multi-stage builds.
+  - Automated CI/CD pipeline in GitHub Actions running Flutter tests, Spring Boot Checkstyle, JUnit 5 integration tests, and Docker multi-stage builds.
+- **Observability, Diagnostics & Performance Verification**:
+  - Global error boundary defense (`ProductionCrashFallbackWidget`) replacing Flutter's red/grey screen of death with an obsidian dark recovery interface.
+  - Thread-safe 100-event FIFO in-memory ring buffer (`AppDiagnostics`) recording lifecycle, BLoC, network, and crash breadcrumbs with zero PII leaks.
+  - Interactive UI diagnostic viewer (`DiagnosticLogsSheet`) with one-click anonymized support report export to clipboard.
+  - Non-intrusive outbound network diagnostic interceptor (`DiagnosticNetworkInterceptor`) tracking HTTP status codes and exceptions.
+  - Canvas 60 FPS rendering performance benchmark suite (`test/benchmarks/canvas_performance_benchmark_test.dart`) validating 16.6ms frame budgets across all procedural painters.
+  - End-to-End simulation test harness (`test/e2e/app_flow_e2e_test.dart`) and native integration test runner (`integration_test/app_e2e_test.dart`).
+  - Pixel-perfect golden visual regression suite (`test/goldens/`) capturing master snapshots for all canvases and composite widgets.

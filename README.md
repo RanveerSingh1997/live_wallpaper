@@ -5,7 +5,8 @@
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart)](https://dart.dev)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture%20%2B%20UDF%20BLoC-blueviolet)](https://bloclibrary.dev)
 [![Platforms](https://img.shields.io/badge/Platforms-Android%20%7C%20iOS%20%7C%20iPadOS%20%7C%20Web-brightgreen)]()
-[![Flutter Tests](https://img.shields.io/badge/Flutter%20Tests-Passing%20(388%2F388)-success)]()
+[![Flutter Tests](https://img.shields.io/badge/Flutter%20Tests-Passing%20(401%2F401)-success)]()
+[![Performance](https://img.shields.io/badge/Performance-60%20FPS%20Benchmarked-brightgreen)]()
 [![Java Backend Tests](https://img.shields.io/badge/Backend%20Tests-Passing%20(15%2F15)-success)]()
 [![Checkstyle](https://img.shields.io/badge/Java%20Checkstyle-0%20Violations-success)]()
 [![R8 Minified](https://img.shields.io/badge/R8%20ProGuard-Optimized%20%26%20Shrunk-blue)]()
@@ -48,6 +49,14 @@
 ### 5. Accessibility & Internationalization (i18n)
 - Accessible TalkBack and VoiceOver `Semantics` tags on all procedural canvases.
 - Full localization supporting **6 languages**: English (`en`), Spanish (`es`), Japanese (`ja`), German (`de`), French (`fr`), and Hindi (`hi`).
+
+### 6. Production Observability & Diagnostics
+- **Error Boundaries**: `ProductionCrashFallbackWidget` eliminates red/grey screens of death in release mode.
+- **Ring Buffer Telemetry**: In-memory FIFO queue capturing `LIFECYCLE`, `BLOC`, `NETWORK`, and `CRASH` breadcrumbs without PII collection.
+- **Diagnostics UI**: Interactive `DiagnosticLogsSheet` accessible in Settings with one-click anonymized support report copy.
+
+### 7. 60 FPS Procedural Canvas Performance
+- Benchmarked frame execution under strict 16.6ms frame budgets across `AuroraSynthesizerCanvas`, `InteractiveParticleOverlay`, `WeatherAtmosphereCanvas`, and `InteractiveGestureCanvas`.
 
 ---
 
@@ -129,11 +138,13 @@ java -jar target/wallaza-service-1.0.0-SNAPSHOT.jar
 
 | Quality Gate | Tool / Command | Standard | Status |
 | :--- | :--- | :--- | :--- |
-| **Gate 1: Dart Static Analysis** | `flutter analyze --fatal-infos --fatal-warnings` | 0 warnings, 0 infos | ✅ Green |
-| **Gate 2: Flutter Test Suite** | `flutter test` | 388 tests (including Golden Snapshots) | ✅ 100% Green |
-| **Gate 3: Java Checkstyle** | `cd backend && ./mvnw checkstyle:check` | 0 violations | ✅ 100% Green |
-| **Gate 4: Java JUnit 5 Tests** | `cd backend && ./mvnw test` | 15 integration tests | ✅ 100% Green |
-| **Gate 5: Production Release Build** | `flutter build apk --release --split-per-abi` | R8 + Resource Shrinking | ✅ Verified |
+| **Gate 1: Dart Static Analysis** | `make analyze` | 0 warnings, 0 infos | ✅ Green |
+| **Gate 2: Flutter Test Suite** | `make test` | 401 unit, BLoC, and widget tests | ✅ 100% Green |
+| **Gate 3: Canvas 60 FPS Benchmarks** | `make test-benchmarks` | 4 painters within 16.6ms budget | ✅ 100% Green |
+| **Gate 4: Golden Visual Regressions** | `make test-goldens` | 6 pixel-perfect snapshots | ✅ 100% Green |
+| **Gate 5: Java Checkstyle** | `cd backend && ./mvnw checkstyle:check` | 0 violations | ✅ 100% Green |
+| **Gate 6: Java JUnit 5 Tests** | `cd backend && ./mvnw test` | 15 integration tests | ✅ 100% Green |
+| **Gate 7: Production Release Build** | `make build-android` + `make build-web` | Split-per-ABI APKs + Web bundle | ✅ Verified |
 
 ---
 
