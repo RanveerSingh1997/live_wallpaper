@@ -4,6 +4,8 @@ import 'translations/app_translations.dart';
 import 'translations/app_translations_de.dart';
 import 'translations/app_translations_en.dart';
 import 'translations/app_translations_es.dart';
+import 'translations/app_translations_fr.dart';
+import 'translations/app_translations_hi.dart';
 import 'translations/app_translations_ja.dart';
 
 /// Centralized localization service for Wallora.
@@ -19,6 +21,8 @@ class AppLocalizations implements AppTranslations {
       'es' => const AppTranslationsEs(),
       'ja' => const AppTranslationsJa(),
       'de' => const AppTranslationsDe(),
+      'fr' => const AppTranslationsFr(),
+      'hi' => const AppTranslationsHi(),
       _ => const AppTranslationsEn(),
     };
   }
@@ -39,6 +43,8 @@ class AppLocalizations implements AppTranslations {
     Locale('es'),
     Locale('ja'),
     Locale('de'),
+    Locale('fr'),
+    Locale('hi'),
   ];
 
   @override

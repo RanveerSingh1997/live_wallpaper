@@ -4,4 +4,6 @@ export 'translations/app_translations.dart';
 export 'translations/app_translations_de.dart';
 export 'translations/app_translations_en.dart';
 export 'translations/app_translations_es.dart';
+export 'translations/app_translations_fr.dart';
+export 'translations/app_translations_hi.dart';
 export 'translations/app_translations_ja.dart';

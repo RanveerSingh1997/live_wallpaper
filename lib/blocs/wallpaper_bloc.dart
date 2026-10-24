@@ -70,6 +70,7 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState>
     on<ShareVideoIntent>(onShareVideo);
     on<OpenPhotosIntent>(onOpenPhotos);
     on<CheckWallpaperStatusIntent>(onCheckWallpaperStatus);
+    on<SyncHardwareBatteryIntent>(onSyncHardwareBattery);
 
     // Auto-Rotation Events
     on<ToggleAutoRotationIntent>(onToggleAutoRotation);

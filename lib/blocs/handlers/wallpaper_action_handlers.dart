@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../models/battery_telemetry_config.dart';
 import '../../repositories/wallpaper_repository.dart';
 import '../wallpaper_intent.dart';
 import '../wallpaper_state.dart';
@@ -291,5 +292,35 @@ mixin WallpaperActionHandlers on Bloc<WallpaperIntent, WallpaperState> {
   ) async {
     final isActive = await repository.isWallpaperActiveOnDevice();
     emit(state.copyWith(isLiveWallpaperActiveOnDevice: isActive));
+    add(const SyncHardwareBatteryIntent());
+  }
+
+  Future<void> onSyncHardwareBattery(
+    SyncHardwareBatteryIntent event,
+    Emitter<WallpaperState> emit,
+  ) async {
+    try {
+      final info = await repository.getHardwareBatteryInfo();
+      final batteryPercent = (info['batteryPercent'] as num?)?.toInt() ?? 100;
+      final isCharging = info['isCharging'] as bool? ?? false;
+      final isPowerSave = info['isPowerSaveMode'] as bool? ?? false;
+
+      BatteryTelemetryConfig telemetry = state.batteryTelemetry;
+      if (telemetry.targetFps == TargetFpsMode.fpsAuto) {
+        final shouldThrottle =
+            (batteryPercent < 20 && !isCharging) || isPowerSave;
+        if (telemetry.isEcoModeEnabled != shouldThrottle) {
+          telemetry = telemetry.copyWith(isEcoModeEnabled: shouldThrottle);
+          await repository.saveBatteryTelemetryConfig(telemetry);
+        }
+      }
+
+      emit(state.copyWith(
+        deviceBatteryLevel: batteryPercent,
+        isDeviceCharging: isCharging,
+        isDevicePowerSaveMode: isPowerSave,
+        batteryTelemetry: telemetry,
+      ));
+    } catch (_) {}
   }
 }

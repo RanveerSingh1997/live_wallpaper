@@ -29,8 +29,9 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
   @override
   void initState() {
     super.initState();
-    final current = context.read<WallpaperBloc>().state.batteryTelemetry;
-    _config = current;
+    final bloc = context.read<WallpaperBloc>();
+    _config = bloc.state.batteryTelemetry;
+    bloc.add(const SyncHardwareBatteryIntent());
   }
 
   void _safePop() {
@@ -154,6 +155,9 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
                         dailyMahSaved: dailyMahSaved,
                         trueBlackPercentage: currentShort?.trueBlackPercentage ?? 0,
                         isAmoledCertified: currentShort?.isAmoledCertified ?? false,
+                        batteryLevel: state.deviceBatteryLevel,
+                        isCharging: state.isDeviceCharging,
+                        isPowerSave: state.isDevicePowerSaveMode,
                       ),
                       const SizedBox(height: 22),
 
@@ -316,6 +320,9 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
     required int dailyMahSaved,
     required int trueBlackPercentage,
     required bool isAmoledCertified,
+    required int batteryLevel,
+    required bool isCharging,
+    required bool isPowerSave,
   }) {
     return Container(
       padding: const EdgeInsets.all(18),
@@ -358,16 +365,42 @@ class _BatteryTelemetrySheetState extends State<BatteryTelemetrySheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.auroraEmerald.withValues(alpha: 0.15),
+                  color: (isPowerSave
+                          ? AppColors.auroraAmber
+                          : AppColors.auroraEmerald)
+                      .withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  'OPTIMIZED',
-                  style: TextStyle(
-                    color: AppColors.auroraEmerald,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 10,
+                  border: Border.all(
+                    color: (isPowerSave
+                            ? AppColors.auroraAmber
+                            : AppColors.auroraEmerald)
+                        .withValues(alpha: 0.3),
                   ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isCharging
+                          ? Icons.battery_charging_full_rounded
+                          : Icons.battery_std_rounded,
+                      size: 13,
+                      color: isPowerSave
+                          ? AppColors.auroraAmber
+                          : AppColors.auroraEmerald,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '$batteryLevel%${isCharging ? " • CHARGING" : isPowerSave ? " • ECO" : ""}',
+                      style: TextStyle(
+                        color: isPowerSave
+                            ? AppColors.auroraAmber
+                            : AppColors.auroraEmerald,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

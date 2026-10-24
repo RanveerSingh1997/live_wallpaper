@@ -423,6 +423,12 @@ class ResetBatteryTelemetryIntent extends WallpaperIntent {
   const ResetBatteryTelemetryIntent();
 }
 
+/// Intent to query native device battery telemetry (level, charging, power-saver mode)
+/// and adaptively govern frame-rates and eco mode.
+class SyncHardwareBatteryIntent extends WallpaperIntent {
+  const SyncHardwareBatteryIntent();
+}
+
 /// Intent to update the Interactive Particle FX configuration.
 class UpdateParticleConfigIntent extends WallpaperIntent {
   final ParticleEffectConfig config;

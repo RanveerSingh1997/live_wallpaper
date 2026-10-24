@@ -1129,6 +1129,28 @@ void main() {
       expect(repository.getBatteryTelemetryConfig(), BatteryTelemetryConfig.defaultConfig);
     });
 
+    test('SyncHardwareBatteryIntent updates device battery state and triggers auto eco governor', () async {
+      // Configure auto-fps mode
+      bloc.add(const UpdateBatteryTelemetryIntent(
+        BatteryTelemetryConfig(targetFps: TargetFpsMode.fpsAuto, isEcoModeEnabled: false),
+      ));
+
+      final batteryExpectation = expectLater(
+        bloc.stream,
+        emitsThrough(predicate<WallpaperState>((s) {
+          return s.deviceBatteryLevel == 100 &&
+              !s.isDeviceCharging &&
+              !s.isDevicePowerSaveMode;
+        })),
+      );
+
+      bloc.add(const SyncHardwareBatteryIntent());
+      await batteryExpectation;
+
+      expect(bloc.state.deviceBatteryLevel, 100);
+      expect(bloc.state.isDeviceCharging, isFalse);
+    });
+
     test('LoadFeedIntent loads persisted particleConfig from repository', () async {
       const savedConfig = ParticleEffectConfig(
         preset: ParticlePreset.electricSparks,

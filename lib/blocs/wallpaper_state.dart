@@ -50,6 +50,9 @@ class WallpaperState extends Equatable {
   final SmartFilterConfig smartFilter;
   final BatteryTelemetryConfig batteryTelemetry;
   final WeatherAtmosphereConfig weatherConfig;
+  final int deviceBatteryLevel;
+  final bool isDeviceCharging;
+  final bool isDevicePowerSaveMode;
   final bool isFeedMuted;
   final bool isLiveWallpaperActiveOnDevice;
   final String? activeWallpaperId;
@@ -105,6 +108,9 @@ class WallpaperState extends Equatable {
     this.smartFilter = SmartFilterConfig.defaultConfig,
     this.batteryTelemetry = BatteryTelemetryConfig.defaultConfig,
     this.weatherConfig = WeatherAtmosphereConfig.defaultConfig,
+    this.deviceBatteryLevel = 100,
+    this.isDeviceCharging = false,
+    this.isDevicePowerSaveMode = false,
     this.isFeedMuted = true,
     this.isLiveWallpaperActiveOnDevice = false,
     this.activeWallpaperId,
@@ -359,6 +365,9 @@ class WallpaperState extends Equatable {
     SmartFilterConfig? smartFilter,
     BatteryTelemetryConfig? batteryTelemetry,
     WeatherAtmosphereConfig? weatherConfig,
+    int? deviceBatteryLevel,
+    bool? isDeviceCharging,
+    bool? isDevicePowerSaveMode,
     bool? isFeedMuted,
     bool? isLiveWallpaperActiveOnDevice,
     String? activeWallpaperId,
@@ -416,6 +425,10 @@ class WallpaperState extends Equatable {
       smartFilter: smartFilter ?? this.smartFilter,
       batteryTelemetry: batteryTelemetry ?? this.batteryTelemetry,
       weatherConfig: weatherConfig ?? this.weatherConfig,
+      deviceBatteryLevel: deviceBatteryLevel ?? this.deviceBatteryLevel,
+      isDeviceCharging: isDeviceCharging ?? this.isDeviceCharging,
+      isDevicePowerSaveMode:
+          isDevicePowerSaveMode ?? this.isDevicePowerSaveMode,
       isFeedMuted: isFeedMuted ?? this.isFeedMuted,
       isLiveWallpaperActiveOnDevice:
           isLiveWallpaperActiveOnDevice ?? this.isLiveWallpaperActiveOnDevice,
@@ -481,6 +494,9 @@ class WallpaperState extends Equatable {
         smartFilter,
         batteryTelemetry,
         weatherConfig,
+        deviceBatteryLevel,
+        isDeviceCharging,
+        isDevicePowerSaveMode,
         isFeedMuted,
         isLiveWallpaperActiveOnDevice,
         activeWallpaperId,

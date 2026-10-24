@@ -58,8 +58,35 @@ void main() {
       expect(l10n.itemsCount(4), '4 Elemente');
     });
 
-    test('Unsupported locale falls back gracefully to English', () {
+    test('French translations provide localized strings', () {
       final l10n = AppLocalizations(const Locale('fr'));
+
+      expect(l10n.appName, 'Wallora');
+      expect(l10n.appTagline, 'Faites de chaque écran le vôtre.');
+      expect(l10n.navCategories, 'Catégories');
+      expect(l10n.navFavorites, 'Favoris');
+      expect(l10n.actionApplyLiveMotion, 'Appliquer le Mouvement en Direct');
+      expect(l10n.titleQuoteStudio, 'STUDIO DE CITATIONS');
+      expect(l10n.itemsCount(1), '1 élément');
+      expect(l10n.itemsCount(4), '4 éléments');
+      expect(l10n.durationSeconds(25), '25s');
+    });
+
+    test('Hindi translations provide localized strings', () {
+      final l10n = AppLocalizations(const Locale('hi'));
+
+      expect(l10n.appName, 'Wallora');
+      expect(l10n.appTagline, 'हर स्क्रीन को अपना बनाएं।');
+      expect(l10n.navCategories, 'श्रेणियां');
+      expect(l10n.navFavorites, 'पसंदीदा');
+      expect(l10n.actionApplyLiveMotion, 'लाइव मोशन लागू करें');
+      expect(l10n.titleQuoteStudio, 'कोट स्टूडियो');
+      expect(l10n.itemsCount(3), '3 आइटम');
+      expect(l10n.durationSeconds(15), '15 से.');
+    });
+
+    test('Unsupported locale falls back gracefully to English', () {
+      final l10n = AppLocalizations(const Locale('it'));
 
       expect(l10n.appName, 'Wallora');
       expect(l10n.appTagline, 'Make every screen yours.');
@@ -73,6 +100,8 @@ void main() {
       expect(delegate.isSupported(const Locale('es')), isTrue);
       expect(delegate.isSupported(const Locale('ja')), isTrue);
       expect(delegate.isSupported(const Locale('de')), isTrue);
+      expect(delegate.isSupported(const Locale('fr')), isTrue);
+      expect(delegate.isSupported(const Locale('hi')), isTrue);
       expect(delegate.isSupported(const Locale('it')), isFalse);
       expect(delegate.shouldReload(delegate), isFalse);
 
