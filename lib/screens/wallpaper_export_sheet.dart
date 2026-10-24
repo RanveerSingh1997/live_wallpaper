@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_state.dart';
+import '../core/core.dart';
 import '../models/motivational_short.dart';
 import '../services/wallpaper_renderer_service.dart';
 
@@ -56,15 +57,15 @@ class _WallpaperExportSheetState extends State<WallpaperExportSheet> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            backgroundColor: const Color(0xFF16161E),
+            backgroundColor: AppColors.cardSurface,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
-              side: const BorderSide(color: Color(0xFF00E676), width: 0.8),
+              side: const BorderSide(color: AppColors.auroraEmerald, width: 0.8),
             ),
             content: Row(
               children: [
-                const Icon(Icons.check_circle_rounded, color: Color(0xFF00E676)),
+                const Icon(Icons.check_circle_rounded, color: AppColors.auroraEmerald),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -86,15 +87,15 @@ class _WallpaperExportSheetState extends State<WallpaperExportSheet> {
       setState(() => _isExporting = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: const Color(0xFF16161E),
+          backgroundColor: AppColors.cardSurface,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
-            side: const BorderSide(color: Color(0xFFFF5252), width: 0.8),
+            side: const BorderSide(color: AppColors.error, width: 0.8),
           ),
           content: Text(
             'Failed to export poster: $e',
-            style: const TextStyle(color: Color(0xFFFF5252)),
+            style: const TextStyle(color: AppColors.error),
           ),
         ),
       );
@@ -114,7 +115,7 @@ class _WallpaperExportSheetState extends State<WallpaperExportSheet> {
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF101014),
+                color: AppColors.darkSurface,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: ListView(
@@ -143,12 +144,12 @@ class _WallpaperExportSheetState extends State<WallpaperExportSheet> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFF5722).withValues(alpha: 0.15),
+                              color: AppColors.sunsetAmber.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
                               Icons.share_rounded,
-                              color: Color(0xFFFF5722),
+                              color: AppColors.sunsetAmber,
                               size: 20,
                             ),
                           ),
@@ -186,7 +187,7 @@ class _WallpaperExportSheetState extends State<WallpaperExportSheet> {
                         child: const Text(
                           '4K UHD',
                           style: TextStyle(
-                            color: Color(0xFFFF5722),
+                            color: AppColors.sunsetAmber,
                             fontSize: 10,
                             fontWeight: FontWeight.w800,
                           ),
@@ -304,7 +305,7 @@ class _WallpaperExportSheetState extends State<WallpaperExportSheet> {
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Icon(Icons.auto_awesome_rounded,
-                                              size: 10, color: Color(0xFF00E5FF)),
+                                              size: 10, color: AppColors.neonCyan),
                                           SizedBox(width: 4),
                                           Text(
                                             'WALLORA',
@@ -436,7 +437,7 @@ class _WallpaperExportSheetState extends State<WallpaperExportSheet> {
             setState(() => _selectedLayoutIndex = index);
           }
         },
-        backgroundColor: const Color(0xFF18181E),
+        backgroundColor: AppColors.cardSurface,
         selectedColor: widget.wallpaper.accentColor.withValues(alpha: 0.25),
         labelStyle: TextStyle(
           color: isSelected ? Colors.white : Colors.white70,

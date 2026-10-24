@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'cache_entry.dart';
 import 'local_cache_service.dart';
 
@@ -127,12 +128,14 @@ class MemoryCacheService implements LocalCacheService {
   @override
   Future<File?> saveFile(String fileName, List<int> bytes) async {
     _fileStorage[fileName] = List<int>.from(bytes);
+    if (kIsWeb) return null;
     return File('/virtual/$fileName');
   }
 
   @override
   Future<File?> getFile(String fileName) async {
     if (_fileStorage.containsKey(fileName)) {
+      if (kIsWeb) return null;
       return File('/virtual/$fileName');
     }
     return null;

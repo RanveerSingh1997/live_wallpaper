@@ -164,6 +164,13 @@ class CatalogRepositoryImpl implements CatalogRepository {
     String? customQuote,
     WallpaperEffectConfig? effectConfig,
   }) async {
+    if (!AppPlatform.isAndroid && !AppPlatform.isIOS) {
+      return {
+        'status': 'unsupported_platform',
+        'message': 'Setting static wallpaper is supported on Android and iOS.'
+      };
+    }
+
     final file = await _rendererService.renderWallpaper(
       wallpaper: short,
       quoteOverride: customQuote,
@@ -179,14 +186,9 @@ class CatalogRepositoryImpl implements CatalogRepository {
         await setActiveWallpaperId(short.id);
       }
       return result;
-    } else if (AppPlatform.isIOS) {
+    } else {
       await bridge.shareVideo(file.path);
       return {'status': 'shared_ios', 'targetScreen': targetScreen};
-    } else {
-      return {
-        'status': 'unsupported_platform',
-        'message': 'Setting static wallpaper is supported on Android and iOS.'
-      };
     }
   }
 
