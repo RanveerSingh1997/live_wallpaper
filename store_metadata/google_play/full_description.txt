@@ -1,0 +1,33 @@
+Wallora — "Make every screen yours."
+
+Elevate your device into a cinematic obsidian canvas. Wallora is the definitive live wallpaper discovery platform and personal aesthetic engine, meticulously engineered for 120Hz AMOLED screens, zero sleep power consumption, and dynamic circadian personalization.
+
+═══════════════════════════════════════════
+✨ WHY WALLORA STANDS ALONE
+═══════════════════════════════════════════
+
+• ZERO SLEEP OVERHEAD
+Our native Android WallpaperService releases hardware decoder surfaces the millisecond your screen turns off. Enjoy immersive 60 FPS live video motion without sacrificing battery longevity.
+
+• 12 HARDWARE-ACCELERATED STUDIOS
+Take total creative mastery over your Home Screen and Lock Screen:
+  1. Kinetic Quote Studio — Overlay inspirational typography with custom affirmations.
+  2. 3D Spatial Parallax — Realistic gyroscope-driven multi-layer depth.
+  3. Aura Chromatic Harmonizer — Fluid neon edge glow reacting to wallpaper palettes.
+  4. Aurora Wave Synthesizer — Procedural fluid canvas sine wave generator.
+  5. Atmospheric Weather Studio — Real-time climate dynamics (Rain, Snow, Sakura, Solar Flares).
+  6. Standby Desk Dock — High-contrast bedside OLED clock with burn-in pixel shift.
+  7. Battery & Telemetry Governor — Dynamic frame-rate throttle (60 FPS / 30 FPS / Adaptive Eco).
+  8. Lock Screen Dynamics — Tailored typography styles and circadian solar widgets.
+  9. Wallpaper Effects & Filters — Exposure, saturation, vignette, and chromatic aberration.
+  10. Auto-Rotation Hub — Scheduled transitions with Wi-Fi only data protection.
+  11. Community Exchange — Share and import full aesthetic blueprints via deep links.
+  12. Wallaza Cloud Discovery — Instant access to curated 4K AMOLED cloud wallpapers.
+
+• OFFLINE-FIRST SMART LRU CACHE
+Never worry about storage bloat or dead zones. Wallora maintains a strict 350MB LRU disk cache ceiling, auto-prunes non-favorite files, and pre-caches the next videos in your stream for instant, zero-stutter playback.
+
+• 100% PRIVATE & ANONYMOUS
+No account required. Zero PII collection. Your curated downloads, custom affirmations, and aesthetic presets are saved directly on your device.
+
+Make every screen yours with Wallora.

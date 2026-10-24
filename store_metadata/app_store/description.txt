@@ -1,0 +1,16 @@
+Wallora — "Make every screen yours."
+
+Wallora brings cinematic obsidian dark aesthetics and kinetic typography live wallpapers to your iPhone and iPad.
+
+Designed specifically for modern iOS and iPadOS displays, Wallora empowers you to personalize your Lock Screen and Home Screen with curated 4K AMOLED imagery, fluid video motion loops, and rich generative studios.
+
+FEATURES:
+• Cinematic Vertical Live Feed: Browse full-screen 9:16 video loops across Anime, Cyberpunk, Nature, Cars, Minimal, and Mindset.
+• Kinetic Typography Studio: Overlay motivational quotes or craft your own personal daily affirmations.
+• Native iPad Photos Integration: Save high-resolution video live wallpapers and image stills directly to your Photos library with Apple PhotoKit, unlocking native "Use as Wallpaper" setup in seconds.
+• 12 Aesthetic Studios: Customize spatial parallax, atmospheric weather effects, aura neon backlights, bedside standby docks, and procedural wave synthesizers.
+• Offline Smart Cache: Enjoy your downloaded favorites anywhere with automatic storage management.
+• Universal Deep Linking: Share your personalized blueprint setups with friends via clickable wallora.app links.
+• Privacy First: Zero tracking. No user registration required.
+
+Experience Wallora today and make every screen yours.
