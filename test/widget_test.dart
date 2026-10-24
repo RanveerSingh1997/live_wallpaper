@@ -1921,6 +1921,7 @@ void main() {
 
       // 2. Verify Metrics Card
       expect(find.text('LIVE OLED & POWER TELEMETRY'), findsOneWidget);
+      expect(find.textContaining('100%'), findsOneWidget);
       expect(find.text('Hourly Drain'), findsOneWidget);
       expect(find.text('Energy Conserved'), findsOneWidget);
 
