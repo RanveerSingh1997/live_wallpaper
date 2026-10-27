@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/core.dart';
 import '../models/aura_palette_config.dart';
+import '../models/audio_visualizer_config.dart';
 import '../models/aurora_synthesizer_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
@@ -48,6 +49,10 @@ abstract class WallpaperFacadeRepository {
   AuroraSynthesizerConfig getAuroraSynthesizerConfig();
   Future<void> saveAuroraSynthesizerConfig(AuroraSynthesizerConfig config);
   Future<void> resetAuroraSynthesizerConfig();
+
+  AudioVisualizerConfig getAudioVisualizerConfig();
+  Future<void> saveAudioVisualizerConfig(AudioVisualizerConfig config);
+  Future<void> resetAudioVisualizerConfig();
 
   WeatherAtmosphereConfig getWeatherAtmosphereConfig();
   Future<void> saveWeatherAtmosphereConfig(WeatherAtmosphereConfig config);
@@ -346,6 +351,18 @@ class WallpaperRepository implements WallpaperFacadeRepository {
   @override
   Future<void> resetAuroraSynthesizerConfig() =>
       studio.resetAuroraSynthesizerConfig();
+
+  @override
+  AudioVisualizerConfig getAudioVisualizerConfig() =>
+      studio.getAudioVisualizerConfig();
+
+  @override
+  Future<void> saveAudioVisualizerConfig(AudioVisualizerConfig config) =>
+      studio.saveAudioVisualizerConfig(config);
+
+  @override
+  Future<void> resetAudioVisualizerConfig() =>
+      studio.resetAudioVisualizerConfig();
 
   @override
   WeatherAtmosphereConfig getWeatherAtmosphereConfig() =>

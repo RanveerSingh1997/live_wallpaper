@@ -1,4 +1,6 @@
 import 'package:equatable/equatable.dart';
+import '../models/audio_spectrum_metrics.dart';
+import '../models/audio_visualizer_config.dart';
 import '../models/aura_palette_config.dart';
 import '../models/aurora_synthesizer_config.dart';
 import '../models/battery_telemetry_config.dart';
@@ -704,6 +706,71 @@ class HandleDeepLinkIntent extends WallpaperIntent {
   @override
   List<Object?> get props => [uri];
 }
+
+// ==========================================
+// Live Audio-Reactive Visualizer Intents
+// ==========================================
+
+/// Intent to toggle audio-reactive spectrum analysis on or off.
+class ToggleAudioVisualizerIntent extends WallpaperIntent {
+  final bool isEnabled;
+  const ToggleAudioVisualizerIntent(this.isEnabled);
+
+  @override
+  List<Object?> get props => [isEnabled];
+}
+
+/// Intent to update the active [AudioVisualizerConfig] parameters.
+class UpdateAudioVisualizerConfigIntent extends WallpaperIntent {
+  final AudioVisualizerConfig config;
+  const UpdateAudioVisualizerConfigIntent(this.config);
+
+  @override
+  List<Object?> get props => [config];
+}
+
+/// Intent to switch between simulated and live microphone capture mode.
+class SetAudioCaptureModeIntent extends WallpaperIntent {
+  final AudioCaptureMode mode;
+  const SetAudioCaptureModeIntent(this.mode);
+
+  @override
+  List<Object?> get props => [mode];
+}
+
+/// Intent to apply a curated visualizer preset.
+class SetAudioVisualizerPresetIntent extends WallpaperIntent {
+  final AudioVisualizerPreset preset;
+  const SetAudioVisualizerPresetIntent(this.preset);
+
+  @override
+  List<Object?> get props => [preset];
+}
+
+/// Intent to reset audio visualizer settings to factory defaults.
+class ResetAudioVisualizerConfigIntent extends WallpaperIntent {
+  const ResetAudioVisualizerConfigIntent();
+}
+
+/// Intent dispatched whenever the audio capture engine analyzes a new spectrum frame.
+class AudioSpectrumUpdatedIntent extends WallpaperIntent {
+  final AudioSpectrumMetrics metrics;
+  const AudioSpectrumUpdatedIntent(this.metrics);
+
+  @override
+  List<Object?> get props => [metrics];
+}
+
+/// Intent to pause audio capture when the app is backgrounded or screen turns off.
+class PauseAudioCaptureIntent extends WallpaperIntent {
+  const PauseAudioCaptureIntent();
+}
+
+/// Intent to resume audio capture when the app is brought back to the foreground.
+class ResumeAudioCaptureIntent extends WallpaperIntent {
+  const ResumeAudioCaptureIntent();
+}
+
 
 
 

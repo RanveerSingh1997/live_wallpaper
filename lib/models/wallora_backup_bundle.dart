@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:equatable/equatable.dart';
+import 'audio_visualizer_config.dart';
 import 'aura_palette_config.dart';
 import 'aurora_synthesizer_config.dart';
 import 'battery_telemetry_config.dart';
@@ -34,6 +35,7 @@ class WalloraBackupBundle extends Equatable {
   final GestureControlConfig gestureConfig;
   final StandbyDockConfig standbyDockConfig;
   final AuroraSynthesizerConfig auroraSynthesizerConfig;
+  final AudioVisualizerConfig audioVisualizerConfig;
   final BatteryTelemetryConfig batteryTelemetry;
   final SmartFilterConfig smartFilter;
   final WeatherAtmosphereConfig weatherConfig;
@@ -56,6 +58,7 @@ class WalloraBackupBundle extends Equatable {
     this.gestureConfig = GestureControlConfig.defaultConfig,
     this.standbyDockConfig = StandbyDockConfig.defaultConfig,
     this.auroraSynthesizerConfig = AuroraSynthesizerConfig.defaultConfig,
+    this.audioVisualizerConfig = AudioVisualizerConfig.defaultConfig,
     this.batteryTelemetry = BatteryTelemetryConfig.defaultConfig,
     this.smartFilter = SmartFilterConfig.defaultConfig,
     this.weatherConfig = WeatherAtmosphereConfig.defaultConfig,
@@ -107,6 +110,7 @@ class WalloraBackupBundle extends Equatable {
       'gestureConfig': gestureConfig.toJson(),
       'standbyDockConfig': standbyDockConfig.toJson(),
       'auroraSynthesizerConfig': auroraSynthesizerConfig.toJson(),
+      'audioVisualizerConfig': audioVisualizerConfig.toJson(),
       'batteryTelemetry': batteryTelemetry.toJson(),
       'smartFilter': smartFilter.toJson(),
       'weatherConfig': weatherConfig.toJson(),
@@ -192,6 +196,10 @@ class WalloraBackupBundle extends Equatable {
           ? AuroraSynthesizerConfig.fromJson(
               json['auroraSynthesizerConfig'] as Map<String, dynamic>)
           : AuroraSynthesizerConfig.defaultConfig,
+      audioVisualizerConfig: json['audioVisualizerConfig'] != null
+          ? AudioVisualizerConfig.fromJson(
+              json['audioVisualizerConfig'] as Map<String, dynamic>)
+          : AudioVisualizerConfig.defaultConfig,
       batteryTelemetry: json['batteryTelemetry'] != null
           ? BatteryTelemetryConfig.fromJson(
               json['batteryTelemetry'] as Map<String, dynamic>)
@@ -231,6 +239,7 @@ class WalloraBackupBundle extends Equatable {
     GestureControlConfig? gestureConfig,
     StandbyDockConfig? standbyDockConfig,
     AuroraSynthesizerConfig? auroraSynthesizerConfig,
+    AudioVisualizerConfig? audioVisualizerConfig,
     BatteryTelemetryConfig? batteryTelemetry,
     SmartFilterConfig? smartFilter,
     WeatherAtmosphereConfig? weatherConfig,
@@ -254,6 +263,8 @@ class WalloraBackupBundle extends Equatable {
       standbyDockConfig: standbyDockConfig ?? this.standbyDockConfig,
       auroraSynthesizerConfig:
           auroraSynthesizerConfig ?? this.auroraSynthesizerConfig,
+      audioVisualizerConfig:
+          audioVisualizerConfig ?? this.audioVisualizerConfig,
       batteryTelemetry: batteryTelemetry ?? this.batteryTelemetry,
       smartFilter: smartFilter ?? this.smartFilter,
       weatherConfig: weatherConfig ?? this.weatherConfig,
@@ -280,6 +291,7 @@ class WalloraBackupBundle extends Equatable {
         gestureConfig,
         standbyDockConfig,
         auroraSynthesizerConfig,
+        audioVisualizerConfig,
         batteryTelemetry,
         smartFilter,
         weatherConfig,

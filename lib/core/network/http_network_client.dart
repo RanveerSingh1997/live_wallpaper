@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'interceptors/diagnostic_interceptor.dart';
 import 'interceptors/header_interceptor.dart';
@@ -24,17 +25,20 @@ class HttpNetworkClient implements NetworkClient {
 
   HttpNetworkClient({
     http.Client? client,
-    this.defaultTimeout = const Duration(seconds: 5),
+    this.defaultTimeout = const Duration(seconds: 10),
     List<NetworkInterceptor>? interceptors,
     Map<String, String>? defaultHeaders,
   }) : _client = client ?? http.Client() {
-    // Register default header injector interceptor if headers provided or default
+    // Register default header injector interceptor.
+    // On Web (and for GET requests), avoid non-safelisted Content-Type or User-Agent headers
+    // that trigger CORS preflight OPTIONS requests which external APIs (e.g. Pixabay) reject.
     final headers = defaultHeaders ??
-        const {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json; charset=utf-8',
-          'User-Agent': 'Wallora-Flutter-Client/1.0',
-        };
+        (kIsWeb
+            ? const <String, String>{}
+            : const {
+                'Accept': 'application/json',
+                'User-Agent': 'Wallora-Flutter-Client/1.0',
+              });
     _interceptors.add(HeaderInterceptor(headers));
     _interceptors.add(const DiagnosticNetworkInterceptor());
 
@@ -70,11 +74,26 @@ class HttpNetworkClient implements NetworkClient {
 
       // Apply request headers
       currentRequest.headers.forEach((key, value) {
+        final lower = key.toLowerCase();
+        // On web, skip browser-forbidden or preflight-triggering headers like User-Agent to avoid CORS preflight errors
+        if (kIsWeb &&
+            (lower == 'user-agent' ||
+                lower == 'content-length' ||
+                (currentRequest.body == null && lower == 'accept'))) {
+          return;
+        }
+        // Never send Content-Type on requests without a body (e.g. GET/HEAD) to prevent CORS preflight
+        if (currentRequest.body == null && lower == 'content-type') {
+          return;
+        }
         httpRequest.headers[key] = value;
       });
 
       // Write body if present
       if (currentRequest.body != null) {
+        if (!httpRequest.headers.containsKey('Content-Type')) {
+          httpRequest.headers['Content-Type'] = 'application/json; charset=utf-8';
+        }
         final dynamic raw = currentRequest.body;
         final encodedBody = raw is String ? raw : jsonEncode(raw);
         httpRequest.body = encodedBody;

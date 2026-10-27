@@ -7,10 +7,12 @@ import '../blocs/wallpaper_state.dart';
 import '../core/core.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
+import '../widgets/cached_wallpaper_image.dart';
 import '../widgets/interactive_particle_overlay.dart';
 import '../widgets/video_player_item.dart';
 import '../widgets/weather_atmosphere_canvas.dart';
 import 'aura_palette_sheet.dart';
+import 'audio_visualizer_sheet.dart';
 import 'battery_telemetry_sheet.dart';
 import 'ipad_wallpaper_dialog.dart';
 import 'lock_screen_studio_sheet.dart';
@@ -337,7 +339,7 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
         }
 
         Widget canvas;
-        if (short.isLive) {
+        if (short.isLive && short.videoAssetPath.isNotEmpty) {
           canvas = VideoPlayerItem(
             key: ValueKey('fullscreen_${short.id}'),
             videoAssetPath: short.videoAssetPath,
@@ -346,6 +348,11 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
             onDoubleTapLike: () {
               context.read<WallpaperBloc>().add(ToggleFavoriteIntent(short.id));
             },
+          );
+        } else if (short.imageUrl != null && short.imageUrl!.isNotEmpty) {
+          canvas = CachedWallpaperImage.fullScreen(
+            imageUrl: short.imageUrl!,
+            fit: BoxFit.cover,
           );
         } else {
           canvas = Container(
@@ -400,6 +407,8 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
         if (state.particleConfig.isEnabled) {
           canvas = InteractiveParticleOverlay(
             config: state.particleConfig,
+            audioSpectrumMetrics: state.audioSpectrumMetrics,
+            audioVisualizerConfig: state.audioVisualizerConfig,
             child: canvas,
           );
         }
@@ -719,6 +728,16 @@ class _FullScreenWallpaperViewerState extends State<FullScreenWallpaperViewer> {
                         onPressed: () {
                           HapticFeedback.mediumImpact();
                           WeatherAtmosphereSheet.show(context);
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      // Live Audio-Reactive Visualizer Studio Button
+                      IconButton(
+                        icon: const Icon(Icons.graphic_eq_rounded, color: AppColors.auroraEmerald),
+                        tooltip: 'Live Audio Visualizer',
+                        onPressed: () {
+                          HapticFeedback.mediumImpact();
+                          AudioVisualizerSheet.show(context);
                         },
                       ),
                     ],

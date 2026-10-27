@@ -22,6 +22,7 @@ import 'wallpaper_quick_actions_sheet.dart';
 import 'weather_atmosphere_sheet.dart';
 import 'wallaza_cloud_discovery_sheet.dart';
 import '../models/smart_filter_config.dart';
+import '../widgets/cached_wallpaper_image.dart';
 import '../widgets/fluid_pressable.dart';
 import '../widgets/shimmer_loading.dart';
 
@@ -39,6 +40,24 @@ class DiscoverScreen extends StatefulWidget {
 
 class _DiscoverScreenState extends State<DiscoverScreen> {
   final TextEditingController _searchController = TextEditingController();
+  int _gridColumns = 3; // Reduced grid size (3 columns on mobile, 4-6 on web)
+
+  void _toggleGridDensity() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _gridColumns = (_gridColumns == 3) ? 2 : 3;
+    });
+  }
+
+  int _calculateCrossAxisCount(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    if (width >= 1200) {
+      return _gridColumns == 2 ? 4 : 6;
+    } else if (width >= 800) {
+      return _gridColumns == 2 ? 3 : 4;
+    }
+    return _gridColumns;
+  }
 
   @override
   void dispose() {
@@ -605,21 +624,60 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               ),
                             ],
                           ),
-                          TextButton.icon(
-                            onPressed: () {
-                              HapticFeedback.selectionClick();
-                              if (state.smartFilter.hasActiveFilters) {
-                                context.read<WallpaperBloc>().add(ResetSmartFilterIntent());
-                              }
-                              context.read<WallpaperBloc>().add(
-                                    const FilterByCategoryIntent('For You'),
-                                  );
-                            },
-                            icon: const Icon(Icons.close_rounded, size: 14, color: Colors.white54),
-                            label: const Text(
-                              'Reset Filter',
-                              style: TextStyle(color: Colors.white54, fontSize: 11),
-                            ),
+                          Row(
+                            children: [
+                              InkWell(
+                                onTap: _toggleGridDensity,
+                                borderRadius: BorderRadius.circular(8),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 4),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        _gridColumns == 3
+                                            ? Icons.view_comfy_rounded
+                                            : Icons.grid_view_rounded,
+                                        size: 15,
+                                        color: AppColors.neonCyan,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        _gridColumns == 3
+                                            ? 'Compact'
+                                            : 'Normal',
+                                        style: const TextStyle(
+                                          color: AppColors.neonCyan,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              TextButton.icon(
+                                onPressed: () {
+                                  HapticFeedback.selectionClick();
+                                  if (state.smartFilter.hasActiveFilters) {
+                                    context
+                                        .read<WallpaperBloc>()
+                                        .add(ResetSmartFilterIntent());
+                                  }
+                                  context.read<WallpaperBloc>().add(
+                                        const FilterByCategoryIntent('For You'),
+                                      );
+                                },
+                                icon: const Icon(Icons.close_rounded,
+                                    size: 14, color: Colors.white54),
+                                label: const Text(
+                                  'Reset Filter',
+                                  style: TextStyle(
+                                      color: Colors.white54, fontSize: 11),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -1155,21 +1213,54 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ),
 
                   // Section 2: Static & AMOLED Wallpapers (Responsive Grid)
-                  const SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(16, 26, 16, 12),
+                      padding: const EdgeInsets.fromLTRB(16, 26, 16, 12),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(Icons.photo_size_select_actual_rounded,
-                              color: AppColors.neonCyan, size: 18),
-                          SizedBox(width: 6),
-                          Text(
-                            'STATIC & 4K AMOLED WALLPAPERS',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.8,
+                          const Row(
+                            children: [
+                              Icon(Icons.photo_size_select_actual_rounded,
+                                  color: AppColors.neonCyan, size: 18),
+                              SizedBox(width: 6),
+                              Text(
+                                'STATIC & 4K AMOLED WALLPAPERS',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ],
+                          ),
+                          InkWell(
+                            onTap: _toggleGridDensity,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 4),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    _gridColumns == 3
+                                        ? Icons.view_comfy_rounded
+                                        : Icons.grid_view_rounded,
+                                    size: 16,
+                                    color: AppColors.neonCyan,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    _gridColumns == 3 ? 'Compact' : 'Normal',
+                                    style: const TextStyle(
+                                      color: AppColors.neonCyan,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -1230,6 +1321,29 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         ),
         child: Stack(
           children: [
+            if (featured.imageUrl != null && featured.imageUrl!.isNotEmpty)
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: CachedWallpaperImage.thumbnail(
+                    imageUrl: featured.imageUrl!,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.35),
+                    Colors.black.withValues(alpha: 0.88),
+                  ],
+                ),
+              ),
+            ),
             Positioned(
               right: -20,
               bottom: -20,
@@ -1366,6 +1480,16 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         ),
         child: Stack(
           children: [
+            if (item.imageUrl != null && item.imageUrl!.isNotEmpty)
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: CachedWallpaperImage.thumbnail(
+                    imageUrl: item.imageUrl!,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
             // Dark gradient overlay
             Container(
               decoration: BoxDecoration(
@@ -1373,7 +1497,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withValues(alpha: 0.85)],
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.85),
+                  ],
                 ),
               ),
             ),
@@ -1442,12 +1569,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   Widget _buildWallpaperGrid(List<MotivationalShort> wallpapers) {
+    final count = _calculateCrossAxisCount(context);
+    final isCompact = count >= 3;
+
     return SliverGrid(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.65,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: count,
+        crossAxisSpacing: isCompact ? 8 : 12,
+        mainAxisSpacing: isCompact ? 8 : 12,
+        childAspectRatio: 0.63,
       ),
       delegate: SliverChildBuilderDelegate(
         (context, index) {
@@ -1462,24 +1592,39 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             },
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(isCompact ? 12 : 16),
                 gradient: LinearGradient(
                   colors: item.gradientColors.isNotEmpty
                       ? item.gradientColors
-                      : [item.accentColor.withValues(alpha: 0.25), Colors.black],
+                      : [
+                          item.accentColor.withValues(alpha: 0.25),
+                          Colors.black
+                        ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 border: Border.all(
                   color: item.accentColor.withValues(alpha: 0.35),
-                  width: 1.2,
+                  width: 1.0,
                 ),
               ),
               child: Stack(
                 children: [
+                  if (item.imageUrl != null && item.imageUrl!.isNotEmpty)
+                    Positioned.fill(
+                      child: ClipRRect(
+                        borderRadius:
+                            BorderRadius.circular(isCompact ? 12 : 16),
+                        child: CachedWallpaperImage.thumbnail(
+                          imageUrl: item.imageUrl!,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius:
+                          BorderRadius.circular(isCompact ? 12 : 16),
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -1491,44 +1636,55 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     ),
                   ),
                   Positioned(
-                    top: 10,
-                    right: 10,
+                    top: isCompact ? 6 : 10,
+                    right: isCompact ? 6 : 10,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (item.isAmoledCertified) ...[
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isCompact ? 4 : 5,
+                              vertical: isCompact ? 2 : 3,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.black.withValues(alpha: 0.75),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius:
+                                  BorderRadius.circular(isCompact ? 6 : 8),
                               border: Border.all(
-                                color: AppColors.auroraEmerald.withValues(alpha: 0.5),
+                                color: AppColors.auroraEmerald
+                                    .withValues(alpha: 0.5),
                                 width: 0.6,
                               ),
                             ),
                             child: Text(
-                              '${item.trueBlackPercentage}% OLED',
-                              style: const TextStyle(
+                              isCompact
+                                  ? 'OLED'
+                                  : '${item.trueBlackPercentage}% OLED',
+                              style: TextStyle(
                                 color: AppColors.auroraEmerald,
-                                fontSize: 8,
+                                fontSize: isCompact ? 7 : 8,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          SizedBox(width: isCompact ? 3 : 4),
                         ],
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isCompact ? 5 : 6,
+                            vertical: isCompact ? 2 : 3,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.black.withValues(alpha: 0.7),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius:
+                                BorderRadius.circular(isCompact ? 8 : 10),
                           ),
                           child: Text(
                             item.isLive ? 'LIVE' : '4K',
                             style: TextStyle(
                               color: item.accentColor,
-                              fontSize: 9,
+                              fontSize: isCompact ? 7.5 : 9,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -1537,29 +1693,31 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     ),
                   ),
                   Positioned(
-                    bottom: 12,
-                    left: 12,
-                    right: 12,
+                    bottom: isCompact ? 8 : 12,
+                    left: isCompact ? 8 : 12,
+                    right: isCompact ? 8 : 12,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           item.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 12,
+                            fontSize: isCompact ? 10.5 : 12,
                             fontWeight: FontWeight.w700,
                           ),
-                          maxLines: 2,
+                          maxLines: isCompact ? 1 : 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 3),
+                        SizedBox(height: isCompact ? 1 : 3),
                         Text(
                           item.category,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white54,
-                            fontSize: 10,
+                            fontSize: isCompact ? 8.5 : 10,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -1598,6 +1756,16 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         ),
         child: Stack(
           children: [
+            if (item.imageUrl != null && item.imageUrl!.isNotEmpty)
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: CachedWallpaperImage.thumbnail(
+                    imageUrl: item.imageUrl!,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),

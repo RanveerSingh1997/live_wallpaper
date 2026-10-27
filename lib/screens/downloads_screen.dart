@@ -5,6 +5,7 @@ import '../blocs/wallpaper_bloc.dart';
 import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import '../core/core.dart';
+import '../widgets/cached_wallpaper_image.dart';
 import 'custom_wallpaper_import_sheet.dart';
 import 'wallpaper_preview_sheet.dart';
 import 'wallpaper_quick_actions_sheet.dart';
@@ -347,13 +348,14 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                                 ),
                               ),
                               alignment: Alignment.center,
-                              child: item.imageUrl != null && item.imageUrl!.isNotEmpty
-                                  ? Image.network(
-                                      item.imageUrl!,
+                              child: item.imageUrl != null &&
+                                      item.imageUrl!.isNotEmpty
+                                  ? CachedWallpaperImage.thumbnail(
+                                      imageUrl: item.imageUrl!,
                                       fit: BoxFit.cover,
                                       width: 50,
                                       height: 60,
-                                      errorBuilder: (_, _, _) => Icon(
+                                      errorWidget: Icon(
                                         Icons.image_rounded,
                                         color: item.accentColor,
                                         size: 20,

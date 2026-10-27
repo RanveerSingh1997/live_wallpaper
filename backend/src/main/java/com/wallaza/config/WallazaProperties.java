@@ -21,9 +21,9 @@ public class WallazaProperties {
     private String apiKey;
 
     /**
-     * Base URL for the Wallaza REST API.
+     * Base URL for the REST API (defaults to Pixabay API).
      */
-    private String baseUrl = "https://api.wallaza.com/v1";
+    private String baseUrl = "https://pixabay.com/api";
 
     /**
      * Connection timeout for outgoing HTTP requests.

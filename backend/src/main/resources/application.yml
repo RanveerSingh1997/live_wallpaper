@@ -7,11 +7,11 @@ spring:
   cache:
     type: caffeine
 
-# Wallaza Client Configuration
+# Wallaza Client Configuration (Pixabay API)
 wallaza:
   enabled: true
-  api-key: ${WALLAZA_API_KEY:demo_key}
-  base-url: ${WALLAZA_BASE_URL:https://api.wallaza.com/v1}
+  api-key: ${WALLAZA_API_KEY:58241521-8a91e1aa8dfce02c3a42eba21}
+  base-url: ${WALLAZA_BASE_URL:https://pixabay.com/api}
   connect-timeout: 5s
   read-timeout: 15s
 

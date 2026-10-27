@@ -11,6 +11,7 @@ import 'collection_detail_sheet.dart';
 import 'create_collection_sheet.dart';
 import 'wallpaper_preview_sheet.dart';
 import 'wallpaper_quick_actions_sheet.dart';
+import '../widgets/cached_wallpaper_image.dart';
 import '../widgets/fluid_pressable.dart';
 
 class CategoriesScreen extends StatefulWidget {
@@ -754,11 +755,17 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     child: GridView.builder(
                       controller: scrollController,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 0.7,
+                      gridDelegate:
+                          SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount:
+                            MediaQuery.of(ctx).size.width >= 1100
+                                ? 5
+                                : MediaQuery.of(ctx).size.width >= 750
+                                    ? 4
+                                    : 3,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                        childAspectRatio: 0.63,
                       ),
                       itemCount: items.length,
                       itemBuilder: (ctx, idx) {
@@ -774,78 +781,129 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
-                              gradient: LinearGradient(
-                                colors: item.gradientColors.isNotEmpty
-                                    ? item.gradientColors
-                                    : [color.withValues(alpha: 0.3), Colors.black],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
                               border: Border.all(
                                 color: item.accentColor.withValues(alpha: 0.35),
                                 width: 1.2,
                               ),
                             ),
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withValues(alpha: 0.6),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        item.isLive ? 'LIVE' : '4K',
-                                        style: TextStyle(
-                                          color: item.accentColor,
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.w800,
-                                        ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: item.gradientColors.isNotEmpty
+                                            ? item.gradientColors
+                                            : [
+                                                color.withValues(alpha: 0.3),
+                                                Colors.black,
+                                              ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
                                       ),
                                     ),
-                                    if (item.isAmoledCertified) ...[
-                                      const SizedBox(width: 4),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 4, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black.withValues(alpha: 0.7),
-                                          borderRadius: BorderRadius.circular(6),
-                                          border: Border.all(
-                                            color: AppColors.auroraEmerald.withValues(alpha: 0.5),
-                                            width: 0.6,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          '${item.trueBlackPercentage}% OLED',
-                                          style: const TextStyle(
-                                            color: AppColors.auroraEmerald,
-                                            fontSize: 8,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  item.title,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
                                   ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
+                                  if (item.imageUrl != null &&
+                                      item.imageUrl!.isNotEmpty)
+                                    Positioned.fill(
+                                      child: CachedWallpaperImage.thumbnail(
+                                        imageUrl: item.imageUrl!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black.withValues(alpha: 0.85),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 5,
+                                                vertical: 2,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black
+                                                    .withValues(alpha: 0.6),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              child: Text(
+                                                item.isLive ? 'LIVE' : '4K',
+                                                style: TextStyle(
+                                                  color: item.accentColor,
+                                                  fontSize: 8,
+                                                  fontWeight: FontWeight.w800,
+                                                ),
+                                              ),
+                                            ),
+                                            if (item.isAmoledCertified) ...[
+                                              const SizedBox(width: 4),
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 4,
+                                                  vertical: 2,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black
+                                                      .withValues(alpha: 0.7),
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                  border: Border.all(
+                                                    color: AppColors
+                                                        .auroraEmerald
+                                                        .withValues(alpha: 0.5),
+                                                    width: 0.6,
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  'OLED',
+                                                  style: const TextStyle(
+                                                    color:
+                                                        AppColors.auroraEmerald,
+                                                    fontSize: 7,
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          item.title,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10.5,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );

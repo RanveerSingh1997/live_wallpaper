@@ -306,11 +306,17 @@ class CollectionDetailSheet extends StatelessWidget {
                     child: GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 0.68,
+                      gridDelegate:
+                          SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount:
+                            MediaQuery.of(context).size.width >= 1100
+                                ? 5
+                                : MediaQuery.of(context).size.width >= 750
+                                    ? 4
+                                    : 3,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                        childAspectRatio: 0.64,
                       ),
                       itemCount: wallpapers.length,
                       itemBuilder: (context, index) {

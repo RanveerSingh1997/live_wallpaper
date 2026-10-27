@@ -1,6 +1,7 @@
 import 'dart:convert';
 import '../core/core.dart';
 import '../models/aura_palette_config.dart';
+import '../models/audio_visualizer_config.dart';
 import '../models/aurora_synthesizer_config.dart';
 import '../models/battery_telemetry_config.dart';
 import '../models/day_night_schedule_config.dart';
@@ -34,6 +35,10 @@ abstract class StudioConfigRepository {
   AuroraSynthesizerConfig getAuroraSynthesizerConfig();
   Future<void> saveAuroraSynthesizerConfig(AuroraSynthesizerConfig config);
   Future<void> resetAuroraSynthesizerConfig();
+
+  AudioVisualizerConfig getAudioVisualizerConfig();
+  Future<void> saveAudioVisualizerConfig(AudioVisualizerConfig config);
+  Future<void> resetAudioVisualizerConfig();
 
   WeatherAtmosphereConfig getWeatherAtmosphereConfig();
   Future<void> saveWeatherAtmosphereConfig(WeatherAtmosphereConfig config);
@@ -211,6 +216,31 @@ class StudioConfigRepositoryImpl implements StudioConfigRepository {
   @override
   Future<void> resetAuroraSynthesizerConfig() async {
     await cache.remove(AppConstants.keyAuroraSynthesizer);
+  }
+
+  // --- Live Audio-Reactive Visualizer ---
+  @override
+  AudioVisualizerConfig getAudioVisualizerConfig() {
+    return cache.getObject<AudioVisualizerConfig>(
+          AppConstants.keyAudioVisualizer,
+          AudioVisualizerConfig.fromJson,
+          fallback: AudioVisualizerConfig.defaultConfig,
+        ) ??
+        AudioVisualizerConfig.defaultConfig;
+  }
+
+  @override
+  Future<void> saveAudioVisualizerConfig(AudioVisualizerConfig config) async {
+    await cache.setObject(
+      AppConstants.keyAudioVisualizer,
+      (c) => c.toJson(),
+      config,
+    );
+  }
+
+  @override
+  Future<void> resetAudioVisualizerConfig() async {
+    await cache.remove(AppConstants.keyAudioVisualizer);
   }
 
   // --- Atmospheric Weather Studio ---

@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../core/core.dart';
+import '../models/audio_spectrum_metrics.dart';
+import '../models/audio_visualizer_config.dart';
 import '../models/aura_palette_config.dart';
 import '../models/aurora_synthesizer_config.dart';
 
@@ -9,6 +11,8 @@ import '../models/aurora_synthesizer_config.dart';
 class AuroraSynthesizerCanvas extends StatefulWidget {
   final AuroraSynthesizerConfig config;
   final AuraPaletteConfig auraConfig;
+  final AudioSpectrumMetrics? audioSpectrumMetrics;
+  final AudioVisualizerConfig? audioVisualizerConfig;
   final Widget? child;
   final bool interactive;
 
@@ -16,6 +20,8 @@ class AuroraSynthesizerCanvas extends StatefulWidget {
     super.key,
     required this.config,
     required this.auraConfig,
+    this.audioSpectrumMetrics,
+    this.audioVisualizerConfig,
     this.child,
     this.interactive = true,
   });
@@ -129,6 +135,8 @@ class _AuroraSynthesizerCanvasState extends State<AuroraSynthesizerCanvas>
                 palette: palette,
                 touchPoint: _touchPoint,
                 touchIntensity: _touchIntensity,
+                audioSpectrumMetrics: widget.audioSpectrumMetrics,
+                audioVisualizerConfig: widget.audioVisualizerConfig,
               ),
               child: child,
             );
@@ -163,6 +171,8 @@ class _AuroraWavePainter extends CustomPainter {
   final List<Color> palette;
   final Offset? touchPoint;
   final double touchIntensity;
+  final AudioSpectrumMetrics? audioSpectrumMetrics;
+  final AudioVisualizerConfig? audioVisualizerConfig;
 
   _AuroraWavePainter({
     required this.time,
@@ -170,6 +180,8 @@ class _AuroraWavePainter extends CustomPainter {
     required this.palette,
     required this.touchPoint,
     required this.touchIntensity,
+    this.audioSpectrumMetrics,
+    this.audioVisualizerConfig,
   });
 
   @override
@@ -179,10 +191,19 @@ class _AuroraWavePainter extends CustomPainter {
 
     if (!config.isEnabled || config.waveCount <= 0) return;
 
+    final bool isAudioActive = audioSpectrumMetrics != null &&
+        !audioSpectrumMetrics!.isSilent &&
+        (audioVisualizerConfig?.isEnabled ?? true);
+    final double intensity = audioVisualizerConfig?.reactiveIntensity ?? 1.0;
+    final double bassMod = isAudioActive ? (audioSpectrumMetrics!.bass * 0.9 * intensity) : 0.0;
+    final double midMod = isAudioActive ? (audioSpectrumMetrics!.mid * 0.8 * intensity) : 0.0;
+    final double trebleMod = isAudioActive ? (audioSpectrumMetrics!.treble * 0.6 * intensity) : 0.0;
+    final bool peakBurst = isAudioActive && audioSpectrumMetrics!.peakDetected;
+
     final waveCount = config.waveCount.clamp(1, 6);
 
     for (int w = 0; w < waveCount; w++) {
-      final speedFactor = config.waveSpeed * (0.8 + (w * 0.25));
+      final speedFactor = config.waveSpeed * (0.8 + (w * 0.25)) * (1.0 + midMod);
       final waveTime = time * speedFactor + (w * 1.5);
       final waveColor = palette[w % palette.length];
 
@@ -195,6 +216,9 @@ class _AuroraWavePainter extends CustomPainter {
             waveCount,
             waveTime,
             waveColor,
+            bassMod: bassMod,
+            trebleMod: trebleMod,
+            peakBurst: peakBurst,
           );
           break;
 
@@ -206,6 +230,9 @@ class _AuroraWavePainter extends CustomPainter {
             waveCount,
             waveTime,
             waveColor,
+            bassMod: bassMod,
+            trebleMod: trebleMod,
+            peakBurst: peakBurst,
           );
           break;
 
@@ -217,6 +244,9 @@ class _AuroraWavePainter extends CustomPainter {
             waveCount,
             waveTime,
             waveColor,
+            bassMod: bassMod,
+            trebleMod: trebleMod,
+            peakBurst: peakBurst,
           );
           break;
 
@@ -228,6 +258,9 @@ class _AuroraWavePainter extends CustomPainter {
             waveCount,
             waveTime,
             waveColor,
+            bassMod: bassMod,
+            trebleMod: trebleMod,
+            peakBurst: peakBurst,
           );
           break;
 
@@ -238,6 +271,8 @@ class _AuroraWavePainter extends CustomPainter {
             w,
             waveCount,
             waveTime,
+            bassMod: bassMod,
+            trebleMod: trebleMod,
           );
           break;
       }
@@ -250,12 +285,15 @@ class _AuroraWavePainter extends CustomPainter {
     int index,
     int total,
     double t,
-    Color color,
-  ) {
+    Color color, {
+    double bassMod = 0.0,
+    double trebleMod = 0.0,
+    bool peakBurst = false,
+  }) {
     final path = Path();
     final baseY = size.height * (0.35 + (index * 0.12));
-    final amp = size.height * 0.12 * config.crestAmplitude;
-    final freq = (config.frequency * 2 * math.pi) / size.width;
+    final amp = size.height * 0.12 * config.crestAmplitude * (1.0 + bassMod);
+    final freq = (config.frequency * (1.0 + trebleMod) * 2 * math.pi) / size.width;
 
     path.moveTo(0, size.height);
     path.lineTo(0, baseY);
@@ -283,13 +321,14 @@ class _AuroraWavePainter extends CustomPainter {
     path.lineTo(size.width, size.height);
     path.close();
 
+    final alphaBoost = peakBurst ? 0.20 : 0.0;
     final paint = Paint()
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          color.withValues(alpha: 0.55 / (index + 1)),
-          color.withValues(alpha: 0.15),
+          color.withValues(alpha: (0.55 / (index + 1) + alphaBoost).clamp(0.1, 0.9)),
+          color.withValues(alpha: (0.15 + (alphaBoost * 0.5)).clamp(0.05, 0.6)),
           Colors.transparent,
         ],
       ).createShader(Offset.zero & size)
@@ -304,12 +343,15 @@ class _AuroraWavePainter extends CustomPainter {
     int index,
     int total,
     double t,
-    Color color,
-  ) {
+    Color color, {
+    double bassMod = 0.0,
+    double trebleMod = 0.0,
+    bool peakBurst = false,
+  }) {
     final path = Path();
     final baseY = size.height * (0.45 + (index * 0.10));
-    final amp = size.height * 0.10 * config.crestAmplitude;
-    final freq = (config.frequency * 3 * math.pi) / size.width;
+    final amp = size.height * 0.10 * config.crestAmplitude * (1.0 + bassMod);
+    final freq = (config.frequency * (1.0 + trebleMod) * 3 * math.pi) / size.width;
 
     const step = 6.0;
     bool first = true;
@@ -328,9 +370,9 @@ class _AuroraWavePainter extends CustomPainter {
 
     // Glow line
     final glowPaint = Paint()
-      ..color = color.withValues(alpha: 0.4)
+      ..color = color.withValues(alpha: peakBurst ? 0.75 : 0.4)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 10.0
+      ..strokeWidth = 10.0 + (trebleMod * 8.0)
       ..maskFilter = MaskFilter.blur(BlurStyle.normal, config.blurSpread * 0.6);
     canvas.drawPath(path, glowPaint);
 
@@ -338,7 +380,7 @@ class _AuroraWavePainter extends CustomPainter {
     final corePaint = Paint()
       ..color = Colors.white.withValues(alpha: 0.9)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
+      ..strokeWidth = peakBurst ? 4.0 : 2.0;
     canvas.drawPath(path, corePaint);
   }
 
@@ -348,12 +390,15 @@ class _AuroraWavePainter extends CustomPainter {
     int index,
     int total,
     double t,
-    Color color,
-  ) {
+    Color color, {
+    double bassMod = 0.0,
+    double trebleMod = 0.0,
+    bool peakBurst = false,
+  }) {
     final path = Path();
     final baseY = size.height * (0.50 + (index * 0.08));
-    final amp = size.height * 0.15 * config.crestAmplitude;
-    final freq = (config.frequency * 1.8 * math.pi) / size.width;
+    final amp = size.height * 0.15 * config.crestAmplitude * (1.0 + bassMod);
+    final freq = (config.frequency * (1.0 + trebleMod) * 1.8 * math.pi) / size.width;
 
     path.moveTo(0, size.height);
     path.lineTo(0, baseY);
@@ -368,13 +413,14 @@ class _AuroraWavePainter extends CustomPainter {
     path.lineTo(size.width, size.height);
     path.close();
 
+    final alphaBoost = peakBurst ? 0.25 : 0.0;
     final paint = Paint()
       ..shader = RadialGradient(
         center: Alignment(0.0, -0.2 + (index * 0.2)),
         radius: 1.1,
         colors: [
-          color.withValues(alpha: 0.45),
-          AppColors.sunsetAmber.withValues(alpha: 0.20),
+          color.withValues(alpha: (0.45 + alphaBoost).clamp(0.2, 0.9)),
+          AppColors.sunsetAmber.withValues(alpha: (0.20 + (alphaBoost * 0.5)).clamp(0.1, 0.7)),
           Colors.transparent,
         ],
       ).createShader(Offset.zero & size)
@@ -389,12 +435,15 @@ class _AuroraWavePainter extends CustomPainter {
     int index,
     int total,
     double t,
-    Color color,
-  ) {
+    Color color, {
+    double bassMod = 0.0,
+    double trebleMod = 0.0,
+    bool peakBurst = false,
+  }) {
     final path = Path();
     final baseY = size.height * (0.40 + (index * 0.12));
-    final amp = size.height * 0.08 * config.crestAmplitude;
-    final freq = (config.frequency * 2.2 * math.pi) / size.width;
+    final amp = size.height * 0.08 * config.crestAmplitude * (1.0 + bassMod);
+    final freq = (config.frequency * (1.0 + trebleMod) * 2.2 * math.pi) / size.width;
 
     path.moveTo(0, size.height);
     path.lineTo(0, baseY);
@@ -407,13 +456,14 @@ class _AuroraWavePainter extends CustomPainter {
     path.lineTo(size.width, size.height);
     path.close();
 
+    final alphaBoost = peakBurst ? 0.20 : 0.0;
     final paint = Paint()
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          color.withValues(alpha: 0.40),
-          AppColors.neonCyan.withValues(alpha: 0.10),
+          color.withValues(alpha: (0.40 + alphaBoost).clamp(0.2, 0.8)),
+          AppColors.neonCyan.withValues(alpha: (0.10 + (alphaBoost * 0.5)).clamp(0.05, 0.5)),
           Colors.transparent,
         ],
       ).createShader(Offset.zero & size)
@@ -427,12 +477,14 @@ class _AuroraWavePainter extends CustomPainter {
     Size size,
     int index,
     int total,
-    double t,
-  ) {
+    double t, {
+    double bassMod = 0.0,
+    double trebleMod = 0.0,
+  }) {
     final path = Path();
     final baseY = size.height * (0.45 + (index * 0.10));
-    final amp = size.height * 0.09 * config.crestAmplitude;
-    final freq = (config.frequency * 2.5 * math.pi) / size.width;
+    final amp = size.height * 0.09 * config.crestAmplitude * (1.0 + bassMod);
+    final freq = (config.frequency * (1.0 + trebleMod) * 2.5 * math.pi) / size.width;
 
     const step = 8.0;
     bool first = true;
@@ -465,6 +517,8 @@ class _AuroraWavePainter extends CustomPainter {
         oldDelegate.config != config ||
         oldDelegate.palette != palette ||
         oldDelegate.touchPoint != touchPoint ||
-        oldDelegate.touchIntensity != touchIntensity;
+        oldDelegate.touchIntensity != touchIntensity ||
+        oldDelegate.audioSpectrumMetrics != audioSpectrumMetrics ||
+        oldDelegate.audioVisualizerConfig != audioVisualizerConfig;
   }
 }

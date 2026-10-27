@@ -6,6 +6,7 @@ import '../blocs/wallpaper_state.dart';
 import '../core/core.dart';
 import '../models/day_night_schedule_config.dart';
 import '../models/motivational_short.dart';
+import '../widgets/cached_wallpaper_image.dart';
 
 /// Modal sheet to configure automated solar Day & Night dynamic wallpaper schedules.
 class DayNightScheduleSheet extends StatelessWidget {
@@ -734,10 +735,9 @@ class DayNightScheduleSheet extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           if (wallpaper.imageUrl != null && wallpaper.imageUrl!.isNotEmpty)
-            Image.asset(
-              wallpaper.imageUrl!,
+            CachedWallpaperImage.thumbnail(
+              imageUrl: wallpaper.imageUrl!,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
             ),
           Center(
             child: Icon(

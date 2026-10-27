@@ -6,6 +6,7 @@ import '../blocs/wallpaper_state.dart';
 import '../core/core.dart';
 import '../models/lock_screen_style_config.dart';
 import '../models/motivational_short.dart';
+import '../widgets/cached_wallpaper_image.dart';
 
 /// Modal sheet to customize and preview lock screen clock typography, layouts, and widgets.
 class LockScreenStudioSheet extends StatefulWidget {
@@ -260,10 +261,9 @@ class _LockScreenStudioSheetState extends State<LockScreenStudioSheet> {
             ),
 
             if (wallpaper?.imageUrl != null && wallpaper!.imageUrl!.isNotEmpty)
-              Image.asset(
-                wallpaper.imageUrl!,
+              CachedWallpaperImage.fullScreen(
+                imageUrl: wallpaper.imageUrl!,
                 fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const SizedBox.shrink(),
               ),
 
             // Subtle dark overlay for contrast

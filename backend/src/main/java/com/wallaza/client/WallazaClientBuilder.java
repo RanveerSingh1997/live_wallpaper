@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 public class WallazaClientBuilder {
 
     private String apiKey;
-    private String baseUrl = "https://api.wallaza.com/v1";
+    private String baseUrl = "https://pixabay.com/api";
     private ObjectMapper objectMapper;
     private RestClient.Builder restClientBuilder;
 

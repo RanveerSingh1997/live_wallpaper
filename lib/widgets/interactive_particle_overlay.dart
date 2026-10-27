@@ -1,18 +1,24 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../models/audio_spectrum_metrics.dart';
+import '../models/audio_visualizer_config.dart';
 import '../models/particle_effect_config.dart';
 
 /// Interactive touch particle overlay that renders real-time kinetic particle FX.
 /// Uses on-demand physics processing to ensure Zero Sleep Overhead and zero battery drain when idle.
 class InteractiveParticleOverlay extends StatefulWidget {
   final ParticleEffectConfig config;
+  final AudioSpectrumMetrics? audioSpectrumMetrics;
+  final AudioVisualizerConfig? audioVisualizerConfig;
   final Widget? child;
   final bool enableTouchGestures;
 
   const InteractiveParticleOverlay({
     super.key,
     required this.config,
+    this.audioSpectrumMetrics,
+    this.audioVisualizerConfig,
     this.child,
     this.enableTouchGestures = true,
   });
@@ -49,6 +55,25 @@ class _InteractiveParticleOverlayState extends State<InteractiveParticleOverlay>
         _spawnTouchBurst(
           Offset(_lastSize.width / 2, _lastSize.height / 2),
           count: 5,
+        );
+      }
+    }
+
+    final audio = widget.audioSpectrumMetrics;
+    final oldAudio = oldWidget.audioSpectrumMetrics;
+    if (audio != null &&
+        widget.config.isEnabled &&
+        (widget.audioVisualizerConfig?.isEnabled ?? true) &&
+        !audio.isSilent) {
+      if (audio.peakDetected &&
+          !(oldAudio?.peakDetected ?? false) &&
+          _lastSize != Size.zero) {
+        final intensity =
+            widget.audioVisualizerConfig?.reactiveIntensity ?? 1.0;
+        _spawnAudioReactiveBurst(
+          Offset(_lastSize.width / 2, _lastSize.height / 2),
+          intensity: intensity,
+          bass: audio.bass,
         );
       }
     }
@@ -158,6 +183,41 @@ class _InteractiveParticleOverlayState extends State<InteractiveParticleOverlay>
           radius: _random.nextDouble() * 4 + 3,
           alpha: widget.config.glowIntensity,
           maxLife: widget.config.lifespanSeconds * 0.8,
+          life: 0,
+          color: preset.accentColor,
+        ),
+      );
+    }
+
+    if (!_controller.isAnimating && widget.config.isEnabled) {
+      _controller.repeat();
+    }
+  }
+
+  void _spawnAudioReactiveBurst(
+    Offset pos, {
+    double intensity = 1.0,
+    double bass = 0.5,
+  }) {
+    final preset = widget.config.preset;
+    final count = ((_random.nextInt(6) + 6) * intensity).clamp(4, 18).toInt();
+    for (int i = 0; i < count; i++) {
+      final angle = _random.nextDouble() * math.pi * 2;
+      final speed = (_random.nextDouble() * 120 + 40) *
+          widget.config.speedMultiplier *
+          (1.0 + bass);
+      final vx = math.cos(angle) * speed;
+      final vy = math.sin(angle) * speed;
+
+      _particles.add(
+        _Particle(
+          x: pos.dx,
+          y: pos.dy,
+          vx: vx,
+          vy: vy,
+          radius: (_random.nextDouble() * 4 + 3) * (1.0 + bass * 0.5),
+          alpha: (widget.config.glowIntensity * (1.0 + bass * 0.3)).clamp(0.2, 1.0),
+          maxLife: widget.config.lifespanSeconds * 0.9,
           life: 0,
           color: preset.accentColor,
         ),

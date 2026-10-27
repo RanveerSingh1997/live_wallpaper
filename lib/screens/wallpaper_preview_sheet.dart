@@ -6,6 +6,7 @@ import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import '../core/core.dart';
 import '../models/motivational_short.dart';
+import '../widgets/cached_wallpaper_image.dart';
 import '../widgets/video_player_item.dart';
 import 'add_to_collection_sheet.dart';
 import 'fullscreen_wallpaper_viewer.dart';
@@ -119,7 +120,7 @@ class WallpaperPreviewSheet extends StatelessWidget {
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
-                            if (wallpaper.isLive)
+                            if (wallpaper.isLive && wallpaper.videoAssetPath.isNotEmpty)
                               VideoPlayerItem(
                                 key: ValueKey('preview_${wallpaper.id}'),
                                 videoAssetPath: wallpaper.videoAssetPath,
@@ -130,6 +131,13 @@ class WallpaperPreviewSheet extends StatelessWidget {
                                       .read<WallpaperBloc>()
                                       .add(ToggleFavoriteIntent(wallpaper.id));
                                 },
+                              )
+                            else if (wallpaper.imageUrl != null &&
+                                wallpaper.imageUrl!.isNotEmpty)
+                              CachedWallpaperImage.fullScreen(
+                                imageUrl: wallpaper.imageUrl!,
+                                fit: BoxFit.cover,
+                                colorFilter: colorFilter,
                               )
                             else
                               ColorFiltered(

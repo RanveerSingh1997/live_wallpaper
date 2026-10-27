@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:live_wallpaper/models/audio_visualizer_config.dart';
 import 'package:live_wallpaper/models/aura_palette_config.dart';
 import 'package:live_wallpaper/models/wallpaper_collection.dart';
 import 'package:live_wallpaper/models/wallpaper_effect_config.dart';
@@ -49,6 +50,11 @@ void main() {
           preset: AuraThemePreset.cyberAurora,
           hueShiftDegrees: 30.0,
         ),
+        audioVisualizerConfig: const AudioVisualizerConfig(
+          isEnabled: true,
+          preset: AudioVisualizerPreset.clubBassDrop,
+          sensitivity: 2.3,
+        ),
         weatherConfig: const WeatherAtmosphereConfig(
           effectType: WeatherEffectType.meteorShower,
           intensity: 0.9,
@@ -71,6 +77,9 @@ void main() {
       expect(restored.customizedQuotes['wall_1'], equals('Be legendary.'));
       expect(restored.customEffects['wall_1']?.colorFilterPreset, equals('cyber_cyan'));
       expect(restored.auraConfig.preset, equals(AuraThemePreset.cyberAurora));
+      expect(restored.audioVisualizerConfig.isEnabled, isTrue);
+      expect(restored.audioVisualizerConfig.preset, equals(AudioVisualizerPreset.clubBassDrop));
+      expect(restored.audioVisualizerConfig.sensitivity, equals(2.3));
       expect(restored.weatherConfig.effectType, equals(WeatherEffectType.meteorShower));
       expect(restored.weatherConfig.intensity, equals(0.9));
       expect(restored.userPreferences, equals({'Cyberpunk', 'AMOLED'}));

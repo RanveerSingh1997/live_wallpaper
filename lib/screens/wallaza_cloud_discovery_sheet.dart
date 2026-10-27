@@ -5,6 +5,7 @@ import '../blocs/wallpaper_intent.dart';
 import '../blocs/wallpaper_state.dart';
 import '../core/core.dart';
 import '../models/wallaza_cloud_wallpaper.dart';
+import '../widgets/cached_wallpaper_image.dart';
 
 /// Modal bottom sheet for discovering, searching, and importing millions of
 /// high-resolution 4K and Ultra-HD wallpapers from the Wallaza Cloud API.
@@ -665,11 +666,16 @@ class _WallazaCloudDiscoverySheetState
                       controller: scrollController,
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                       gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.64,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
+                          SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount:
+                            MediaQuery.of(context).size.width >= 1100
+                                ? 5
+                                : MediaQuery.of(context).size.width >= 750
+                                    ? 4
+                                    : 3,
+                        childAspectRatio: 0.63,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
                       ),
                       itemCount: displayedWallpapers.length,
                       itemBuilder: (context, index) {
@@ -723,129 +729,103 @@ class _CloudWallpaperCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Background Image Preview
-            Image.network(
-              item.thumbnailUrl.isNotEmpty ? item.thumbnailUrl : item.url,
+            // Background Image Preview (Cached & Downsampled)
+            CachedWallpaperImage.thumbnail(
+              imageUrl:
+                  item.thumbnailUrl.isNotEmpty ? item.thumbnailUrl : item.url,
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(
-                color: AppColors.cardHighlight,
-                child: const Center(
-                  child: Icon(Icons.broken_image_rounded,
-                      color: Colors.white24, size: 36),
-                ),
-              ),
-              loadingBuilder: (context, child, progress) {
-                if (progress == null) return child;
-                return Container(
-                  color: AppColors.modalBackground,
-                  child: const Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.neonCyan,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
             ),
 
             // Top Badges (Resolution, Live Motion, AMOLED)
             Positioned(
-              top: 8,
-              left: 8,
-              right: 8,
+              top: 6,
+              left: 6,
+              right: 6,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withAlpha(190),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: item.is4K
-                                ? AppColors.neonCyan.withAlpha(150)
-                                : Colors.white24,
+                  Flexible(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withAlpha(190),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: item.is4K
+                                  ? AppColors.neonCyan.withAlpha(150)
+                                  : Colors.white24,
+                            ),
                           ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.hd_rounded,
-                              size: 11,
+                          child: Text(
+                            item.is4K
+                                ? '4K'
+                                : (item.isVideo ? 'LIVE' : 'HD'),
+                            style: TextStyle(
                               color: item.is4K
                                   ? AppColors.neonCyan
                                   : Colors.white70,
+                              fontSize: 8,
+                              fontWeight: FontWeight.w800,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              item.is4K ? '4K UHD' : 'FHD',
-                              style: TextStyle(
-                                color: item.is4K
-                                    ? AppColors.neonCyan
-                                    : Colors.white70,
-                                fontSize: 9,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (item.isVideo) ...[
-                        const SizedBox(width: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 3),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [AppColors.neonCyan, AppColors.auroraViolet],
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.neonCyan.withValues(alpha: 0.4),
-                                blurRadius: 4,
-                              ),
-                            ],
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.videocam_rounded,
-                                size: 10,
-                                color: Colors.white,
+                        ),
+                        if (item.isVideo) ...[
+                          const SizedBox(width: 3),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 2),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  AppColors.neonCyan,
+                                  AppColors.auroraViolet,
+                                ],
                               ),
-                              SizedBox(width: 3),
-                              Text(
-                                'LIVE 60FPS',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 0.3,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      AppColors.neonCyan.withValues(alpha: 0.4),
+                                  blurRadius: 4,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.videocam_rounded,
+                                  size: 9,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(width: 2),
+                                Text(
+                                  '60FPS',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 7,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
-                  if (item.isAmoled)
+                  if (item.isAmoled) ...[
+                    const SizedBox(width: 3),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 3),
+                          horizontal: 5, vertical: 2),
                       decoration: BoxDecoration(
                         color: Colors.black.withAlpha(210),
                         borderRadius: BorderRadius.circular(8),
@@ -856,11 +836,12 @@ class _CloudWallpaperCard extends StatelessWidget {
                         'OLED',
                         style: TextStyle(
                           color: AppColors.auroraEmerald,
-                          fontSize: 9,
+                          fontSize: 8,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
+                  ],
                 ],
               ),
             ),
@@ -1102,16 +1083,9 @@ class _CloudWallpaperDetailModal extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.network(
-                  item.url,
+                CachedWallpaperImage.fullScreen(
+                  imageUrl: item.url,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => Container(
-                    color: AppColors.cardSurface,
-                    child: const Center(
-                      child: Icon(Icons.broken_image_rounded,
-                          color: Colors.white30, size: 48),
-                    ),
-                  ),
                 ),
                 if (item.isVideo)
                   Center(

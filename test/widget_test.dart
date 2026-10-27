@@ -7,6 +7,10 @@ import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
 import 'package:live_wallpaper/repositories/wallpaper_repository.dart';
 import 'package:live_wallpaper/models/aura_palette_config.dart';
+import 'package:live_wallpaper/models/audio_spectrum_metrics.dart';
+import 'package:live_wallpaper/models/audio_visualizer_config.dart';
+import 'package:live_wallpaper/screens/audio_visualizer_sheet.dart';
+import 'package:live_wallpaper/widgets/audio_visualizer_meter.dart';
 import 'package:live_wallpaper/models/aurora_synthesizer_config.dart';
 import 'package:live_wallpaper/models/battery_telemetry_config.dart';
 import 'package:live_wallpaper/models/lock_screen_style_config.dart';
@@ -3878,8 +3882,8 @@ void main() {
 
       expect(bloc.state.selectedCloudCategory, 'Live');
 
-      // Verify LIVE 60FPS badge is present in the grid for video wallpapers
-      expect(find.text('LIVE 60FPS'), findsWidgets);
+      // Verify 60FPS badge is present in the grid for video wallpapers
+      expect(find.text('60FPS'), findsWidgets);
 
       // Find and tap on a live motion wallpaper card
       final liveCard = find.text('Neo-Tokyo Holographic Neon Rain');
@@ -3934,6 +3938,190 @@ void main() {
       expect(find.text('NETWORK'), findsOneWidget);
       expect(find.byIcon(Icons.copy_rounded), findsOneWidget);
       expect(find.byIcon(Icons.delete_outline_rounded), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('AudioVisualizerMeter renders 3-band equalizer, peak indicator, and silence badge',
+        (WidgetTester tester) async {
+      const activeMetrics = AudioSpectrumMetrics(
+        bass: 0.85,
+        mid: 0.55,
+        treble: 0.40,
+        overallAmplitude: 0.75,
+        peakDetected: true,
+        isSilent: false,
+      );
+      const activeConfig = AudioVisualizerConfig(isEnabled: true);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AudioVisualizerMeter(
+              metrics: activeMetrics,
+              config: activeConfig,
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('BASS'), findsOneWidget);
+      expect(find.text('MID'), findsOneWidget);
+      expect(find.text('TREBLE'), findsOneWidget);
+      expect(find.text('BEAT PEAK'), findsOneWidget);
+      expect(find.text('20-250 Hz'), findsOneWidget);
+      expect(find.text('250-4k Hz'), findsOneWidget);
+      expect(find.text('4k-20k Hz'), findsOneWidget);
+
+      // Verify zero CPU silence badge when silent
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AudioVisualizerMeter(
+              metrics: AudioSpectrumMetrics.zero,
+              config: AudioVisualizerConfig(isEnabled: true),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.text('SILENT (0 CPU)'), findsOneWidget);
+    });
+
+    testWidgets('AudioVisualizerSheet renders, toggles reactivity, selects presets, and switches capture mode',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          audioVisualizerConfig: const AudioVisualizerConfig(isEnabled: false),
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider<WallpaperBloc>.value(
+          value: bloc,
+          child: const MaterialApp(
+            home: Scaffold(
+              body: AudioVisualizerSheet(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Audio-Reactive Visualizer'), findsOneWidget);
+      expect(find.text('Enable Audio Reactivity'), findsOneWidget);
+      expect(find.text('CAPTURE SOURCE'), findsOneWidget);
+      expect(find.text('REACTIVE PRESETS'), findsOneWidget);
+      expect(find.text('Cosmic Pulse'), findsOneWidget);
+      expect(find.text('Club Bass Drop'), findsOneWidget);
+
+      // Verify Adaptive Switch has activeThumbColor AppColors.neonCyan
+      final switchTileFinder = find.widgetWithText(SwitchListTile, 'Enable Audio Reactivity');
+      expect(switchTileFinder, findsOneWidget);
+      final switchTile = tester.widget<SwitchListTile>(switchTileFinder);
+      expect(switchTile.activeThumbColor, AppColors.neonCyan);
+
+      // Tap enable switch
+      await tester.tap(switchTileFinder);
+      await tester.pumpAndSettle();
+      expect(bloc.state.audioVisualizerConfig.isEnabled, isTrue);
+
+      // Select Club Bass Drop preset
+      await tester.tap(find.text('Club Bass Drop'));
+      await tester.pumpAndSettle();
+      expect(bloc.state.audioVisualizerConfig.preset, AudioVisualizerPreset.clubBassDrop);
+
+      // Select Live Device Audio Input mode
+      await tester.tap(find.text('Live Device Audio Input'));
+      await tester.pumpAndSettle();
+      expect(bloc.state.audioVisualizerConfig.mode, AudioCaptureMode.live);
+
+      // Tap Reset to Defaults
+      await tester.ensureVisible(find.text('Reset Visualizer to Defaults'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Reset Visualizer to Defaults'));
+      for (int i = 0; i < 20 && bloc.state.audioVisualizerConfig.preset != AudioVisualizerPreset.cosmicPulse; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+      expect(bloc.state.audioVisualizerConfig.preset, AudioVisualizerPreset.cosmicPulse);
+
+      // Tap Close button
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pump(const Duration(milliseconds: 50));
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('FullScreenWallpaperViewer toolbar includes Live Audio Visualizer button which opens sheet',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repository = FakeWallpaperRepository(prefs: prefs);
+      final staticIndex = CuratedShortsData.shorts.indexWhere((s) => !s.isLive);
+      final initialIdx = staticIndex >= 0 ? staticIndex : 0;
+      final bloc = WallpaperBloc(
+        repository: repository,
+        initialState: WallpaperState(
+          allShorts: CuratedShortsData.shorts,
+          filteredShorts: CuratedShortsData.shorts,
+          weatherConfig: const WeatherAtmosphereConfig(effectType: WeatherEffectType.none),
+          particleConfig: const ParticleEffectConfig(preset: ParticlePreset.none),
+          audioVisualizerConfig: const AudioVisualizerConfig(isEnabled: true),
+        ),
+      );
+      addTearDown(bloc.close);
+
+      await tester.pumpWidget(
+        BlocProvider<WallpaperBloc>.value(
+          value: bloc,
+          child: MaterialApp(
+            home: FullScreenWallpaperViewer(
+              wallpapers: CuratedShortsData.shorts,
+              initialIndex: initialIdx,
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Find the Audio Visualizer button in the toolbar
+      final visualizerBtn = find.byIcon(Icons.graphic_eq_rounded);
+      expect(visualizerBtn, findsOneWidget);
+
+      // Tap button to open sheet
+      await tester.tap(visualizerBtn);
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Expect sheet title to appear
+      expect(find.text('Audio-Reactive Visualizer'), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox.shrink());
 
       await tester.pumpWidget(const SizedBox.shrink());
     });

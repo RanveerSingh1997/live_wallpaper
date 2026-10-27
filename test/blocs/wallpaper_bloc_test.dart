@@ -4,6 +4,8 @@ import 'package:live_wallpaper/blocs/wallpaper_bloc.dart';
 import 'package:live_wallpaper/blocs/wallpaper_intent.dart';
 import 'package:live_wallpaper/blocs/wallpaper_state.dart';
 import 'package:live_wallpaper/data/curated_shorts_data.dart';
+import 'package:live_wallpaper/models/audio_spectrum_metrics.dart';
+import 'package:live_wallpaper/models/audio_visualizer_config.dart';
 import 'package:live_wallpaper/models/aura_palette_config.dart';
 import 'package:live_wallpaper/models/aurora_synthesizer_config.dart';
 import 'package:live_wallpaper/models/battery_telemetry_config.dart';
@@ -2143,6 +2145,167 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 20));
 
       expect(bloc.state.message, contains(target.title));
+    });
+
+    group('Live Audio-Reactive Visualizer UDF Tests', () {
+      test('ToggleAudioVisualizerIntent enables audio visualizer and persists to repository', () async {
+        bloc.add(const ToggleAudioVisualizerIntent(true));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        expect(bloc.state.audioVisualizerConfig.isEnabled, isTrue);
+        expect(bloc.state.isAudioCaptureRunning, isTrue);
+        expect(repository.getAudioVisualizerConfig().isEnabled, isTrue);
+
+        bloc.add(const ToggleAudioVisualizerIntent(false));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        expect(bloc.state.audioVisualizerConfig.isEnabled, isFalse);
+        expect(bloc.state.isAudioCaptureRunning, isFalse);
+        expect(bloc.state.audioSpectrumMetrics, equals(AudioSpectrumMetrics.zero));
+        expect(repository.getAudioVisualizerConfig().isEnabled, isFalse);
+      });
+
+      test('UpdateAudioVisualizerConfigIntent updates parameters and persists', () async {
+        const customConfig = AudioVisualizerConfig(
+          isEnabled: true,
+          mode: AudioCaptureMode.simulated,
+          preset: AudioVisualizerPreset.custom,
+          sensitivity: 2.2,
+          smoothingFactor: 0.35,
+          frequencyFocus: AudioFrequencyFocus.bassCentric,
+          reactiveIntensity: 1.8,
+        );
+
+        bloc.add(const UpdateAudioVisualizerConfigIntent(customConfig));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        expect(bloc.state.audioVisualizerConfig, equals(customConfig));
+        expect(repository.getAudioVisualizerConfig(), equals(customConfig));
+      });
+
+      test('SetAudioCaptureModeIntent switches between simulated and live modes', () async {
+        bloc.add(const SetAudioCaptureModeIntent(AudioCaptureMode.live));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        expect(bloc.state.audioVisualizerConfig.mode, equals(AudioCaptureMode.live));
+        expect(repository.getAudioVisualizerConfig().mode, equals(AudioCaptureMode.live));
+
+        bloc.add(const SetAudioCaptureModeIntent(AudioCaptureMode.simulated));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        expect(bloc.state.audioVisualizerConfig.mode, equals(AudioCaptureMode.simulated));
+        expect(repository.getAudioVisualizerConfig().mode, equals(AudioCaptureMode.simulated));
+      });
+
+      test('SetAudioVisualizerPresetIntent applies predefined preset', () async {
+        bloc.add(const SetAudioVisualizerPresetIntent(AudioVisualizerPreset.clubBassDrop));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        expect(bloc.state.audioVisualizerConfig.preset, equals(AudioVisualizerPreset.clubBassDrop));
+        expect(bloc.state.audioVisualizerConfig.frequencyFocus, equals(AudioFrequencyFocus.bassCentric));
+        expect(bloc.state.audioVisualizerConfig.sensitivity, greaterThan(1.0));
+      });
+
+      test('ResetAudioVisualizerConfigIntent restores default config and zeroes metrics', () async {
+        bloc.add(const UpdateAudioVisualizerConfigIntent(AudioVisualizerConfig(
+          isEnabled: true,
+          sensitivity: 2.5,
+        )));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        expect(bloc.state.audioVisualizerConfig.sensitivity, equals(2.5));
+
+        bloc.add(const ResetAudioVisualizerConfigIntent());
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        expect(bloc.state.audioVisualizerConfig, equals(AudioVisualizerConfig.defaultConfig));
+        expect(bloc.state.audioSpectrumMetrics, equals(AudioSpectrumMetrics.zero));
+        expect(repository.getAudioVisualizerConfig(), equals(AudioVisualizerConfig.defaultConfig));
+      });
+
+      test('AudioSpectrumUpdatedIntent updates spectrum metrics and reactive getters', () async {
+        bloc.add(const UpdateAudioVisualizerConfigIntent(AudioVisualizerConfig(isEnabled: true)));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        const metrics = AudioSpectrumMetrics(
+          bass: 0.8,
+          mid: 0.5,
+          treble: 0.3,
+          overallAmplitude: 0.7,
+          peakDetected: true,
+          isSilent: false,
+        );
+
+        bloc.add(const AudioSpectrumUpdatedIntent(metrics));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        expect(bloc.state.audioSpectrumMetrics, equals(metrics));
+        expect(bloc.state.isAudioReactiveActive, isTrue);
+        expect(bloc.state.effectiveBassEnergy, closeTo(0.8, 0.001));
+        expect(bloc.state.effectiveMidEnergy, closeTo(0.5, 0.001));
+        expect(bloc.state.effectiveTrebleEnergy, closeTo(0.3, 0.001));
+        expect(bloc.state.effectiveOverallAmplitude, closeTo(0.7, 0.001));
+        expect(bloc.state.isAudioPeakActive, isTrue);
+      });
+
+      test('PauseAudioCaptureIntent and ResumeAudioCaptureIntent toggle isAudioCaptureRunning', () async {
+        bloc.add(const ToggleAudioVisualizerIntent(true));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        expect(bloc.state.isAudioCaptureRunning, isTrue);
+
+        bloc.add(const PauseAudioCaptureIntent());
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        expect(bloc.state.isAudioCaptureRunning, isFalse);
+
+        bloc.add(const ResumeAudioCaptureIntent());
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        expect(bloc.state.isAudioCaptureRunning, isTrue);
+      });
+
+      test('LoadFeedIntent initializes audioVisualizerConfig from repository', () async {
+        const savedConfig = AudioVisualizerConfig(
+          isEnabled: true,
+          sensitivity: 1.7,
+          preset: AudioVisualizerPreset.ambientChill,
+        );
+        await repository.saveAudioVisualizerConfig(savedConfig);
+
+        bloc.add(const LoadFeedIntent());
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        expect(bloc.state.audioVisualizerConfig, equals(savedConfig));
+      });
+
+      test('RestoreBackupIntent restores audioVisualizerConfig from bundle', () async {
+        const bundleConfig = AudioVisualizerConfig(
+          isEnabled: true,
+          sensitivity: 2.1,
+          preset: AudioVisualizerPreset.vocalAcoustic,
+        );
+        final bundle = WalloraBackupBundle(
+          exportedAt: DateTime.now(),
+          audioVisualizerConfig: bundleConfig,
+        );
+
+        bloc.add(RestoreBackupIntent(bundle: bundle));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        expect(bloc.state.audioVisualizerConfig, equals(bundleConfig));
+        expect(repository.getAudioVisualizerConfig(), equals(bundleConfig));
+      });
+
+      test('ResetFactoryDefaultsIntent resets audioVisualizerConfig to defaultConfig', () async {
+        bloc.add(const UpdateAudioVisualizerConfigIntent(AudioVisualizerConfig(
+          isEnabled: true,
+          sensitivity: 2.9,
+        )));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        bloc.add(const ResetFactoryDefaultsIntent());
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        expect(bloc.state.audioVisualizerConfig, equals(AudioVisualizerConfig.defaultConfig));
+        expect(repository.getAudioVisualizerConfig(), equals(AudioVisualizerConfig.defaultConfig));
+      });
     });
   });
 }

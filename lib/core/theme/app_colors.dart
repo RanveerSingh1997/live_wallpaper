@@ -40,11 +40,13 @@ abstract final class AppColors {
   // Text & Neutral Shades
   static const Color textPrimary = Color(0xFFFFFFFF);
   static const Color textSecondary = Color(0xB3FFFFFF); // 70%
+  static const Color textMuted = textSecondary;
   static const Color textTertiary = Color(0x61FFFFFF);  // 38%
   static const Color textDisabled = Color(0x3DFFFFFF);  // 24%
 
   // Borders & Specular Highlights
   static const Color borderSubtle = Color(0x1AFFFFFF);  // 10%
+  static const Color glassBorder = borderSubtle;
   static const Color borderMedium = Color(0x1FFFFFFF);  // 12%
   static const Color borderAccent = Color(0xFF00E5FF);
   static const Color specularHighlight = Color(0x33FFFFFF); // 20%

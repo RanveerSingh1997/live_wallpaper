@@ -7,6 +7,7 @@ import '../blocs/wallpaper_state.dart';
 import '../core/core.dart';
 import '../models/motivational_short.dart';
 import '../models/parallax_effect_config.dart';
+import '../widgets/cached_wallpaper_image.dart';
 
 /// Interactive 3D Spatial Parallax Motion Studio.
 /// Allows customizing gyroscopic sensitivity, multi-layer depth separation,
@@ -312,11 +313,11 @@ class _ParallaxStudioSheetState extends State<ParallaxStudioSheet>
                                 end: Alignment.bottomRight,
                               ),
                             ),
-                            child: wallpaper?.imageUrl != null && wallpaper!.imageUrl!.isNotEmpty
-                                ? Image.asset(
-                                    wallpaper.imageUrl!,
+                            child: wallpaper?.imageUrl != null &&
+                                    wallpaper!.imageUrl!.isNotEmpty
+                                ? CachedWallpaperImage.fullScreen(
+                                    imageUrl: wallpaper.imageUrl!,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
                                   )
                                 : null,
                           ),

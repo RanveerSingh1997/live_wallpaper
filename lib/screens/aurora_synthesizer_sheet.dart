@@ -354,6 +354,8 @@ class _AuroraSynthesizerSheetState extends State<AuroraSynthesizerSheet> {
               AuroraSynthesizerCanvas(
                 config: _config,
                 auraConfig: state.auraConfig,
+                audioSpectrumMetrics: state.audioSpectrumMetrics,
+                audioVisualizerConfig: state.audioVisualizerConfig,
                 interactive: true,
               ),
               Positioned(

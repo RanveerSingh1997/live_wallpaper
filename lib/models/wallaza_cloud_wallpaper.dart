@@ -143,8 +143,15 @@ class WallazaCloudWallpaper extends Equatable {
     };
   }
 
-  /// Deserializes a JSON map from Wallaza REST responses
+  /// Deserializes a JSON map from Wallaza REST responses or Pixabay API
   factory WallazaCloudWallpaper.fromJson(Map<String, dynamic> json) {
+    if (json.containsKey('largeImageURL') ||
+        json.containsKey('webformatURL') ||
+        json.containsKey('videos') ||
+        json.containsKey('previewURL')) {
+      return WallazaCloudWallpaper.fromPixabayJson(json);
+    }
+
     final authorMap = json['author'] as Map<String, dynamic>?;
     DateTime? parsedDate;
     if (json['created_at'] != null) {
@@ -184,6 +191,129 @@ class WallazaCloudWallpaper extends Equatable {
       isVideo: isVideoParsed,
       videoStreamUrl: videoUrl,
       durationSeconds: (json['duration'] as num?)?.toInt() ?? 15,
+    );
+  }
+
+  /// Parses a raw hit from the Pixabay API (photos, vectors, illustrations, videos).
+  /// Conforms to https://pixabay.com/api/docs/#api_support
+  factory WallazaCloudWallpaper.fromPixabayJson(Map<String, dynamic> json) {
+    final int id = json['id'] is int
+        ? json['id'] as int
+        : int.tryParse(json['id'].toString()) ?? 0;
+    final String tags = json['tags'] as String? ?? 'wallpaper';
+    final List<String> tagList = tags
+        .split(',')
+        .map((t) => t.trim())
+        .where((t) => t.isNotEmpty)
+        .toList();
+    final String firstTag = tagList.isNotEmpty ? tagList.first : 'Wallpaper';
+    final String title = firstTag.isNotEmpty
+        ? '${firstTag[0].toUpperCase()}${firstTag.substring(1)} Wallpaper'
+        : 'Pixabay Wallpaper';
+
+    final bool isVideo = json.containsKey('videos') ||
+        json['type'] == 'film' ||
+        json['type'] == 'animation';
+
+    String url = '';
+    String thumbnailUrl = '';
+    String? videoUrl;
+    String resolution = '3840x2160';
+    int fileSizeBytes = 3500000;
+    int duration = 0;
+
+    if (isVideo) {
+      final videos = json['videos'] as Map<String, dynamic>?;
+      final large = videos?['large'] as Map<String, dynamic>?;
+      final medium = videos?['medium'] as Map<String, dynamic>?;
+      final small = videos?['small'] as Map<String, dynamic>?;
+
+      videoUrl = large?['url'] as String? ??
+          medium?['url'] as String? ??
+          small?['url'] as String?;
+      thumbnailUrl = large?['thumbnail'] as String? ??
+          medium?['thumbnail'] as String? ??
+          (json['userImageURL'] as String? ?? '');
+      url = thumbnailUrl;
+      final int width = (large?['width'] as num?)?.toInt() ?? 1920;
+      final int height = (large?['height'] as num?)?.toInt() ?? 1080;
+      resolution = '${width}x$height';
+      fileSizeBytes = (large?['size'] as num?)?.toInt() ?? 8000000;
+      duration = (json['duration'] as num?)?.toInt() ?? 15;
+    } else {
+      url = json['largeImageURL'] as String? ??
+          json['fullHDURL'] as String? ??
+          json['imageURL'] as String? ??
+          json['webformatURL'] as String? ??
+          '';
+      thumbnailUrl = json['webformatURL'] as String? ??
+          json['previewURL'] as String? ??
+          url;
+      final int width = (json['imageWidth'] as num?)?.toInt() ?? 3840;
+      final int height = (json['imageHeight'] as num?)?.toInt() ?? 2160;
+      resolution = '${width}x$height';
+      fileSizeBytes = (json['imageSize'] as num?)?.toInt() ?? 3500000;
+    }
+
+    String category = 'Abstract';
+    for (final tag in tagList) {
+      final t = tag.toLowerCase();
+      if (t == 'nature' ||
+          t == 'landscape' ||
+          t == 'mountain' ||
+          t == 'forest' ||
+          t == 'ocean') {
+        category = 'Nature';
+        break;
+      } else if (t == 'space' ||
+          t == 'galaxy' ||
+          t == 'stars' ||
+          t == 'sky' ||
+          t == 'astronomy') {
+        category = 'Space';
+        break;
+      } else if (t == 'cyberpunk' ||
+          t == 'neon' ||
+          t == 'city' ||
+          t == 'urban' ||
+          t == 'technology') {
+        category = 'Cyberpunk';
+        break;
+      } else if (t == 'amoled' ||
+          t == 'dark' ||
+          t == 'black' ||
+          t == 'minimalist') {
+        category = 'AMOLED';
+        break;
+      } else if (t == 'anime' || t == 'illustration' || t == 'art') {
+        category = 'Anime';
+        break;
+      }
+    }
+    if (isVideo && category == 'Abstract') {
+      category = 'Live';
+    }
+
+    return WallazaCloudWallpaper(
+      id: 'pixabay_$id',
+      title: title,
+      description:
+          'Pixabay ${json['type'] ?? (isVideo ? 'video' : 'photo')} by ${json['user'] ?? 'Creator'}',
+      url: url,
+      thumbnailUrl: thumbnailUrl,
+      category: category,
+      tags: tagList,
+      resolution: resolution,
+      fileSizeBytes: fileSizeBytes,
+      downloads: (json['downloads'] as num?)?.toInt() ?? 0,
+      favorites: (json['likes'] as num?)?.toInt() ?? 0,
+      authorName: json['user'] as String? ?? 'Pixabay Artist',
+      authorUsername: json['user'] as String?,
+      authorAvatarUrl: json['userImageURL'] as String?,
+      createdAt: DateTime.now(),
+      isVideo: isVideo,
+      videoStreamUrl: videoUrl,
+      durationSeconds: duration,
     );
   }
 

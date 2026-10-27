@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../models/audio_visualizer_config.dart';
 import '../../models/aura_palette_config.dart';
 import '../../models/aurora_synthesizer_config.dart';
 import '../../models/battery_telemetry_config.dart';
@@ -39,6 +40,7 @@ mixin PortabilityHandlers on Bloc<WallpaperIntent, WallpaperState> {
       final gesture = repository.getGestureControlConfig();
       final standbyDock = repository.getStandbyDockConfig();
       final auroraSynthesizer = repository.getAuroraSynthesizerConfig();
+      final audioVisualizer = repository.getAudioVisualizerConfig();
       final telemetry = repository.getBatteryTelemetryConfig();
       final smartFilter = repository.getSmartFilterConfig();
       final weatherConfig = repository.getWeatherAtmosphereConfig();
@@ -66,6 +68,7 @@ mixin PortabilityHandlers on Bloc<WallpaperIntent, WallpaperState> {
         gestureConfig: gesture,
         standbyDockConfig: standbyDock,
         auroraSynthesizerConfig: auroraSynthesizer,
+        audioVisualizerConfig: audioVisualizer,
         batteryTelemetry: telemetry,
         smartFilter: smartFilter,
         weatherConfig: weatherConfig,
@@ -106,6 +109,7 @@ mixin PortabilityHandlers on Bloc<WallpaperIntent, WallpaperState> {
       gestureConfig: GestureControlConfig.defaultConfig,
       standbyDockConfig: StandbyDockConfig.defaultConfig,
       auroraSynthesizerConfig: AuroraSynthesizerConfig.defaultConfig,
+      audioVisualizerConfig: AudioVisualizerConfig.defaultConfig,
       batteryTelemetry: BatteryTelemetryConfig.defaultConfig,
       smartFilter: SmartFilterConfig.defaultConfig,
       weatherConfig: WeatherAtmosphereConfig.defaultConfig,

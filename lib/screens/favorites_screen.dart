@@ -146,11 +146,18 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                               child: GridView.builder(
                                 physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                                 padding: const EdgeInsets.only(bottom: 96),
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 12,
-                                  mainAxisSpacing: 12,
-                                  childAspectRatio: 0.65,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount:
+                                      MediaQuery.of(context).size.width >= 1100
+                                          ? 5
+                                          : MediaQuery.of(context).size.width >=
+                                                  750
+                                              ? 4
+                                              : 3,
+                                  crossAxisSpacing: 8,
+                                  mainAxisSpacing: 8,
+                                  childAspectRatio: 0.63,
                                 ),
                                 itemCount: (_filter == 'Live'
                                         ? favorites.where((s) => s.isLive).toList()

@@ -23,9 +23,23 @@ mixin CloudHandlers on Bloc<WallpaperIntent, WallpaperState> {
         page: event.page,
         category: cat,
       );
+      final existingIds = state.allShorts.map((s) => s.id).toSet();
+      final newShorts = items
+          .map((w) => w.toMotivationalShort())
+          .where((s) => !existingIds.contains(s.id))
+          .toList();
+      final updatedAll = [...state.allShorts, ...newShorts];
+      final updatedFiltered = WallpaperFeedFilter.filterShorts(
+        allShorts: updatedAll,
+        category: state.selectedCategory,
+        preferences: state.userPreferences,
+        smartFilter: state.smartFilter,
+      );
       emit(state.copyWith(
         isCloudLoading: false,
         cloudWallpapers: items,
+        allShorts: updatedAll,
+        filteredShorts: updatedFiltered,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -53,9 +67,23 @@ mixin CloudHandlers on Bloc<WallpaperIntent, WallpaperState> {
         resolution: res,
         page: event.page,
       );
+      final existingIds = state.allShorts.map((s) => s.id).toSet();
+      final newShorts = items
+          .map((w) => w.toMotivationalShort())
+          .where((s) => !existingIds.contains(s.id))
+          .toList();
+      final updatedAll = [...state.allShorts, ...newShorts];
+      final updatedFiltered = WallpaperFeedFilter.filterShorts(
+        allShorts: updatedAll,
+        category: state.selectedCategory,
+        preferences: state.userPreferences,
+        smartFilter: state.smartFilter,
+      );
       emit(state.copyWith(
         isCloudLoading: false,
         cloudWallpapers: items,
+        allShorts: updatedAll,
+        filteredShorts: updatedFiltered,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -71,7 +99,9 @@ mixin CloudHandlers on Bloc<WallpaperIntent, WallpaperState> {
   ) async {
     try {
       final imported = await repository.importCloudWallpaper(event.wallpaper);
-      final all = repository.getCuratedShorts();
+      final existing =
+          state.allShorts.where((s) => s.id != imported.id).toList();
+      final all = [imported, ...existing];
       final updatedFiltered = WallpaperFeedFilter.filterShorts(
         allShorts: all,
         category: state.selectedCategory,

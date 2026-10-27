@@ -7,6 +7,7 @@ import '../blocs/wallpaper_state.dart';
 import '../core/core.dart';
 import '../data/curated_shorts_data.dart';
 import '../models/motivational_short.dart';
+import '../widgets/cached_wallpaper_image.dart';
 import '../widgets/interactive_gesture_canvas.dart';
 import '../widgets/kinetic_quote_overlay.dart';
 import '../widgets/shorts_action_rail.dart';
@@ -186,16 +187,38 @@ class _ShortsFeedScreenState extends State<ShortsFeedScreen> {
                   final content = Stack(
                     fit: StackFit.expand,
                     children: [
-                      // Video Player (loops seamlessly)
-                      VideoPlayerItem(
-                        key: ValueKey(short.id),
-                        videoAssetPath: short.videoAssetPath,
-                        isActive: isPageActive,
-                        isMuted: state.isFeedMuted,
-                        onDoubleTapLike: () {
-                          context.read<WallpaperBloc>().add(ToggleFavoriteIntent(short.id));
-                        },
-                      ),
+                      // Video Player (loops seamlessly) or High-Res Image
+                      if (short.isLive && short.videoAssetPath.isNotEmpty)
+                        VideoPlayerItem(
+                          key: ValueKey(short.id),
+                          videoAssetPath: short.videoAssetPath,
+                          isActive: isPageActive,
+                          isMuted: state.isFeedMuted,
+                          onDoubleTapLike: () {
+                            context.read<WallpaperBloc>().add(ToggleFavoriteIntent(short.id));
+                          },
+                        )
+                      else if (short.imageUrl != null &&
+                          short.imageUrl!.isNotEmpty)
+                        CachedWallpaperImage.fullScreen(
+                          imageUrl: short.imageUrl!,
+                          fit: BoxFit.cover,
+                        )
+                      else
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: short.gradientColors.isNotEmpty
+                                  ? short.gradientColors
+                                  : [
+                                      short.accentColor.withValues(alpha: 0.4),
+                                      Colors.black,
+                                    ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                          ),
+                        ),
 
                       // Interactive Touch Ripples, Sparks & Gesture Triggers Layer
                       InteractiveGestureCanvas(

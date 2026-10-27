@@ -39,8 +39,17 @@ abstract final class AppConstants {
   static const String keyStandbyDock = 'standby_dock_config';
   static const String keyAuroraSynthesizer = 'aurora_synthesizer_config';
   static const String keyWeatherAtmosphere = 'wallora_weather_atmosphere_config';
+  static const String keyAudioVisualizer = 'wallora_audio_visualizer_config';
+  static const String prefsKeyAudioVisualizerConfig = keyAudioVisualizer;
   static const String keyPublishedBlueprints = 'wallora_published_blueprints';
   static const String keyLikedBlueprintIds = 'wallora_liked_blueprint_ids';
+
+  // Pixabay API Configuration
+  static const String defaultPixabayApiKey = '58241521-8a91e1aa8dfce02c3a42eba21';
+  static const String pixabayApiKey = String.fromEnvironment(
+    'PIXABAY_API_KEY',
+    defaultValue: defaultPixabayApiKey,
+  );
 
   // Animation Timings & Durations
   static const Duration splashDelay = Duration(milliseconds: 2200);

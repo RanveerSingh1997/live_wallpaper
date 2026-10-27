@@ -53,6 +53,7 @@ class DataPortabilityRepositoryImpl implements DataPortabilityRepository {
       gestureConfig: studioRepo.getGestureControlConfig(),
       standbyDockConfig: studioRepo.getStandbyDockConfig(),
       auroraSynthesizerConfig: studioRepo.getAuroraSynthesizerConfig(),
+      audioVisualizerConfig: studioRepo.getAudioVisualizerConfig(),
       batteryTelemetry: studioRepo.getBatteryTelemetryConfig(),
       smartFilter: studioRepo.getSmartFilterConfig(),
       weatherConfig: studioRepo.getWeatherAtmosphereConfig(),
@@ -116,6 +117,7 @@ class DataPortabilityRepositoryImpl implements DataPortabilityRepository {
       await studioRepo.saveGestureControlConfig(bundle.gestureConfig);
       await studioRepo.saveStandbyDockConfig(bundle.standbyDockConfig);
       await studioRepo.saveAuroraSynthesizerConfig(bundle.auroraSynthesizerConfig);
+      await studioRepo.saveAudioVisualizerConfig(bundle.audioVisualizerConfig);
       await studioRepo.saveBatteryTelemetryConfig(bundle.batteryTelemetry);
       await studioRepo.saveSmartFilterConfig(bundle.smartFilter);
       await studioRepo.saveWeatherAtmosphereConfig(bundle.weatherConfig);
@@ -146,6 +148,7 @@ class DataPortabilityRepositoryImpl implements DataPortabilityRepository {
     await cache.remove(AppConstants.keyGestureControl);
     await cache.remove(AppConstants.keyStandbyDock);
     await cache.remove(AppConstants.keyAuroraSynthesizer);
+    await cache.remove(AppConstants.keyAudioVisualizer);
     await cache.remove(AppConstants.keyWeatherAtmosphere);
     await cache.remove(AppConstants.keySmartFilter);
     await cache.remove(AppConstants.keyBatteryTelemetry);

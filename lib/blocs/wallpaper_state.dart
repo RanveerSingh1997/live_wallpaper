@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 import '../data/curated_shorts_data.dart';
+import '../models/audio_spectrum_metrics.dart';
+import '../models/audio_visualizer_config.dart';
 import '../models/aura_palette_config.dart';
 import '../models/aurora_synthesizer_config.dart';
 import '../models/battery_telemetry_config.dart';
@@ -47,6 +49,9 @@ class WallpaperState extends Equatable {
   final GestureControlConfig gestureConfig;
   final StandbyDockConfig standbyDockConfig;
   final AuroraSynthesizerConfig auroraSynthesizerConfig;
+  final AudioVisualizerConfig audioVisualizerConfig;
+  final AudioSpectrumMetrics audioSpectrumMetrics;
+  final bool isAudioCaptureRunning;
   final SmartFilterConfig smartFilter;
   final BatteryTelemetryConfig batteryTelemetry;
   final WeatherAtmosphereConfig weatherConfig;
@@ -105,6 +110,9 @@ class WallpaperState extends Equatable {
     this.gestureConfig = GestureControlConfig.defaultConfig,
     this.standbyDockConfig = StandbyDockConfig.defaultConfig,
     this.auroraSynthesizerConfig = AuroraSynthesizerConfig.defaultConfig,
+    this.audioVisualizerConfig = AudioVisualizerConfig.defaultConfig,
+    this.audioSpectrumMetrics = AudioSpectrumMetrics.zero,
+    this.isAudioCaptureRunning = false,
     this.smartFilter = SmartFilterConfig.defaultConfig,
     this.batteryTelemetry = BatteryTelemetryConfig.defaultConfig,
     this.weatherConfig = WeatherAtmosphereConfig.defaultConfig,
@@ -151,6 +159,39 @@ class WallpaperState extends Equatable {
     }
     return filteredShorts[activeIndex];
   }
+
+  /// Whether the audio visualizer is actively modulating the wallpaper visuals.
+  bool get isAudioReactiveActive =>
+      audioVisualizerConfig.isEnabled && !audioSpectrumMetrics.isSilent;
+
+  /// Effective Bass energy scaled by reactive intensity, clamped to [0.0, 1.0].
+  double get effectiveBassEnergy => audioVisualizerConfig.isEnabled
+      ? (audioSpectrumMetrics.bass * audioVisualizerConfig.reactiveIntensity)
+          .clamp(0.0, 1.0)
+      : 0.0;
+
+  /// Effective Mid energy scaled by reactive intensity, clamped to [0.0, 1.0].
+  double get effectiveMidEnergy => audioVisualizerConfig.isEnabled
+      ? (audioSpectrumMetrics.mid * audioVisualizerConfig.reactiveIntensity)
+          .clamp(0.0, 1.0)
+      : 0.0;
+
+  /// Effective Treble energy scaled by reactive intensity, clamped to [0.0, 1.0].
+  double get effectiveTrebleEnergy => audioVisualizerConfig.isEnabled
+      ? (audioSpectrumMetrics.treble * audioVisualizerConfig.reactiveIntensity)
+          .clamp(0.0, 1.0)
+      : 0.0;
+
+  /// Effective overall audio amplitude scaled by reactive intensity.
+  double get effectiveOverallAmplitude => audioVisualizerConfig.isEnabled
+      ? (audioSpectrumMetrics.overallAmplitude *
+              audioVisualizerConfig.reactiveIntensity)
+          .clamp(0.0, 1.0)
+      : 0.0;
+
+  /// Whether a transient percussion/kick beat peak is detected on this frame.
+  bool get isAudioPeakActive =>
+      audioVisualizerConfig.isEnabled && audioSpectrumMetrics.peakDetected;
 
   /// Returns the current active solar slot based on system clock.
   DayNightSlot get activeScheduleSlot =>
@@ -362,6 +403,9 @@ class WallpaperState extends Equatable {
     GestureControlConfig? gestureConfig,
     StandbyDockConfig? standbyDockConfig,
     AuroraSynthesizerConfig? auroraSynthesizerConfig,
+    AudioVisualizerConfig? audioVisualizerConfig,
+    AudioSpectrumMetrics? audioSpectrumMetrics,
+    bool? isAudioCaptureRunning,
     SmartFilterConfig? smartFilter,
     BatteryTelemetryConfig? batteryTelemetry,
     WeatherAtmosphereConfig? weatherConfig,
@@ -422,6 +466,12 @@ class WallpaperState extends Equatable {
       standbyDockConfig: standbyDockConfig ?? this.standbyDockConfig,
       auroraSynthesizerConfig:
           auroraSynthesizerConfig ?? this.auroraSynthesizerConfig,
+      audioVisualizerConfig:
+          audioVisualizerConfig ?? this.audioVisualizerConfig,
+      audioSpectrumMetrics:
+          audioSpectrumMetrics ?? this.audioSpectrumMetrics,
+      isAudioCaptureRunning:
+          isAudioCaptureRunning ?? this.isAudioCaptureRunning,
       smartFilter: smartFilter ?? this.smartFilter,
       batteryTelemetry: batteryTelemetry ?? this.batteryTelemetry,
       weatherConfig: weatherConfig ?? this.weatherConfig,
@@ -491,6 +541,9 @@ class WallpaperState extends Equatable {
         gestureConfig,
         standbyDockConfig,
         auroraSynthesizerConfig,
+        audioVisualizerConfig,
+        audioSpectrumMetrics,
+        isAudioCaptureRunning,
         smartFilter,
         batteryTelemetry,
         weatherConfig,

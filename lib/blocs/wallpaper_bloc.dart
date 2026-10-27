@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../core/core.dart';
 import '../repositories/wallpaper_repository.dart';
+import '../services/audio_capture_service.dart';
+import 'handlers/audio_visualizer_handlers.dart';
 import 'handlers/auto_rotation_handlers.dart';
 import 'handlers/cloud_handlers.dart';
 import 'handlers/community_handlers.dart';
@@ -28,14 +30,19 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState>
         StudioHandlers,
         CommunityHandlers,
         PortabilityHandlers,
-        CloudHandlers {
+        CloudHandlers,
+        AudioVisualizerHandlers {
   @override
   final WallpaperFacadeRepository repository;
 
   WallpaperBloc({
     required this.repository,
     WallpaperState? initialState,
+    AudioCaptureService? audioCaptureService,
   }) : super(initialState ?? const WallpaperState()) {
+    if (audioCaptureService != null) {
+      setAudioCaptureService(audioCaptureService);
+    }
     // Feed & Navigation Events
     on<LoadFeedIntent>(onLoadFeed);
     on<ChangeActiveShortIntent>(onChangeActiveShort);
@@ -135,6 +142,22 @@ class WallpaperBloc extends Bloc<WallpaperIntent, WallpaperState>
     on<ClearCloudSearchIntent>(onClearCloudSearch);
     on<UpdateCloudSortIntent>(onUpdateCloudSort);
     on<FilterCloudByAuthorIntent>(onFilterCloudByAuthor);
+
+    // Live Audio-Reactive Visualizer Events
+    on<ToggleAudioVisualizerIntent>(onToggleAudioVisualizer);
+    on<UpdateAudioVisualizerConfigIntent>(onUpdateAudioVisualizerConfig);
+    on<SetAudioCaptureModeIntent>(onSetAudioCaptureMode);
+    on<SetAudioVisualizerPresetIntent>(onSetAudioVisualizerPreset);
+    on<ResetAudioVisualizerConfigIntent>(onResetAudioVisualizerConfig);
+    on<AudioSpectrumUpdatedIntent>(onAudioSpectrumUpdated);
+    on<PauseAudioCaptureIntent>(onPauseAudioCapture);
+    on<ResumeAudioCaptureIntent>(onResumeAudioCapture);
+  }
+
+  @override
+  Future<void> close() async {
+    await stopAudioCapture();
+    return super.close();
   }
 
   @override

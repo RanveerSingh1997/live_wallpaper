@@ -9,8 +9,8 @@ services:
       - "${SERVER_PORT:-8080}:8080"
     environment:
       - SERVER_PORT=8080
-      - WALLAZA_API_KEY=${WALLAZA_API_KEY:-demo_key}
-      - WALLAZA_BASE_URL=${WALLAZA_BASE_URL:-https://api.wallaza.com/v1}
+      - WALLAZA_API_KEY=${WALLAZA_API_KEY:-58241521-8a91e1aa8dfce02c3a42eba21}
+      - WALLAZA_BASE_URL=${WALLAZA_BASE_URL:-https://pixabay.com/api}
       - JAVA_OPTS=${JAVA_OPTS:--XX:+UseG1GC -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError}
     restart: unless-stopped
     healthcheck:

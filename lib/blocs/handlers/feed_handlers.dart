@@ -42,6 +42,7 @@ mixin FeedHandlers on Bloc<WallpaperIntent, WallpaperState> {
       final gestureConfig = repository.getGestureControlConfig();
       final standbyDock = repository.getStandbyDockConfig();
       final auroraSynthesizer = repository.getAuroraSynthesizerConfig();
+      final audioVisualizer = repository.getAudioVisualizerConfig();
       final smartFilter = repository.getSmartFilterConfig();
       final batteryTelemetry = repository.getBatteryTelemetryConfig();
       final weatherConfig = repository.getWeatherAtmosphereConfig();
@@ -53,15 +54,19 @@ mixin FeedHandlers on Bloc<WallpaperIntent, WallpaperState> {
         initialCloud = await repository.fetchCloudWallpapers();
       } catch (_) {}
 
+      final cloudShorts =
+          initialCloud.map((w) => w.toMotivationalShort()).toList();
+      final allShorts = [...shorts, ...cloudShorts];
+
       final forYouList = WallpaperFeedFilter.filterShorts(
-        allShorts: shorts,
+        allShorts: allShorts,
         category: 'For You',
         preferences: preferences,
         smartFilter: smartFilter,
       );
 
       emit(state.copyWith(
-        allShorts: shorts,
+        allShorts: allShorts,
         filteredShorts: forYouList,
         customCollections: customCollections,
         activeIndex: 0,
@@ -80,6 +85,7 @@ mixin FeedHandlers on Bloc<WallpaperIntent, WallpaperState> {
         gestureConfig: gestureConfig,
         standbyDockConfig: standbyDock,
         auroraSynthesizerConfig: auroraSynthesizer,
+        audioVisualizerConfig: audioVisualizer,
         smartFilter: smartFilter,
         batteryTelemetry: batteryTelemetry,
         weatherConfig: weatherConfig,
@@ -113,7 +119,15 @@ mixin FeedHandlers on Bloc<WallpaperIntent, WallpaperState> {
     Emitter<WallpaperState> emit,
   ) {
     if (event.index >= 0 && event.index < state.filteredShorts.length) {
-      emit(state.copyWith(activeIndex: event.index));
+      emit(state.copyWith(
+        activeIndex: event.index,
+        actionStatus: state.actionStatus == WallpaperActionStatus.error
+            ? WallpaperActionStatus.idle
+            : state.actionStatus,
+        errorMessage: state.actionStatus == WallpaperActionStatus.error
+            ? null
+            : state.errorMessage,
+      ));
       repository.prefetchFeed(
         currentIndex: event.index,
         shorts: state.filteredShorts,
@@ -136,17 +150,44 @@ mixin FeedHandlers on Bloc<WallpaperIntent, WallpaperState> {
     emit(state.copyWith(isFeedMuted: !state.isFeedMuted));
   }
 
-  void onSearchWallpapers(
+  Future<void> onSearchWallpapers(
     SearchWallpapersIntent event,
     Emitter<WallpaperState> emit,
-  ) {
+  ) async {
     emit(state.copyWith(searchQuery: event.query));
+
+    final trimmed = event.query.trim();
+    if (trimmed.length >= 2) {
+      try {
+        final results = await repository.searchCloudWallpapers(query: trimmed);
+        if (results.isNotEmpty) {
+          final existingIds = state.allShorts.map((s) => s.id).toSet();
+          final newShorts = results
+              .map((w) => w.toMotivationalShort())
+              .where((s) => !existingIds.contains(s.id))
+              .toList();
+          if (newShorts.isNotEmpty) {
+            final updatedAll = [...state.allShorts, ...newShorts];
+            final updatedFiltered = WallpaperFeedFilter.filterShorts(
+              allShorts: updatedAll,
+              category: state.selectedCategory,
+              preferences: state.userPreferences,
+              smartFilter: state.smartFilter,
+            );
+            emit(state.copyWith(
+              allShorts: updatedAll,
+              filteredShorts: updatedFiltered,
+            ));
+          }
+        }
+      } catch (_) {}
+    }
   }
 
-  void onFilterByCategory(
+  Future<void> onFilterByCategory(
     FilterByCategoryIntent event,
     Emitter<WallpaperState> emit,
-  ) {
+  ) async {
     final filtered = WallpaperFeedFilter.filterShorts(
       allShorts: state.allShorts,
       category: event.category,
@@ -158,7 +199,40 @@ mixin FeedHandlers on Bloc<WallpaperIntent, WallpaperState> {
       selectedCategory: event.category,
       filteredShorts: filtered,
       activeIndex: 0,
+      actionStatus: state.actionStatus == WallpaperActionStatus.error
+          ? WallpaperActionStatus.idle
+          : state.actionStatus,
+      errorMessage: state.actionStatus == WallpaperActionStatus.error
+          ? null
+          : state.errorMessage,
     ));
+
+    if (event.category != 'For You' && event.category != 'All') {
+      try {
+        final cloudItems =
+            await repository.fetchCloudWallpapers(category: event.category);
+        if (cloudItems.isNotEmpty) {
+          final existingIds = state.allShorts.map((s) => s.id).toSet();
+          final newShorts = cloudItems
+              .map((w) => w.toMotivationalShort())
+              .where((s) => !existingIds.contains(s.id))
+              .toList();
+          if (newShorts.isNotEmpty) {
+            final updatedAll = [...state.allShorts, ...newShorts];
+            final updatedFiltered = WallpaperFeedFilter.filterShorts(
+              allShorts: updatedAll,
+              category: event.category,
+              preferences: state.userPreferences,
+              smartFilter: state.smartFilter,
+            );
+            emit(state.copyWith(
+              allShorts: updatedAll,
+              filteredShorts: updatedFiltered,
+            ));
+          }
+        }
+      } catch (_) {}
+    }
   }
 
   Future<void> onToggleAmoledSaverMode(

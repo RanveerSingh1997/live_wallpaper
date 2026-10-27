@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../models/battery_telemetry_config.dart';
 import '../../repositories/wallpaper_repository.dart';
@@ -173,7 +174,9 @@ mixin WallpaperActionHandlers on Bloc<WallpaperIntent, WallpaperState> {
       } else if (status == 'unsupported_platform') {
         emit(state.copyWith(
           actionStatus: WallpaperActionStatus.error,
-          errorMessage: result['message']?.toString() ?? 'Unsupported platform',
+          errorMessage: kIsWeb
+              ? 'Setting live wallpapers directly is supported on Android and iOS. On Web, enjoy full-screen preview and downloading!'
+              : (result['message']?.toString() ?? 'Unsupported platform'),
         ));
       } else {
         emit(state.copyWith(
@@ -246,7 +249,15 @@ mixin WallpaperActionHandlers on Bloc<WallpaperIntent, WallpaperState> {
     if (list.length > 20) {
       list.removeRange(20, list.length);
     }
-    emit(state.copyWith(recentlyViewedIds: list));
+    emit(state.copyWith(
+      recentlyViewedIds: list,
+      actionStatus: state.actionStatus == WallpaperActionStatus.error
+          ? WallpaperActionStatus.idle
+          : state.actionStatus,
+      errorMessage: state.actionStatus == WallpaperActionStatus.error
+          ? null
+          : state.errorMessage,
+    ));
     await repository.recordRecentlyViewed(event.wallpaperId);
   }
 
